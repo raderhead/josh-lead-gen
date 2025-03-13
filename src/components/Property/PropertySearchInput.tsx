@@ -33,7 +33,9 @@ const PropertySearchInput: React.FC<PropertySearchInputProps> = ({
 
   useEffect(() => {
     // Check if Google Maps API is loaded
-    if (!window.google || !window.google.maps || !window.google.maps.places) {
+    if (typeof window.google === 'undefined' || 
+        typeof window.google.maps === 'undefined' || 
+        typeof window.google.maps.places === 'undefined') {
       console.error('Google Maps API not loaded. Check your API key.');
       toast({
         title: "Google Maps API not loaded",
@@ -104,7 +106,7 @@ const PropertySearchInput: React.FC<PropertySearchInputProps> = ({
 
     return () => {
       // Clean up by removing event listeners
-      if (autocompleteRef.current && window.google) {
+      if (autocompleteRef.current && typeof window.google !== 'undefined') {
         google.maps.event.clearInstanceListeners(autocompleteRef.current);
       }
     };
