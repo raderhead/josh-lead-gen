@@ -2,16 +2,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Search, Home, MapPin, DollarSign } from 'lucide-react';
+import { Home, MapPin, DollarSign } from 'lucide-react';
+import PropertySearchInput from '@/components/Property/PropertySearchInput';
 
 const HeroSection = () => {
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const [addressData, setAddressData] = useState<any>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate(`/properties?search=${encodeURIComponent(searchQuery)}`);
+  const handleAddressSelected = (data: any) => {
+    setAddressData(data);
+    // You can optionally navigate here or store the data
   };
 
   return (
@@ -31,23 +31,21 @@ const HeroSection = () => {
           Search the most complete source of homes for sale & real estate near you
         </p>
         
-        <form onSubmit={handleSearch} className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="relative flex items-center bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="absolute left-4 text-gray-400">
-              <Search size={20} />
-            </div>
-            <Input
-              type="text"
-              placeholder="Enter an address, city, or zip code"
-              className="flex-grow pl-12 pr-4 py-4 border-none focus:ring-0 text-lg"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+            <PropertySearchInput 
+              className="flex-grow border-none focus:ring-0 text-lg py-4"
+              onAddressSelected={handleAddressSelected}
             />
-            <Button type="submit" className="m-1 bg-estate-blue hover:bg-estate-dark-blue text-lg px-6 py-6">
+            <Button 
+              type="button" 
+              className="m-1 bg-estate-blue hover:bg-estate-dark-blue text-lg px-6 py-6"
+              onClick={() => navigate(`/properties${addressData ? `?search=${encodeURIComponent(addressData.formattedAddress)}` : ''}`)}
+            >
               Search
             </Button>
           </div>
-        </form>
+        </div>
         
         <div className="flex flex-wrap justify-center gap-4 mt-12">
           <Button 

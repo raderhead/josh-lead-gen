@@ -14,3 +14,16 @@ export function formatCurrency(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+// Define TypeScript types for Google Places API
+export interface GoogleAddressData {
+  formattedAddress: string;
+  streetNumber: string;
+  route: string;
+  locality: string;
+  administrativeAreaLevel1: string;
+  postalCode: string;
+  country: string;
+  lat: number;
+  lng: number;
+}
