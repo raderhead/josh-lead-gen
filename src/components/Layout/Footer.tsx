@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, Mail, Phone, Home, MapPin } from 'lucide-react';
 
@@ -10,7 +9,7 @@ const Footer = () => {
           <div>
             <Link to="/" className="flex items-center">
               <Home className="h-8 w-8 text-estate-blue" />
-              <span className="ml-2 text-xl font-bold text-white">EstateView</span>
+              <span className="ml-2 text-xl font-bold text-white">Abilene Commercial</span>
             </Link>
             <p className="mt-4 text-gray-400">
               Your trusted partner in finding the perfect home in Abilene and surrounding areas.
@@ -70,7 +69,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 text-estate-blue mr-2" />
-                <span className="text-gray-400">info@estateview.com</span>
+                <span className="text-gray-400">info@abilenecommercial.com</span>
               </li>
             </ul>
           </div>
@@ -78,7 +77,7 @@ const Footer = () => {
         
         <div className="border-t border-gray-800 mt-12 pt-8">
           <p className="text-center text-gray-400 text-sm">
-            &copy; {new Date().getFullYear()} EstateView. All rights reserved.
+            &copy; {new Date().getFullYear()} Abilene Commercial. All rights reserved.
           </p>
         </div>
       </div>

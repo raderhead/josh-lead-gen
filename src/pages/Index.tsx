@@ -50,7 +50,7 @@ const Index = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900">What Our Clients Say</h2>
             <p className="mt-4 text-xl text-gray-600">
-              Hear from our satisfied clients about their experience working with EstateView
+              Hear from our satisfied clients about their experience working with Abilene Commercial
             </p>
           </div>
           

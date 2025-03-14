@@ -15,7 +15,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
               <Home className="h-8 w-8 text-estate-blue" />
-              <span className="ml-2 text-xl font-bold text-estate-dark-blue">EstateView</span>
+              <span className="ml-2 text-xl font-bold text-estate-dark-blue">Abilene Commercial</span>
             </Link>
           </div>
           
