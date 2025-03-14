@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Mail, Phone, Calendar, MessageSquare, User } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
+import BuyerQuiz from '@/components/Quiz/BuyerQuiz';
+
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters."
@@ -26,6 +28,7 @@ const formSchema = z.object({
     required_error: "Please select a preferred contact method."
   })
 });
+
 const Contact = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,6 +40,7 @@ const Contact = () => {
       preferredContactMethod: "either"
     }
   });
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
 
@@ -49,6 +53,7 @@ const Contact = () => {
       form.reset();
     }, 1000);
   }
+
   return <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
@@ -155,7 +160,7 @@ const Contact = () => {
               <h2 className="text-xl font-bold text-gray-900 mb-4">Meet Your Agent</h2>
               
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                <img alt="Sarah Johnson" className="w-32 h-32 object-cover rounded-full" src="/lovable-uploads/a4c82100-4d68-4bc5-9bbb-772c16042215.png" />
+                <img alt="Josh Rader" className="w-32 h-32 object-cover rounded-full" src="/lovable-uploads/a4c82100-4d68-4bc5-9bbb-772c16042215.png" />
                 <div>
                   <h3 className="text-lg font-semibold">Josh Rader</h3>
                   <p className="text-gray-600">Licensed Real Estate Agent</p>
@@ -172,6 +177,19 @@ const Contact = () => {
                   <p className="mt-4 text-gray-600">With over 10 years of experience in the Abilene real estate market, Josh has helped hundreds of families find their perfect home.</p>
                 </div>
               </div>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <MessageSquare className="h-5 w-5 text-estate-blue mr-2" />
+                Find Your Perfect Home
+              </h2>
+              
+              <p className="text-gray-600 mb-4">
+                Help us understand your needs better. Take our quick questionnaire to give our agent insights into what you're looking for.
+              </p>
+              
+              <BuyerQuiz />
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-md">
@@ -217,4 +235,6 @@ const Contact = () => {
       </div>
     </Layout>;
 };
+
 export default Contact;
+
