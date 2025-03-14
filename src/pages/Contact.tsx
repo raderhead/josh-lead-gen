@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -10,25 +9,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Mail, Phone, Calendar, MessageSquare, User } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
-
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
+    message: "Name must be at least 2 characters."
   }),
   email: z.string().email({
-    message: "Please enter a valid email address.",
+    message: "Please enter a valid email address."
   }),
   phone: z.string().min(10, {
-    message: "Phone number must be at least 10 digits.",
+    message: "Phone number must be at least 10 digits."
   }),
   message: z.string().min(10, {
-    message: "Message must be at least 10 characters.",
+    message: "Message must be at least 10 characters."
   }),
   preferredContactMethod: z.enum(["email", "phone", "either"], {
-    required_error: "Please select a preferred contact method.",
-  }),
+    required_error: "Please select a preferred contact method."
+  })
 });
-
 const Contact = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,25 +34,22 @@ const Contact = () => {
       email: "",
       phone: "",
       message: "",
-      preferredContactMethod: "either",
-    },
+      preferredContactMethod: "either"
+    }
   });
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    
+
     // Simulate API submission
     setTimeout(() => {
       toast({
         title: "Message Sent",
-        description: "Thank you for contacting us. We'll get back to you soon!",
+        description: "Thank you for contacting us. We'll get back to you soon!"
       });
       form.reset();
     }, 1000);
   }
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Contact Our Agent</h1>
@@ -71,11 +65,9 @@ const Contact = () => {
               
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="name" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>Your Name</FormLabel>
                         <FormControl>
                           <div className="flex">
@@ -84,16 +76,12 @@ const Contact = () => {
                           </div>
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="email" render={({
+                    field
+                  }) => <FormItem>
                           <FormLabel>Email</FormLabel>
                           <FormControl>
                             <div className="flex">
@@ -102,15 +90,11 @@ const Contact = () => {
                             </div>
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                     
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="phone" render={({
+                    field
+                  }) => <FormItem>
                           <FormLabel>Phone</FormLabel>
                           <FormControl>
                             <div className="flex">
@@ -119,78 +103,46 @@ const Contact = () => {
                             </div>
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
                   
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="message" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>Message</FormLabel>
                         <FormControl>
                           <div className="flex">
                             <MessageSquare className="h-5 w-5 text-gray-400 mr-2 mt-1" />
-                            <Textarea 
-                              placeholder="I'm interested in learning more about properties in the Abilene area..." 
-                              className="min-h-32"
-                              {...field} 
-                            />
+                            <Textarea placeholder="I'm interested in learning more about properties in the Abilene area..." className="min-h-32" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
-                  <FormField
-                    control={form.control}
-                    name="preferredContactMethod"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
+                  <FormField control={form.control} name="preferredContactMethod" render={({
+                  field
+                }) => <FormItem className="space-y-3">
                         <FormLabel>Preferred Contact Method</FormLabel>
                         <FormControl>
                           <div className="flex flex-wrap gap-4">
                             <label className="flex items-center space-x-2 cursor-pointer">
-                              <input 
-                                type="radio" 
-                                className="h-4 w-4 text-estate-blue" 
-                                checked={field.value === "email"}
-                                onChange={() => field.onChange("email")}
-                              />
+                              <input type="radio" className="h-4 w-4 text-estate-blue" checked={field.value === "email"} onChange={() => field.onChange("email")} />
                               <span>Email</span>
                             </label>
                             <label className="flex items-center space-x-2 cursor-pointer">
-                              <input 
-                                type="radio" 
-                                className="h-4 w-4 text-estate-blue" 
-                                checked={field.value === "phone"}
-                                onChange={() => field.onChange("phone")}
-                              />
+                              <input type="radio" className="h-4 w-4 text-estate-blue" checked={field.value === "phone"} onChange={() => field.onChange("phone")} />
                               <span>Phone</span>
                             </label>
                             <label className="flex items-center space-x-2 cursor-pointer">
-                              <input 
-                                type="radio" 
-                                className="h-4 w-4 text-estate-blue" 
-                                checked={field.value === "either"}
-                                onChange={() => field.onChange("either")}
-                              />
+                              <input type="radio" className="h-4 w-4 text-estate-blue" checked={field.value === "either"} onChange={() => field.onChange("either")} />
                               <span>Either</span>
                             </label>
                           </div>
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-estate-blue hover:bg-estate-dark-blue"
-                  >
+                  <Button type="submit" className="w-full bg-estate-blue hover:bg-estate-dark-blue">
                     Send Message
                   </Button>
                 </form>
@@ -203,11 +155,7 @@ const Contact = () => {
               <h2 className="text-xl font-bold text-gray-900 mb-4">Meet Your Agent</h2>
               
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                <img 
-                  src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=500" 
-                  alt="Sarah Johnson" 
-                  className="w-32 h-32 object-cover rounded-full"
-                />
+                <img alt="Sarah Johnson" className="w-32 h-32 object-cover rounded-full" src="/lovable-uploads/a4c82100-4d68-4bc5-9bbb-772c16042215.png" />
                 <div>
                   <h3 className="text-lg font-semibold">Sarah Johnson</h3>
                   <p className="text-gray-600">Licensed Real Estate Agent</p>
@@ -269,8 +217,6 @@ const Contact = () => {
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Contact;
