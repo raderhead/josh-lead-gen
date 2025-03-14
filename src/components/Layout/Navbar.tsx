@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Home, Search, BarChart2, Phone } from 'lucide-react';
+import UserMenu from './UserMenu';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,15 +24,19 @@ const Navbar = () => {
             <Link to="/properties" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Properties</Link>
             <Link to="/valuation" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Home Valuation</Link>
             <Link to="/contact" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Contact</Link>
-            <Button className="ml-4 bg-estate-blue hover:bg-estate-dark-blue">
-              (325) 555-1234
-            </Button>
+            <div className="ml-4 flex items-center space-x-2">
+              <Button variant="outline" className="text-estate-blue border-estate-blue">
+                (325) 555-1234
+              </Button>
+              <UserMenu />
+            </div>
           </div>
           
           <div className="md:hidden flex items-center">
+            <UserMenu />
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
+              className="ml-2 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>

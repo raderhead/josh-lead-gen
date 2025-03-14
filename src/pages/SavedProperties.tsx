@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Heart, Trash2 } from "lucide-react";
 import Layout from "@/components/Layout/Layout";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +8,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useUser } from "@/contexts/UserContext";
 
 interface SavedProperty {
   id: string;
@@ -20,6 +21,12 @@ interface SavedProperty {
 const SavedProperties: React.FC = () => {
   const [savedProperties, setSavedProperties] = useState<SavedProperty[]>([]);
   const { toast } = useToast();
+  const { user } = useUser();
+
+  // Redirect if not logged in
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   useEffect(() => {
     // Load saved properties from localStorage
