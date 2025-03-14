@@ -157,7 +157,7 @@ const Contact = () => {
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                 <img alt="Sarah Johnson" className="w-32 h-32 object-cover rounded-full" src="/lovable-uploads/a4c82100-4d68-4bc5-9bbb-772c16042215.png" />
                 <div>
-                  <h3 className="text-lg font-semibold">Sarah Johnson</h3>
+                  <h3 className="text-lg font-semibold">Josh Rader</h3>
                   <p className="text-gray-600">Licensed Real Estate Agent</p>
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center">
