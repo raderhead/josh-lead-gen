@@ -169,9 +169,7 @@ const Contact = () => {
                       <span>sarah.johnson@estateview.com</span>
                     </div>
                   </div>
-                  <p className="mt-4 text-gray-600">
-                    With over 10 years of experience in the Abilene real estate market, Sarah has helped hundreds of families find their perfect home.
-                  </p>
+                  <p className="mt-4 text-gray-600">With over 10 years of experience in the Abilene real estate market, Josh has helped hundreds of families find their perfect home.</p>
                 </div>
               </div>
             </div>
