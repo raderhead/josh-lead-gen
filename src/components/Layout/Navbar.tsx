@@ -20,14 +20,13 @@ const Navbar = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Home</Link>
-            <Link to="/properties" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Properties</Link>
-            <Link to="/valuation" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Home Valuation</Link>
-            <Link to="/contact" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Contact</Link>
-            <div className="ml-4 flex items-center space-x-2">
-              <Button variant="outline" className="text-estate-blue border-estate-blue">
-                (325) 555-1234
-              </Button>
+            <div className="flex space-x-1">
+              <Link to="/" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Home</Link>
+              <Link to="/properties" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Properties</Link>
+              <Link to="/valuation" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Valuation</Link>
+              <Link to="/contact" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Contact</Link>
+            </div>
+            <div className="ml-4 flex items-center">
               <UserMenu />
             </div>
           </div>
@@ -80,7 +79,7 @@ const Navbar = () => {
             >
               <div className="flex items-center">
                 <BarChart2 className="h-5 w-5 mr-3" />
-                Home Valuation
+                Valuation
               </div>
             </Link>
             <Link 
