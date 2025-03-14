@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { 
   Bath, 
   Bed, 
   Calendar, 
   Car, 
+  Heart,
   Home, 
   MapPin, 
   Ruler, 
@@ -24,6 +25,17 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Layout from "@/components/Layout/Layout";
 import { properties } from "@/data/properties";
 import { formatCurrency } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 // Create a custom Pool icon since it's not available in lucide-react
 const Pool = ({ className }: { className?: string }) => (
@@ -46,13 +58,131 @@ const Pool = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Types for our saved properties
+interface SavedProperty {
+  id: string;
+  address: string;
+  price: number;
+  image: string;
+  savedAt: string;
+}
+
+interface ShowingRequest {
+  propertyId: string;
+  date: string;
+  time: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}
+
 const PropertyDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const property = properties.find((p) => p.id === id);
+  const { toast } = useToast();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showingDate, setShowingDate] = useState("");
+  const [showingTime, setShowingTime] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [showingDialogOpen, setShowingDialogOpen] = useState(false);
+
+  // Check if the property is already saved
+  useEffect(() => {
+    if (!property) return;
+    
+    // Get saved properties from localStorage
+    const savedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+    const isAlreadySaved = savedProperties.some((p: SavedProperty) => p.id === property.id);
+    setIsFavorite(isAlreadySaved);
+  }, [property]);
 
   if (!property) {
     return <div>Property not found</div>;
   }
+
+  const toggleFavorite = () => {
+    // Get existing saved properties
+    const savedProperties: SavedProperty[] = JSON.parse(
+      localStorage.getItem("savedProperties") || "[]"
+    );
+
+    if (isFavorite) {
+      // Remove from favorites
+      const updatedProperties = savedProperties.filter(
+        (p: SavedProperty) => p.id !== property.id
+      );
+      localStorage.setItem("savedProperties", JSON.stringify(updatedProperties));
+      setIsFavorite(false);
+      toast({
+        title: "Property removed from favorites",
+        description: "You can add it back anytime.",
+      });
+    } else {
+      // Add to favorites
+      const propertyToSave: SavedProperty = {
+        id: property.id,
+        address: `${property.address.street}, ${property.address.city}`,
+        price: property.price,
+        image: property.images[0],
+        savedAt: new Date().toISOString(),
+      };
+      
+      const updatedProperties = [...savedProperties, propertyToSave];
+      localStorage.setItem("savedProperties", JSON.stringify(updatedProperties));
+      setIsFavorite(true);
+      toast({
+        title: "Property saved to favorites",
+        description: "You can view all your saved properties in your dashboard.",
+      });
+    }
+  };
+
+  const handleRequestShowing = () => {
+    if (!contactName || !contactEmail || !showingDate || !showingTime) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create showing request object
+    const showingRequest: ShowingRequest = {
+      propertyId: property.id,
+      date: showingDate,
+      time: showingTime,
+      name: contactName,
+      email: contactEmail,
+      phone: contactPhone,
+      message: message
+    };
+
+    // Save showing request to localStorage for now
+    const showingRequests = JSON.parse(
+      localStorage.getItem("showingRequests") || "[]"
+    );
+    localStorage.setItem("showingRequests", JSON.stringify([...showingRequests, showingRequest]));
+
+    // Show success toast
+    toast({
+      title: "Showing request sent",
+      description: `An agent will contact you soon to confirm your showing on ${showingDate} at ${showingTime}.`,
+    });
+
+    // Close the dialog and reset form
+    setShowingDialogOpen(false);
+    setShowingDate("");
+    setShowingTime("");
+    setContactName("");
+    setContactEmail("");
+    setContactPhone("");
+    setMessage("");
+  };
 
   return (
     <Layout>
@@ -83,8 +213,20 @@ const PropertyDetail: React.FC = () => {
 
           {/* Property Details */}
           <div>
-            <h1 className="text-2xl font-semibold">{property.address.street}, {property.address.city}</h1>
-            <p className="text-gray-500">{property.address.neighborhood}</p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-semibold">{property.address.street}, {property.address.city}</h1>
+                <p className="text-gray-500">{property.address.neighborhood}</p>
+              </div>
+              <Button 
+                variant={isFavorite ? "default" : "outline"} 
+                size="icon" 
+                onClick={toggleFavorite}
+                className={isFavorite ? "bg-rose-500 hover:bg-rose-600" : ""}
+              >
+                <Heart className={isFavorite ? "fill-white" : ""} />
+              </Button>
+            </div>
             <div className="mt-4 flex items-center space-x-3">
               <Bed className="h-5 w-5" />
               <span>{property.beds} Beds</span>
@@ -134,12 +276,113 @@ const PropertyDetail: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap gap-2">
               <Button asChild>
                 <a href={property.virtualTourUrl} target="_blank" rel="noopener noreferrer">
                   Virtual Tour
                 </a>
               </Button>
+              
+              <Dialog open={showingDialogOpen} onOpenChange={setShowingDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="default">Request Showing</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Request a Showing</DialogTitle>
+                    <DialogDescription>
+                      Fill out the form below to schedule a showing of this property.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-2">
+                        <label htmlFor="name" className="text-sm font-medium">
+                          Full Name*
+                        </label>
+                        <input
+                          id="name"
+                          value={contactName}
+                          onChange={(e) => setContactName(e.target.value)}
+                          className="w-full p-2 border rounded-md mt-1"
+                          required
+                        />
+                      </div>
+                      <div className="col-span-2 md:col-span-1">
+                        <label htmlFor="email" className="text-sm font-medium">
+                          Email*
+                        </label>
+                        <input
+                          id="email"
+                          type="email"
+                          value={contactEmail}
+                          onChange={(e) => setContactEmail(e.target.value)}
+                          className="w-full p-2 border rounded-md mt-1"
+                          required
+                        />
+                      </div>
+                      <div className="col-span-2 md:col-span-1">
+                        <label htmlFor="phone" className="text-sm font-medium">
+                          Phone
+                        </label>
+                        <input
+                          id="phone"
+                          type="tel"
+                          value={contactPhone}
+                          onChange={(e) => setContactPhone(e.target.value)}
+                          className="w-full p-2 border rounded-md mt-1"
+                        />
+                      </div>
+                      <div className="col-span-2 md:col-span-1">
+                        <label htmlFor="date" className="text-sm font-medium">
+                          Preferred Date*
+                        </label>
+                        <input
+                          id="date"
+                          type="date"
+                          value={showingDate}
+                          onChange={(e) => setShowingDate(e.target.value)}
+                          className="w-full p-2 border rounded-md mt-1"
+                          min={new Date().toISOString().split('T')[0]}
+                          required
+                        />
+                      </div>
+                      <div className="col-span-2 md:col-span-1">
+                        <label htmlFor="time" className="text-sm font-medium">
+                          Preferred Time*
+                        </label>
+                        <input
+                          id="time"
+                          type="time"
+                          value={showingTime}
+                          onChange={(e) => setShowingTime(e.target.value)}
+                          className="w-full p-2 border rounded-md mt-1"
+                          required
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label htmlFor="message" className="text-sm font-medium">
+                          Message
+                        </label>
+                        <Textarea
+                          id="message"
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          className="w-full mt-1"
+                          placeholder="Add any additional information or questions..."
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" onClick={handleRequestShowing}>
+                      Submit Request
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              
               <Button variant="secondary">
                 <Share2 className="h-4 w-4 mr-2" /> Share
               </Button>

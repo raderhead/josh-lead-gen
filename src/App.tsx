@@ -10,6 +10,7 @@ import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
 import HomeValuation from "./pages/HomeValuation";
 import Contact from "./pages/Contact";
+import SavedProperties from "./pages/SavedProperties";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/property/:id" element={<PropertyDetail />} />
           <Route path="/valuation" element={<HomeValuation />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/saved-properties" element={<SavedProperties />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
