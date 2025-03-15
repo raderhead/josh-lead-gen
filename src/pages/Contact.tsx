@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -167,11 +168,11 @@ const Contact = () => {
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center">
                       <Phone className="h-5 w-5 text-estate-blue mr-2" />
-                      <span>(325) 555-1234</span>
+                      <span>(325) 665-9244</span>
                     </div>
                     <div className="flex items-center">
                       <Mail className="h-5 w-5 text-estate-blue mr-2" />
-                      <span>sarah.johnson@estateview.com</span>
+                      <span>Josh.Rader@McCullerProperties.com</span>
                     </div>
                   </div>
                   <p className="mt-4 text-gray-600">With over 10 years of experience in the Abilene real estate market, Josh has helped hundreds of families find their perfect home.</p>
@@ -237,4 +238,3 @@ const Contact = () => {
 };
 
 export default Contact;
-
