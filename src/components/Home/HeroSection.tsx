@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, MapPin, DollarSign } from 'lucide-react';
+import { Building, MapPin, DollarSign } from 'lucide-react';
 import PropertySearchInput from '@/components/Property/PropertySearchInput';
 
 const HeroSection = () => {
@@ -19,16 +19,16 @@ const HeroSection = () => {
       <div className="absolute inset-0 overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1470" 
-          alt="Modern luxury home" 
+          alt="Modern commercial property" 
           className="w-full h-full object-cover opacity-30"
         />
       </div>
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-          Find Your Dream Home in Abilene
+          Find Your Ideal Commercial Property in Abilene
         </h1>
         <p className="text-xl text-gray-200 mb-8 max-w-3xl mx-auto">
-          Search the most complete source of homes for sale & real estate near you
+          Search the most complete source of commercial properties for sale & lease near you
         </p>
         
         <div className="max-w-3xl mx-auto">
@@ -55,7 +55,7 @@ const HeroSection = () => {
             className="bg-white/10 text-white border-white/30 hover:bg-white/20 flex items-center gap-2 text-lg py-6 px-8"
             onClick={() => navigate('/properties')}
           >
-            <Home size={20} />
+            <Building size={20} />
             Browse Properties
           </Button>
           <Button 
@@ -64,7 +64,7 @@ const HeroSection = () => {
             onClick={() => navigate('/valuation')}
           >
             <DollarSign size={20} />
-            Home Valuation
+            Property Valuation
           </Button>
           <Button 
             variant="outline" 

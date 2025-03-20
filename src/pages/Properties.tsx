@@ -23,8 +23,8 @@ const Properties = () => {
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Properties for Sale</h1>
-          <p className="text-gray-600 mt-2">Find your perfect home in Abilene and surrounding areas</p>
+          <h1 className="text-3xl font-bold text-gray-900">Commercial Properties</h1>
+          <p className="text-gray-600 mt-2">Find your perfect commercial space in Abilene and surrounding areas</p>
         </div>
 
         {loading ? (

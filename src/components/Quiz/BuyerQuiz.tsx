@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -49,32 +48,32 @@ const quizSteps: QuizStep[] = [
   },
   {
     id: 2,
-    question: "What features are you looking for in a home?",
+    question: "What features are you looking for in a commercial property?",
     description: "Select all that apply",
     type: 'checkbox',
-    options: ['Pool', 'Large yard', 'Garage (2+ cars)', 'Open floor plan', 'Single story', 'Multiple stories', 'Updated kitchen', 'Office/study', 'Guest house', 'Energy efficient']
+    options: ['High visibility', 'Ample parking', 'Loading dock', 'Open floor plan', 'Multiple offices', 'Reception area', 'Kitchen/break room', 'Conference rooms', 'Storage space', 'Energy efficient']
   },
   {
     id: 3,
     question: "What is a comfortable price range?",
     type: 'select',
-    options: ['Under $150,000', '$150,000 - $200,000', '$200,000 - $300,000', '$300,000 - $500,000', '$500,000 - $750,000', '$750,000 - $1,000,000', 'Over $1,000,000']
+    options: ['Under $200,000', '$200,000 - $500,000', '$500,000 - $1,000,000', '$1,000,000 - $2,000,000', '$2,000,000 - $5,000,000', 'Over $5,000,000']
   },
   {
     id: 4,
-    question: "When are you looking to make your purchase?",
+    question: "When are you looking to make your investment?",
     type: 'radio',
     options: ['Immediately (0-3 months)', 'Soon (3-6 months)', 'This year (6-12 months)', 'Just exploring (>12 months)']
   },
   {
     id: 5,
-    question: "Are you a first time buyer, making a second home purchase, or an investor?",
+    question: "Are you a first-time investor, an experienced buyer, or a business owner?",
     type: 'radio',
-    options: ['First time buyer', 'Second home purchase', 'Investor', 'Other']
+    options: ['First-time investor', 'Experienced buyer', 'Business owner', 'Other']
   },
   {
     id: 6,
-    question: "Do you have to sell a home first?",
+    question: "Do you need to sell a property first?",
     type: 'radio',
     options: ['Yes', 'No', 'Not sure yet']
   }
@@ -123,7 +122,6 @@ const BuyerQuiz = () => {
   };
   
   const handleSubmit = () => {
-    // Validate contact info
     if (!name || !email || !phone) {
       toast({
         title: "Missing Information",
@@ -133,7 +131,6 @@ const BuyerQuiz = () => {
       return;
     }
     
-    // Prepare data to send
     const formData = {
       name,
       email,
@@ -149,7 +146,6 @@ const BuyerQuiz = () => {
     
     console.log('Quiz submission:', formData);
     
-    // Reset and close dialog
     setCurrentStep(0);
     setAnswers({});
     setName('');
@@ -320,7 +316,7 @@ const BuyerQuiz = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="w-full bg-estate-blue hover:bg-estate-dark-blue">
-          Take Our Buyer Questionnaire
+          Take Our Commercial Property Questionnaire
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">

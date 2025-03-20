@@ -1,29 +1,29 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, DollarSign, Home, Phone } from "lucide-react";
+import { Search, DollarSign, Building, Phone } from "lucide-react";
 
 const HomeFeatures = () => {
   const features = [
     {
       icon: <Search className="h-8 w-8 text-estate-blue" />,
       title: "Advanced Property Search",
-      description: "Filter homes by location, price, beds, baths, and more to find exactly what you're looking for."
+      description: "Filter commercial properties by location, price, square footage, and more to find exactly what your business needs."
     },
     {
       icon: <DollarSign className="h-8 w-8 text-estate-green" />,
-      title: "Home Valuation Tool",
-      description: "Get an accurate estimate of your home's value based on recent sales and market trends."
+      title: "Property Valuation Tool",
+      description: "Get an accurate estimate of your commercial property's value based on recent sales and market trends."
     },
     {
-      icon: <Home className="h-8 w-8 text-estate-red" />,
+      icon: <Building className="h-8 w-8 text-estate-red" />,
       title: "Featured Listings",
-      description: "Browse our curated selection of premium properties in the most desirable neighborhoods."
+      description: "Browse our curated selection of premium commercial properties in the most desirable business districts."
     },
     {
       icon: <Phone className="h-8 w-8 text-estate-yellow" />,
       title: "Direct Agent Contact",
-      description: "Connect directly with our experienced agents for personalized assistance and advice."
+      description: "Connect directly with our experienced commercial real estate agents for personalized assistance and advice."
     }
   ];
 
@@ -32,9 +32,9 @@ const HomeFeatures = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <Badge className="mb-2 bg-estate-light-blue text-estate-blue hover:bg-estate-light-blue">Our Services</Badge>
-          <h2 className="text-3xl font-bold text-gray-900">Find Your Perfect Home</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Find Your Perfect Commercial Space</h2>
           <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-            EstateView provides all the tools you need to find your dream home or sell your property with ease.
+            Abilene Commercial provides all the tools you need to find your ideal business property or sell your commercial real estate with ease.
           </p>
         </div>
 

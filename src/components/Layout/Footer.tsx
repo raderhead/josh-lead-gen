@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail, Phone, Home, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, Phone, Building, MapPin } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -9,11 +9,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Link to="/" className="flex items-center">
-              <Home className="h-8 w-8 text-estate-blue" />
+              <Building className="h-8 w-8 text-estate-blue" />
               <span className="ml-2 text-xl font-bold text-white">Abilene Commercial</span>
             </Link>
             <p className="mt-4 text-gray-400">
-              Your trusted partner in finding the perfect home in Abilene and surrounding areas.
+              Your trusted partner in finding the perfect commercial property in Abilene and surrounding areas.
             </p>
             <div className="flex space-x-4 mt-6">
               <a href="#" className="text-gray-400 hover:text-white">
@@ -38,7 +38,7 @@ const Footer = () => {
                 <Link to="/properties" className="text-gray-400 hover:text-white">Properties</Link>
               </li>
               <li>
-                <Link to="/valuation" className="text-gray-400 hover:text-white">Home Valuation</Link>
+                <Link to="/valuation" className="text-gray-400 hover:text-white">Property Valuation</Link>
               </li>
               <li>
                 <Link to="/contact" className="text-gray-400 hover:text-white">Contact</Link>

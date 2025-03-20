@@ -5,7 +5,7 @@ import FeaturedListings from '@/components/Home/FeaturedListings';
 import HomeFeatures from '@/components/Home/HomeFeatures';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Phone, BarChart2, User } from 'lucide-react';
+import { Phone, BarChart2, Building } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -17,9 +17,9 @@ const Index = () => {
       {/* Call to Action Section */}
       <section className="py-16 hero-gradient text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Find Your Dream Home?</h2>
+          <h2 className="text-3xl font-bold mb-4">Ready to Find Your Ideal Commercial Property?</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
-            Connect with our experienced real estate agents today and start your home buying or selling journey.
+            Connect with our experienced commercial real estate agents today and start your property search or listing journey.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/contact">
@@ -31,12 +31,12 @@ const Index = () => {
             <Link to="/valuation">
               <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10 flex items-center gap-2">
                 <BarChart2 size={20} />
-                Free Home Valuation
+                Free Property Valuation
               </Button>
             </Link>
             <Link to="/properties">
               <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10 flex items-center gap-2">
-                <User size={20} />
+                <Building size={20} />
                 Browse Properties
               </Button>
             </Link>
@@ -57,19 +57,19 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                quote: "Working with EstateView was a fantastic experience! They helped me find my dream home in less than a month.",
+                quote: "Working with Abilene Commercial was a fantastic experience! They helped us find the perfect retail space in less than a month.",
                 name: "Jennifer Smith",
-                title: "Home Buyer"
+                title: "Business Owner"
               },
               {
-                quote: "The home valuation tool was spot on, and their agent guided me through the selling process with expertise and care.",
+                quote: "The property valuation tool was spot on, and their agent guided me through the selling process with expertise and care.",
                 name: "Michael Johnson",
-                title: "Home Seller"
+                title: "Property Investor"
               },
               {
-                quote: "Their knowledge of the Abilene market is unmatched. The property search tools made finding our new home simple.",
+                quote: "Their knowledge of the Abilene commercial market is unmatched. The property search tools made finding our new office simple.",
                 name: "David Williams",
-                title: "First-time Buyer"
+                title: "CEO"
               }
             ].map((testimonial, index) => (
               <div key={index} className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
