@@ -33,13 +33,15 @@ const HeroSection = () => {
         
         <div className="max-w-3xl mx-auto">
           <div className="relative flex items-center bg-white rounded-lg shadow-lg overflow-hidden">
-            <PropertySearchInput 
-              className="flex-grow border-none focus:ring-0 text-lg py-4"
-              onAddressSelected={handleAddressSelected}
-            />
+            <div className="flex-grow">
+              <PropertySearchInput 
+                className="border-none focus:ring-0 text-lg py-4 w-full"
+                onAddressSelected={handleAddressSelected}
+              />
+            </div>
             <Button 
               type="button" 
-              className="m-1 bg-estate-blue hover:bg-estate-dark-blue text-lg px-6 py-6"
+              className="bg-estate-blue hover:bg-estate-dark-blue text-lg px-6 py-6 rounded-l-none"
               onClick={() => navigate(`/properties${addressData ? `?search=${encodeURIComponent(addressData.formattedAddress)}` : ''}`)}
             >
               Search
