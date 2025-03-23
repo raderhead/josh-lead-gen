@@ -1,5 +1,5 @@
 
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export interface PropertyDetails {
   address: string;
@@ -20,17 +20,58 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
   const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
   
   try {
-    // Send the property details as JSON in the request body
+    // Create a new object for the webhook data
+    const webhookData: Record<string, string | number> = {
+      address: property.address,
+      city: property.city,
+      state: property.state,
+      zip: property.zip,
+      sqft: property.sqft,
+      propertyType: property.propertyType,
+      propertyCondition: property.propertyCondition,
+    };
+    
+    // Only add the feature if it's true, and use descriptive names
+    if (property.isCornerLot) {
+      webhookData.features = "Corner Lot";
+    }
+    
+    if (property.hasParkingLot) {
+      // If features already exists, append to it, otherwise create it
+      if (webhookData.features) {
+        webhookData.features = `${webhookData.features}, Parking Lot`;
+      } else {
+        webhookData.features = "Parking Lot";
+      }
+    }
+    
+    if (property.hasLoadingDock) {
+      if (webhookData.features) {
+        webhookData.features = `${webhookData.features}, Loading Dock`;
+      } else {
+        webhookData.features = "Loading Dock";
+      }
+    }
+    
+    if (property.recentRenovations) {
+      if (webhookData.features) {
+        webhookData.features = `${webhookData.features}, Recent Renovations`;
+      } else {
+        webhookData.features = "Recent Renovations";
+      }
+    }
+    
+    // Send the modified property details as JSON in the request body
     const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(property)
+      body: JSON.stringify(webhookData)
     });
     
     console.log("Webhook response:", response);
-    console.log("Property details sent:", property);
+    console.log("Property details sent:", webhookData);
     
     if (response.ok) {
       console.log("Webhook triggered successfully");
