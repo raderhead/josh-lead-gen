@@ -20,19 +20,13 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
   const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
   
   try {
-    // Construct the URL with query parameters to include all property details
-    const url = new URL(webhookUrl);
-    
-    // Add all property details as query parameters
-    Object.entries(property).forEach(([key, value]) => {
-      url.searchParams.append(key, value.toString());
-    });
-    
-    const response = await fetch(url.toString(), {
-      method: "GET",
+    // Send the property details as JSON in the request body
+    const response = await fetch(webhookUrl, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
-      }
+      },
+      body: JSON.stringify(property)
     });
     
     console.log("Webhook response:", response);
