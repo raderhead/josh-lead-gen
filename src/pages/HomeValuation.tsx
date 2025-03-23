@@ -12,7 +12,6 @@ import { Building, DollarSign, BarChart2, AreaChart, Share2, Info, Clock, PieCha
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AddressAutocomplete from '@/components/AddressAutocomplete';
-import { GoogleAddressData } from '@/lib/utils';
 import { PropertyDetails, ValuationResult, calculatePropertyValuation, triggerValuationWebhook } from '@/utils/valuationUtils';
 
 const formSchema = z.object({
@@ -67,7 +66,6 @@ const propertyConditions = [
 const HomeValuation = () => {
   const [valuationResult, setValuationResult] = useState<ValuationResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [addressData, setAddressData] = useState<GoogleAddressData | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -86,24 +84,8 @@ const HomeValuation = () => {
     },
   });
 
-  const handleAddressSelect = (data: GoogleAddressData | null) => {
-    if (!data) return;
-    
-    setAddressData(data);
-    
-    form.setValue("address", data.formattedAddress);
-    
-    if (data.locality) {
-      form.setValue("city", data.locality);
-    }
-    
-    if (data.administrativeAreaLevel1) {
-      form.setValue("state", data.administrativeAreaLevel1);
-    }
-    
-    if (data.postalCode) {
-      form.setValue("zip", data.postalCode);
-    }
+  const handleAddressSelect = (address: string) => {
+    form.setValue("address", address);
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
