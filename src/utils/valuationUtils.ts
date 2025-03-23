@@ -7,15 +7,11 @@ export interface PropertyDetails {
   state: string;
   zip: string;
   sqft: number;
-  bedrooms: number;
-  bathrooms: number;
-  yearBuilt: number;
-  lotSize?: number;
   propertyType: string;
   propertyCondition: string;
-  hasGarage: boolean;
-  hasPool: boolean;
-  hasBasement: boolean;
+  isCornerLot: boolean;
+  hasParkingLot: boolean;
+  hasLoadingDock: boolean;
   recentRenovations: boolean;
 }
 
@@ -43,24 +39,20 @@ export async function calculatePropertyValuation(property: PropertyDetails): Pro
     setTimeout(() => {
       try {
         // Base value calculation based on location and size
-        const basePricePerSqFt = getBasePricePerSqft(property.city, property.zip);
+        const basePricePerSqFt = getBasePricePerSqft(property.city, property.zip, property.propertyType);
         let baseValue = property.sqft * basePricePerSqFt;
         
         // Adjustments based on property details
-        const bedroomAdjustment = getBedroomValue(property.bedrooms, basePricePerSqFt);
-        const bathroomAdjustment = getBathroomValue(property.bathrooms, basePricePerSqFt);
-        const ageAdjustment = getAgeAdjustment(property.yearBuilt);
         const conditionAdjustment = getConditionAdjustment(property.propertyCondition);
         const featuresAdjustment = getFeaturesAdjustment(property);
+        const locationAdjustment = getLocationAdjustment(property.city, property.isCornerLot);
         
         // Calculate final value
         const estimatedValue = Math.round(
           baseValue + 
-          bedroomAdjustment + 
-          bathroomAdjustment + 
-          ageAdjustment + 
           conditionAdjustment +
-          featuresAdjustment
+          featuresAdjustment +
+          locationAdjustment
         );
         
         // Create a reasonable value range (typically ±5-8%)
@@ -75,20 +67,20 @@ export async function calculatePropertyValuation(property: PropertyDetails): Pro
             low: valueLow,
             high: valueHigh
           },
-          comparableHomes: Math.floor(Math.random() * 8) + 3, // 3-10 comparable homes
+          comparableHomes: Math.floor(Math.random() * 8) + 3, // 3-10 comparable properties
           confidenceScore: Math.floor(Math.random() * 16) + 70, // 70-85% confidence score
           pricePerSqFt: Math.round(estimatedValue / property.sqft),
           marketTrends: {
-            annualGrowth: parseFloat((Math.random() * 7 + 3).toFixed(1)), // 3-10% annual growth
-            averageDaysOnMarket: Math.floor(Math.random() * 20) + 25, // 25-45 days on market
-            listToSaleRatio: parseFloat((Math.random() * 0.05 + 0.94).toFixed(2)) // 94-99% list to sale ratio
+            annualGrowth: parseFloat((Math.random() * 5 + 2).toFixed(1)), // 2-7% annual growth for commercial
+            averageDaysOnMarket: Math.floor(Math.random() * 30) + 60, // 60-90 days on market (commercial takes longer)
+            listToSaleRatio: parseFloat((Math.random() * 0.05 + 0.92).toFixed(2)) // 92-97% list to sale ratio
           }
         });
       } catch (error) {
         console.error("Error calculating valuation:", error);
         toast({
           title: "Valuation Error",
-          description: "There was an error calculating your home's value. Please try again.",
+          description: "There was an error calculating your property's value. Please try again.",
           variant: "destructive"
         });
         
@@ -111,62 +103,55 @@ export async function calculatePropertyValuation(property: PropertyDetails): Pro
 }
 
 // Helper functions for valuation calculation
-function getBasePricePerSqft(city: string, zip: string): number {
-  // In a real app, this would be based on actual market data by location
+function getBasePricePerSqft(city: string, zip: string, propertyType: string): number {
+  // Base prices by city - for commercial properties
   const basePrices: Record<string, number> = {
-    'Abilene': 135,
-    'Dallas': 210,
-    'Austin': 375,
-    'Houston': 180,
-    'San Antonio': 165,
-    'Fort Worth': 190,
-    'El Paso': 130,
-    'Arlington': 175,
-    'Corpus Christi': 155,
-    'Plano': 220
+    'Abilene': 85,
+    'Dallas': 180,
+    'Austin': 250,
+    'Houston': 160,
+    'San Antonio': 120,
+    'Fort Worth': 150,
+    'El Paso': 90,
+    'Arlington': 130,
+    'Corpus Christi': 95,
+    'Plano': 170
+  };
+  
+  // Property type multipliers
+  const typeMultipliers: Record<string, number> = {
+    'Office': 1.3,
+    'Retail': 1.2,
+    'Industrial': 0.8,
+    'Mixed-Use': 1.1,
+    'Warehouse': 0.7,
+    'Restaurant': 1.4,
+    'Medical': 1.5,
+    'Hotel/Motel': 1.2,
+    'Land': 0.5,
+    'Other': 1.0
   };
   
   // Default price if city not found
-  const defaultPrice = 150;
+  const defaultPrice = 100;
   
   // ZIP code premium/discount (would be data-driven in real app)
   const zipPremium = parseInt(zip.substring(0, 2)) % 10 * 5;
   
-  return (basePrices[city] || defaultPrice) + zipPremium;
-}
-
-function getBedroomValue(bedrooms: number, basePricePerSqft: number): number {
-  // Bedrooms typically add non-linear value (3->4 adds less than 2->3)
-  const bedroomValues = [0, 25000, 45000, 60000, 70000, 77000, 83000];
-  return bedroomValues[Math.min(bedrooms, bedroomValues.length - 1)];
-}
-
-function getBathroomValue(bathrooms: number, basePricePerSqft: number): number {
-  // Each bathroom adds significant value
-  return Math.min(bathrooms, 5) * 20000;
-}
-
-function getAgeAdjustment(yearBuilt: number): number {
-  const currentYear = new Date().getFullYear();
-  const age = currentYear - yearBuilt;
+  const basePrice = basePrices[city] || defaultPrice;
+  const typeMultiplier = typeMultipliers[propertyType] || 1.0;
   
-  // Newer homes have less depreciation
-  if (age <= 5) return 25000;
-  if (age <= 10) return 15000;
-  if (age <= 20) return 0;
-  if (age <= 40) return -15000;
-  if (age <= 60) return -25000;
-  return -35000;
+  return (basePrice + zipPremium) * typeMultiplier;
 }
 
 function getConditionAdjustment(condition: string): number {
   // Condition significantly impacts value
   const conditionValues: Record<string, number> = {
-    'Excellent': 40000,
-    'Good': 20000,
+    'Excellent': 100000,
+    'Good': 50000,
     'Average': 0,
-    'Fair': -20000,
-    'Poor': -40000
+    'Fair': -50000,
+    'Poor': -100000
   };
   
   return conditionValues[condition] || 0;
@@ -175,14 +160,24 @@ function getConditionAdjustment(condition: string): number {
 function getFeaturesAdjustment(property: PropertyDetails): number {
   let adjustment = 0;
   
-  if (property.hasGarage) adjustment += 15000;
-  if (property.hasPool) adjustment += 25000;
-  if (property.hasBasement) adjustment += 20000;
-  if (property.recentRenovations) adjustment += 30000;
+  if (property.hasParkingLot) adjustment += 75000;
+  if (property.hasLoadingDock) adjustment += 50000;
+  if (property.recentRenovations) adjustment += 100000;
   
-  // Property type adjustments
-  if (property.propertyType === 'Single Family') adjustment += 10000;
-  if (property.propertyType === 'Condo') adjustment -= 5000;
+  return adjustment;
+}
+
+function getLocationAdjustment(city: string, isCornerLot: boolean): number {
+  // Premium cities get higher adjustments
+  const premiumCities = ['Dallas', 'Austin', 'Houston'];
+  const isPremiumCity = premiumCities.includes(city);
+  
+  let adjustment = 0;
+  
+  // Corner lots are typically more valuable for commercial properties
+  if (isCornerLot) {
+    adjustment += isPremiumCity ? 150000 : 100000;
+  }
   
   return adjustment;
 }

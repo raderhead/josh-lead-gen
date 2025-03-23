@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Building, DollarSign, Home, MapPin, BarChart2, AreaChart, Share2, Info, Clock, PieChart } from 'lucide-react';
+import { Building, DollarSign, BarChart2, AreaChart, Share2, Info, Clock, PieChart } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AddressAutocomplete from '@/components/AddressAutocomplete';
@@ -32,33 +32,27 @@ const formSchema = z.object({
   sqft: z.string().min(3, {
     message: "Square footage must be at least 3 digits.",
   }),
-  bedrooms: z.string().min(1, {
-    message: "Number of bedrooms is required.",
-  }),
-  bathrooms: z.string().min(1, {
-    message: "Number of bathrooms is required.",
-  }),
-  yearBuilt: z.string().min(4, {
-    message: "Year built must be 4 digits.",
-  }),
-  lotSize: z.string().optional(),
   propertyType: z.string({
     required_error: "Please select a property type.",
   }),
   propertyCondition: z.string({
     required_error: "Please select the property condition.",
   }),
-  hasGarage: z.boolean().default(false),
-  hasPool: z.boolean().default(false),
-  hasBasement: z.boolean().default(false),
+  isCornerLot: z.boolean().default(false),
+  hasParkingLot: z.boolean().default(false),
+  hasLoadingDock: z.boolean().default(false),
   recentRenovations: z.boolean().default(false),
 });
 
 const propertyTypes = [
-  "Single Family",
-  "Condo",
-  "Townhouse",
-  "Multi Family",
+  "Office",
+  "Retail",
+  "Industrial",
+  "Mixed-Use",
+  "Warehouse",
+  "Restaurant",
+  "Medical",
+  "Hotel/Motel",
   "Land",
   "Other"
 ];
@@ -84,15 +78,11 @@ const HomeValuation = () => {
       state: "TX",
       zip: "",
       sqft: "",
-      bedrooms: "",
-      bathrooms: "",
-      yearBuilt: "",
-      lotSize: "",
-      propertyType: "Single Family",
+      propertyType: "Office",
       propertyCondition: "Good",
-      hasGarage: false,
-      hasPool: false,
-      hasBasement: false,
+      isCornerLot: false,
+      hasParkingLot: false,
+      hasLoadingDock: false,
       recentRenovations: false,
     },
   });
@@ -129,15 +119,11 @@ const HomeValuation = () => {
         state: values.state,
         zip: values.zip,
         sqft: parseInt(values.sqft),
-        bedrooms: parseInt(values.bedrooms),
-        bathrooms: parseInt(values.bathrooms),
-        yearBuilt: parseInt(values.yearBuilt),
-        lotSize: values.lotSize ? parseFloat(values.lotSize) : undefined,
         propertyType: values.propertyType,
         propertyCondition: values.propertyCondition,
-        hasGarage: values.hasGarage,
-        hasPool: values.hasPool,
-        hasBasement: values.hasBasement,
+        isCornerLot: values.isCornerLot,
+        hasParkingLot: values.hasParkingLot,
+        hasLoadingDock: values.hasLoadingDock,
         recentRenovations: values.recentRenovations,
       };
       
@@ -147,13 +133,13 @@ const HomeValuation = () => {
       
       toast({
         title: "Valuation Complete",
-        description: "Your home valuation has been calculated.",
+        description: "Your commercial property valuation has been calculated.",
       });
     } catch (error) {
       console.error("Valuation error:", error);
       toast({
         title: "Valuation Error",
-        description: "There was an error calculating your home's value. Please try again.",
+        description: "There was an error calculating your property's value. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -165,9 +151,9 @@ const HomeValuation = () => {
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Home Valuation</h1>
+          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Commercial Property Valuation</h1>
           <p className="mt-4 text-lg text-gray-600">
-            Get an accurate estimate of your home's value based on detailed property information and recent market trends.
+            Get an accurate estimate of your commercial property's value based on detailed property information and recent market trends.
           </p>
         </div>
 
@@ -177,7 +163,7 @@ const HomeValuation = () => {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-4">
                   <h2 className="text-xl font-semibold flex items-center">
-                    <MapPin className="h-5 w-5 text-estate-blue mr-2" />
+                    <Building className="h-5 w-5 text-estate-blue mr-2" />
                     Property Location
                   </h2>
                   
@@ -246,7 +232,7 @@ const HomeValuation = () => {
                 
                 <div className="space-y-4 pt-4">
                   <h2 className="text-xl font-semibold flex items-center">
-                    <Home className="h-5 w-5 text-estate-blue mr-2" />
+                    <Building className="h-5 w-5 text-estate-blue mr-2" />
                     Property Details
                   </h2>
                   
@@ -308,79 +294,19 @@ const HomeValuation = () => {
                     />
                   </div>
                 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="sqft"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Square Footage</FormLabel>
-                          <FormControl>
-                            <Input type="number" placeholder="2000" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="lotSize"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Lot Size (acres)</FormLabel>
-                          <FormControl>
-                            <Input type="number" step="0.01" placeholder="0.25" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <FormField
-                      control={form.control}
-                      name="bedrooms"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bedrooms</FormLabel>
-                          <FormControl>
-                            <Input type="number" placeholder="3" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="bathrooms"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bathrooms</FormLabel>
-                          <FormControl>
-                            <Input type="number" step="0.5" placeholder="2" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="yearBuilt"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Year Built</FormLabel>
-                          <FormControl>
-                            <Input type="number" placeholder="2000" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="sqft"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Square Footage</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="2000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
                 
                 <div className="space-y-4 pt-4">
@@ -392,7 +318,7 @@ const HomeValuation = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="hasGarage"
+                      name="isCornerLot"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                           <FormControl>
@@ -402,9 +328,9 @@ const HomeValuation = () => {
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>Garage</FormLabel>
+                            <FormLabel>Corner Lot</FormLabel>
                             <FormDescription>
-                              Property has an attached garage
+                              Property is located on a corner lot
                             </FormDescription>
                           </div>
                         </FormItem>
@@ -413,7 +339,7 @@ const HomeValuation = () => {
                     
                     <FormField
                       control={form.control}
-                      name="hasPool"
+                      name="hasParkingLot"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                           <FormControl>
@@ -423,9 +349,9 @@ const HomeValuation = () => {
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>Swimming Pool</FormLabel>
+                            <FormLabel>Parking Lot</FormLabel>
                             <FormDescription>
-                              Property has a swimming pool
+                              Property includes a parking lot
                             </FormDescription>
                           </div>
                         </FormItem>
@@ -434,7 +360,7 @@ const HomeValuation = () => {
                     
                     <FormField
                       control={form.control}
-                      name="hasBasement"
+                      name="hasLoadingDock"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                           <FormControl>
@@ -444,9 +370,9 @@ const HomeValuation = () => {
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>Basement</FormLabel>
+                            <FormLabel>Loading Dock</FormLabel>
                             <FormDescription>
-                              Property has a basement
+                              Property has a loading dock
                             </FormDescription>
                           </div>
                         </FormItem>
@@ -481,7 +407,7 @@ const HomeValuation = () => {
                   className="w-full bg-estate-blue hover:bg-estate-dark-blue"
                   disabled={loading}
                 >
-                  {loading ? "Calculating..." : "Get Home Valuation"}
+                  {loading ? "Calculating..." : "Get Commercial Property Valuation"}
                 </Button>
               </form>
             </Form>
@@ -559,8 +485,8 @@ const HomeValuation = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600 flex items-center">
-                        <Home className="h-4 w-4 text-estate-blue mr-2" />
-                        Comparable Homes
+                        <Building className="h-4 w-4 text-estate-blue mr-2" />
+                        Comparable Properties
                       </span>
                       <span className="font-medium text-estate-blue">
                         {valuationResult.comparableHomes} properties
@@ -574,24 +500,24 @@ const HomeValuation = () => {
                     Request Professional Valuation
                   </Button>
                   <p className="text-xs text-gray-500 mt-2 text-center">
-                    Get a more detailed valuation from a local real estate expert.
+                    Get a more detailed valuation from a local commercial real estate expert.
                   </p>
                 </div>
               </div>
             ) : (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <Home className="h-5 w-5 text-estate-blue mr-2" />
-                  Why Get a Valuation?
+                  <Building className="h-5 w-5 text-estate-blue mr-2" />
+                  Why Get a Commercial Valuation?
                 </h2>
                 <ul className="space-y-3 text-gray-600">
                   <li className="flex items-start">
                     <span className="bg-estate-blue text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 mt-0.5">1</span>
-                    <span>Understand your home's current market value</span>
+                    <span>Understand your property's current market value</span>
                   </li>
                   <li className="flex items-start">
                     <span className="bg-estate-blue text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 mt-0.5">2</span>
-                    <span>Make informed decisions about selling or refinancing</span>
+                    <span>Make informed decisions about selling or leasing</span>
                   </li>
                   <li className="flex items-start">
                     <span className="bg-estate-blue text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 mt-0.5">3</span>
@@ -599,12 +525,12 @@ const HomeValuation = () => {
                   </li>
                   <li className="flex items-start">
                     <span className="bg-estate-blue text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2 mt-0.5">4</span>
-                    <span>Compare your home to others in the neighborhood</span>
+                    <span>Compare your property to others in the commercial market</span>
                   </li>
                 </ul>
                 <div className="mt-6 p-4 bg-gray-50 rounded-md">
                   <p className="text-sm text-gray-500">
-                    Note: This is an automated estimate and should not replace a professional appraisal or comparative market analysis by a licensed real estate agent.
+                    Note: This is an automated estimate and should not replace a professional appraisal or comparative market analysis by a licensed commercial real estate agent.
                   </p>
                 </div>
               </div>
