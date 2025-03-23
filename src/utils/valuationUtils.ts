@@ -1,3 +1,4 @@
+
 import { toast } from "@/components/ui/use-toast";
 
 export interface PropertyDetails {
@@ -14,28 +15,20 @@ export interface PropertyDetails {
   recentRenovations: boolean;
 }
 
-export interface ValuationResult {
-  estimatedValue: number;
-  valueRange: {
-    low: number;
-    high: number;
-  };
-  comparableHomes: number;
-  confidenceScore: number;
-  pricePerSqFt: number;
-  marketTrends: {
-    annualGrowth: number;
-    averageDaysOnMarket: number;
-    listToSaleRatio: number;
-  };
-}
-
 // Function to trigger the webhook with property details
 export async function triggerValuationWebhook(property: PropertyDetails): Promise<void> {
   const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
   
   try {
-    const response = await fetch(webhookUrl, {
+    // Construct the URL with query parameters to include all property details
+    const url = new URL(webhookUrl);
+    
+    // Add all property details as query parameters
+    Object.entries(property).forEach(([key, value]) => {
+      url.searchParams.append(key, value.toString());
+    });
+    
+    const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -43,6 +36,7 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
     });
     
     console.log("Webhook response:", response);
+    console.log("Property details sent:", property);
     
     if (response.ok) {
       console.log("Webhook triggered successfully");
