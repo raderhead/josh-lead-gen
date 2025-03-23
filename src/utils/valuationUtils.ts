@@ -60,7 +60,7 @@ export const triggerValuationWebhook = async (propertyDetails: PropertyDetails) 
       zip: propertyDetails.zip,
       propertyType: propertyDetails.propertyType,
       propertyCondition: propertyDetails.propertyCondition,
-      fullName: `${propertyDetails.firstName} ${propertyDetails.lastName}` // Added a combined name field
+      fullName: `${propertyDetails.firstName} ${propertyDetails.lastName}`
     };
     
     // Add conditional fields
@@ -77,15 +77,25 @@ export const triggerValuationWebhook = async (propertyDetails: PropertyDetails) 
     
     console.log("Prepared webhook data:", webhookData);
     
-    // In a real application, you would send this data to your backend
-    // For demonstration, we'll simulate a successful API call
+    // Use the specific webhook URL provided
+    const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Make actual HTTP request to the webhook URL
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(webhookData),
+    });
     
-    // Log success - in a real app this would be an actual API call
-    console.log("Webhook response status: 200");
-    console.log("Webhook triggered successfully");
+    // Check if the request was successful
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const responseData = await response.text();
+    console.log("Webhook response:", responseData);
     
     toast({
       title: "Valuation Request Submitted",
