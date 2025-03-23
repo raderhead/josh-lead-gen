@@ -1,4 +1,3 @@
-
 import { toast } from "@/components/ui/use-toast";
 
 export interface PropertyDetails {
@@ -37,16 +36,10 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
   
   try {
     const response = await fetch(webhookUrl, {
-      method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
-      },
-      // Removed mode: "no-cors" to allow proper response handling
-      body: JSON.stringify({
-        propertyDetails: property,
-        timestamp: new Date().toISOString(),
-        source: window.location.origin
-      }),
+      }
     });
     
     console.log("Webhook response:", response);
@@ -55,7 +48,7 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
       console.log("Webhook triggered successfully");
       toast({
         title: "Notification Sent",
-        description: "The valuation request has been sent to our system.",
+        description: "Your valuation request has been received. A real estate agent will contact you shortly with the results.",
       });
     } else {
       throw new Error(`Failed to trigger webhook: ${response.status} ${response.statusText}`);
@@ -65,81 +58,10 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
     
     toast({
       title: "Notification Error",
-      description: "There was an issue sending the valuation notification.",
+      description: "There was an issue sending the valuation notification. Please try again later.",
       variant: "destructive"
     });
   }
-}
-
-// This function would ideally call a backend API or service
-// For demo purposes, we're using a more sophisticated but still simulated algorithm
-export async function calculatePropertyValuation(property: PropertyDetails): Promise<ValuationResult> {
-  // Simulate API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      try {
-        // Base value calculation based on location and size
-        const basePricePerSqFt = getBasePricePerSqft(property.city, property.zip, property.propertyType);
-        let baseValue = property.sqft * basePricePerSqFt;
-        
-        // Adjustments based on property details
-        const conditionAdjustment = getConditionAdjustment(property.propertyCondition);
-        const featuresAdjustment = getFeaturesAdjustment(property);
-        const locationAdjustment = getLocationAdjustment(property.city, property.isCornerLot);
-        
-        // Calculate final value
-        const estimatedValue = Math.round(
-          baseValue + 
-          conditionAdjustment +
-          featuresAdjustment +
-          locationAdjustment
-        );
-        
-        // Create a reasonable value range (typically ±5-8%)
-        const variabilityFactor = 0.08; // 8% variability
-        const valueLow = Math.round(estimatedValue * (1 - variabilityFactor));
-        const valueHigh = Math.round(estimatedValue * (1 + variabilityFactor));
-        
-        // Final result
-        resolve({
-          estimatedValue: estimatedValue,
-          valueRange: {
-            low: valueLow,
-            high: valueHigh
-          },
-          comparableHomes: Math.floor(Math.random() * 8) + 3, // 3-10 comparable properties
-          confidenceScore: Math.floor(Math.random() * 16) + 70, // 70-85% confidence score
-          pricePerSqFt: Math.round(estimatedValue / property.sqft),
-          marketTrends: {
-            annualGrowth: parseFloat((Math.random() * 5 + 2).toFixed(1)), // 2-7% annual growth for commercial
-            averageDaysOnMarket: Math.floor(Math.random() * 30) + 60, // 60-90 days on market (commercial takes longer)
-            listToSaleRatio: parseFloat((Math.random() * 0.05 + 0.92).toFixed(2)) // 92-97% list to sale ratio
-          }
-        });
-      } catch (error) {
-        console.error("Error calculating valuation:", error);
-        toast({
-          title: "Valuation Error",
-          description: "There was an error calculating your property's value. Please try again.",
-          variant: "destructive"
-        });
-        
-        // Return default values in case of error
-        resolve({
-          estimatedValue: 0,
-          valueRange: { low: 0, high: 0 },
-          comparableHomes: 0,
-          confidenceScore: 0,
-          pricePerSqFt: 0,
-          marketTrends: {
-            annualGrowth: 0,
-            averageDaysOnMarket: 0,
-            listToSaleRatio: 0
-          }
-        });
-      }
-    }, 1500); // Simulate API delay
-  });
 }
 
 // Helper functions for valuation calculation
