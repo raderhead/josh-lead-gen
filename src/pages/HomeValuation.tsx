@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -14,7 +13,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { GoogleAddressData } from '@/lib/utils';
-import { PropertyDetails, ValuationResult, calculatePropertyValuation } from '@/utils/valuationUtils';
+import { PropertyDetails, ValuationResult, calculatePropertyValuation, triggerValuationWebhook } from '@/utils/valuationUtils';
 
 const formSchema = z.object({
   address: z.string().min(5, {
@@ -126,6 +125,9 @@ const HomeValuation = () => {
         hasLoadingDock: values.hasLoadingDock,
         recentRenovations: values.recentRenovations,
       };
+      
+      // Trigger the webhook with property details
+      await triggerValuationWebhook(propertyDetails);
       
       // Calculate valuation
       const result = await calculatePropertyValuation(propertyDetails);

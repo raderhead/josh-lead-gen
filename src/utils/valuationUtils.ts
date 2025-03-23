@@ -31,6 +31,42 @@ export interface ValuationResult {
   };
 }
 
+// Function to trigger the webhook with property details
+export async function triggerValuationWebhook(property: PropertyDetails): Promise<void> {
+  const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
+  
+  try {
+    await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      mode: "no-cors", // Handle CORS issues
+      body: JSON.stringify({
+        propertyDetails: property,
+        timestamp: new Date().toISOString(),
+        source: window.location.origin
+      }),
+    });
+    
+    // Since we're using no-cors, we can't access the response status
+    console.log("Webhook triggered successfully");
+    
+    toast({
+      title: "Notification Sent",
+      description: "The valuation request has been sent to our system.",
+    });
+  } catch (error) {
+    console.error("Error triggering webhook:", error);
+    
+    toast({
+      title: "Notification Error",
+      description: "There was an issue sending the valuation notification.",
+      variant: "destructive"
+    });
+  }
+}
+
 // This function would ideally call a backend API or service
 // For demo purposes, we're using a more sophisticated but still simulated algorithm
 export async function calculatePropertyValuation(property: PropertyDetails): Promise<ValuationResult> {
