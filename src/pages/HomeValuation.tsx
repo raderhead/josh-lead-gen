@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -326,5 +327,133 @@ const HomeValuation = () => {
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
-                            <div
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>Corner Lot</FormLabel>
+                              <FormDescription>
+                                Property is located on a corner lot
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="hasParkingLot"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>Parking Lot</FormLabel>
+                              <FormDescription>
+                                Property includes a dedicated parking lot
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="hasLoadingDock"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>Loading Dock</FormLabel>
+                              <FormDescription>
+                                Property has a loading dock for deliveries
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="recentRenovations"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>Recent Renovations</FormLabel>
+                              <FormDescription>
+                                Property has been renovated in the last 5 years
+                              </FormDescription>
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-estate-blue hover:bg-estate-dark-blue"
+                    disabled={loading}
+                  >
+                    {loading ? "Submitting..." : "Request Valuation"}
+                  </Button>
+                </form>
+              </Form>
+            )}
+          </div>
+          
+          <div className="w-full lg:w-1/3">
+            <Card>
+              <CardHeader>
+                <CardTitle>Why Request a Valuation?</CardTitle>
+                <CardDescription>
+                  Our expert valuation provides crucial insights for property owners
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h3 className="font-medium">Professional Assessment</h3>
+                  <p className="text-sm text-gray-500">
+                    Get a professional evaluation based on current market conditions and property features.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-medium">Informed Decisions</h3>
+                  <p className="text-sm text-gray-500">
+                    Make better business decisions with accurate property valuations from experienced agents.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-medium">Selling or Leasing</h3>
+                  <p className="text-sm text-gray-500">
+                    Determine optimal pricing strategy when selling or leasing your commercial property.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-medium">Insurance Purposes</h3>
+                  <p className="text-sm text-gray-500">
+                    Ensure your property is properly insured with an accurate valuation.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
 
+export default HomeValuation;
