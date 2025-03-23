@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { 
   Select, 
@@ -35,6 +34,8 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFilterChange }) => 
     hasPool: false,
     hasGarage: false
   });
+
+  const isLandProperty = filters.propertyType === 'Land';
 
   const handleChange = (name: string, value: any) => {
     setFilters(prev => ({
@@ -172,6 +173,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFilterChange }) => 
                   <SelectItem value="Townhouse">Townhouse</SelectItem>
                   <SelectItem value="Multi Family">Multi Family</SelectItem>
                   <SelectItem value="Land">Land</SelectItem>
+                  <SelectItem value="Commercial">Commercial</SelectItem>
                   <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>

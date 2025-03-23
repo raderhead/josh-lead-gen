@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -31,7 +30,7 @@ const formSchema = z.object({
   }),
   sqft: z.string().min(3, {
     message: "Square footage must be at least 3 digits.",
-  }),
+  }).optional(),
   propertyType: z.string({
     required_error: "Please select a property type.",
   }),
@@ -64,12 +63,23 @@ const propertyTypes = [
   "Other"
 ];
 
-const propertyConditions = [
+const commercialConditions = [
   "Excellent",
   "Good",
   "Average",
   "Fair",
   "Poor"
+];
+
+const landConditions = [
+  "Wooded",
+  "Cleared",
+  "Partially Cleared",
+  "Rocky",
+  "Wetland",
+  "Flat",
+  "Sloped",
+  "Hillside"
 ];
 
 const HomeValuation = () => {
@@ -102,6 +112,14 @@ const HomeValuation = () => {
 
   const propertyType = form.watch("propertyType");
   const isLandProperty = propertyType === "Land";
+  
+  React.useEffect(() => {
+    if (isLandProperty && commercialConditions.includes(form.getValues("propertyCondition"))) {
+      form.setValue("propertyCondition", landConditions[0]);
+    } else if (!isLandProperty && landConditions.includes(form.getValues("propertyCondition"))) {
+      form.setValue("propertyCondition", commercialConditions[0]);
+    }
+  }, [isLandProperty, form]);
 
   const handleAddressSelect = (address: string) => {
     form.setValue("address", address);
@@ -116,7 +134,7 @@ const HomeValuation = () => {
         city: values.city,
         state: values.state,
         zip: values.zip,
-        sqft: parseInt(values.sqft),
+        sqft: isLandProperty ? 0 : parseInt(values.sqft || "0"),
         propertyType: values.propertyType,
         propertyCondition: values.propertyCondition,
         isCornerLot: values.isCornerLot,
@@ -126,7 +144,6 @@ const HomeValuation = () => {
         acres: values.acres,
       };
       
-      // Add land-specific features if the property type is Land
       if (isLandProperty) {
         propertyDetails.hasWater = values.hasWater;
         propertyDetails.hasRoad = values.hasRoad;
@@ -297,7 +314,7 @@ const HomeValuation = () => {
                             <FormLabel>Property Condition</FormLabel>
                             <Select 
                               onValueChange={field.onChange} 
-                              defaultValue={field.value}
+                              value={field.value}
                             >
                               <FormControl>
                                 <SelectTrigger>
@@ -318,19 +335,21 @@ const HomeValuation = () => {
                       />
                     </div>
                     
-                    <FormField
-                      control={form.control}
-                      name="sqft"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Square Footage</FormLabel>
-                          <FormControl>
-                            <Input type="number" placeholder="2000" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {!isLandProperty && (
+                      <FormField
+                        control={form.control}
+                        name="sqft"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Square Footage</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="2000" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                     
                     {isLandProperty && (
                       <FormField
@@ -357,7 +376,6 @@ const HomeValuation = () => {
                     )}
                   </div>
                   
-                  {/* Standard Commercial Features Section */}
                   {!isLandProperty && (
                     <div className="space-y-4 pt-4">
                       <h2 className="text-xl font-semibold flex items-center">
@@ -453,7 +471,6 @@ const HomeValuation = () => {
                     </div>
                   )}
                   
-                  {/* Land Features Section - Only shown when Property Type is Land */}
                   {isLandProperty && (
                     <div className="space-y-4 pt-4">
                       <h2 className="text-xl font-semibold flex items-center">

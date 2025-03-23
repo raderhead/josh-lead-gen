@@ -31,10 +31,14 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
       city: property.city,
       state: property.state,
       zip: property.zip,
-      sqft: property.sqft,
       propertyType: property.propertyType,
       propertyCondition: property.propertyCondition,
     };
+    
+    // Only add sqft if it's not a Land property or if sqft is greater than 0
+    if (property.propertyType !== "Land" && property.sqft > 0) {
+      webhookData.sqft = property.sqft;
+    }
     
     // Add acres if provided (for Land properties)
     if (property.acres) {
