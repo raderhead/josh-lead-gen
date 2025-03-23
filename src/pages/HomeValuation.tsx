@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,9 +29,7 @@ const formSchema = z.object({
   zip: z.string().length(5, {
     message: "ZIP code must be 5 digits.",
   }),
-  sqft: z.string().min(3, {
-    message: "Square footage must be at least 3 digits.",
-  }).optional(),
+  sqft: z.string().optional(),
   propertyType: z.string({
     required_error: "Please select a property type.",
   }),
@@ -126,6 +125,7 @@ const HomeValuation = () => {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Form submitted with values:", values);
     setLoading(true);
     
     try {
@@ -151,6 +151,7 @@ const HomeValuation = () => {
         propertyDetails.hasMountainView = values.hasMountainView;
       }
       
+      console.log("Calling triggerValuationWebhook with:", propertyDetails);
       await triggerValuationWebhook(propertyDetails);
       setSubmitted(true);
       
@@ -194,7 +195,7 @@ const HomeValuation = () => {
                     setSubmitted(false);
                     form.reset();
                   }}
-                  className="bg-estate-blue hover:bg-estate-dark-blue"
+                  variant="estate"
                 >
                   Submit Another Request
                 </Button>
@@ -572,7 +573,9 @@ const HomeValuation = () => {
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-estate-blue hover:bg-estate-dark-blue"
+                    variant="estate"
+                    size="xl"
+                    className="w-full"
                     disabled={loading}
                   >
                     {loading ? "Submitting..." : "Request Valuation"}

@@ -25,8 +25,10 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
   const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
   
   try {
+    console.log("Sending property details to webhook:", property);
+    
     // Create a new object for the webhook data
-    const webhookData: Record<string, string | number> = {
+    const webhookData: Record<string, any> = {
       address: property.address,
       city: property.city,
       state: property.state,
@@ -87,6 +89,8 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
       webhookData.features = features.join(", ");
     }
     
+    console.log("Prepared webhook data:", webhookData);
+    
     // Send the modified property details as JSON in the request body
     const response = await fetch(webhookUrl, {
       method: "POST",
@@ -96,8 +100,7 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
       body: JSON.stringify(webhookData)
     });
     
-    console.log("Webhook response:", response);
-    console.log("Property details sent:", webhookData);
+    console.log("Webhook response status:", response.status);
     
     if (response.ok) {
       console.log("Webhook triggered successfully");
@@ -105,7 +108,10 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
         title: "Notification Sent",
         description: "Your valuation request has been received. A real estate agent will contact you shortly with the results.",
       });
+      return Promise.resolve();
     } else {
+      const errorText = await response.text();
+      console.error("Webhook error response:", errorText);
       throw new Error(`Failed to trigger webhook: ${response.status} ${response.statusText}`);
     }
   } catch (error) {
@@ -116,5 +122,7 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
       description: "There was an issue sending the valuation notification. Please try again later.",
       variant: "destructive"
     });
+    
+    return Promise.reject(error);
   }
 }
