@@ -322,7 +322,11 @@ const HomeValuation = () => {
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {propertyConditions.map((condition) => (
+                                {isLandProperty ? landConditions.map((condition) => (
+                                  <SelectItem key={condition} value={condition}>
+                                    {condition}
+                                  </SelectItem>
+                                )) : commercialConditions.map((condition) => (
                                   <SelectItem key={condition} value={condition}>
                                     {condition}
                                   </SelectItem>
