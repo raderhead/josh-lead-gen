@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { GoogleAddressData } from '@/lib/utils';
@@ -99,7 +98,9 @@ const AddressAutocomplete = ({
           google.maps.event.clearInstanceListeners(autocompleteRef.current);
         }
         // Reset the global error handler
-        window.gm_authFailure = () => {};
+        if (window.gm_authFailure) {
+          window.gm_authFailure = undefined;
+        }
       };
     } catch (error) {
       console.error("Error initializing Google Places Autocomplete:", error);
