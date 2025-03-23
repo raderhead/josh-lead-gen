@@ -3,7 +3,8 @@ import { toast } from "@/hooks/use-toast";
 
 export interface PropertyDetails {
   // Contact information (new required fields)
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   // Property details
@@ -48,7 +49,8 @@ export const triggerValuationWebhook = async (propertyDetails: PropertyDetails) 
     // Prepare webhook data
     const webhookData = {
       // Contact information
-      name: propertyDetails.name,
+      firstName: propertyDetails.firstName,
+      lastName: propertyDetails.lastName,
       email: propertyDetails.email,
       phone: propertyDetails.phone,
       // Property details

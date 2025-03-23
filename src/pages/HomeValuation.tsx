@@ -52,7 +52,8 @@ const HomeValuation = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       // Contact information
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       phone: "",
       // Property information
@@ -98,7 +99,8 @@ const HomeValuation = () => {
     
     try {
       const propertyDetails: PropertyDetails = {
-        name: values.name,
+        firstName: values.firstName,
+        lastName: values.lastName,
         email: values.email, 
         phone: values.phone,
         address: values.address,
