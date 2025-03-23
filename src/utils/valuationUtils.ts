@@ -14,6 +14,10 @@ export interface PropertyDetails {
   hasLoadingDock: boolean;
   recentRenovations: boolean;
   acres?: string;
+  hasWater?: boolean;
+  hasRoad?: boolean;
+  isLevelLot?: boolean;
+  hasMountainView?: boolean;
 }
 
 // Function to trigger the webhook with property details
@@ -37,34 +41,46 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
       webhookData.acres = property.acres;
     }
     
-    // Only add the feature if it's true, and use descriptive names
+    // Initialize features array to collect all true features
+    const features: string[] = [];
+    
+    // Add commercial property features if true
     if (property.isCornerLot) {
-      webhookData.features = "Corner Lot";
+      features.push("Corner Lot");
     }
     
     if (property.hasParkingLot) {
-      // If features already exists, append to it, otherwise create it
-      if (webhookData.features) {
-        webhookData.features = `${webhookData.features}, Parking Lot`;
-      } else {
-        webhookData.features = "Parking Lot";
-      }
+      features.push("Parking Lot");
     }
     
     if (property.hasLoadingDock) {
-      if (webhookData.features) {
-        webhookData.features = `${webhookData.features}, Loading Dock`;
-      } else {
-        webhookData.features = "Loading Dock";
-      }
+      features.push("Loading Dock");
     }
     
     if (property.recentRenovations) {
-      if (webhookData.features) {
-        webhookData.features = `${webhookData.features}, Recent Renovations`;
-      } else {
-        webhookData.features = "Recent Renovations";
-      }
+      features.push("Recent Renovations");
+    }
+    
+    // Add land-specific features if true
+    if (property.hasWater) {
+      features.push("Water Access");
+    }
+    
+    if (property.hasRoad) {
+      features.push("Road Access");
+    }
+    
+    if (property.isLevelLot) {
+      features.push("Level Lot");
+    }
+    
+    if (property.hasMountainView) {
+      features.push("Mountain View");
+    }
+    
+    // Only add features to webhook data if there are any
+    if (features.length > 0) {
+      webhookData.features = features.join(", ");
     }
     
     // Send the modified property details as JSON in the request body

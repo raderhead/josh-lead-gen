@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Building, CheckCircle } from 'lucide-react';
+import { Building, CheckCircle, TreePine } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AddressAutocomplete from '@/components/AddressAutocomplete';
@@ -38,10 +39,16 @@ const formSchema = z.object({
     required_error: "Please select the property condition.",
   }),
   acres: z.string().optional(),
+  // Commercial property features
   isCornerLot: z.boolean().default(false),
   hasParkingLot: z.boolean().default(false),
   hasLoadingDock: z.boolean().default(false),
   recentRenovations: z.boolean().default(false),
+  // Land-specific features
+  hasWater: z.boolean().default(false),
+  hasRoad: z.boolean().default(false),
+  isLevelLot: z.boolean().default(false),
+  hasMountainView: z.boolean().default(false),
 });
 
 const propertyTypes = [
@@ -80,14 +87,21 @@ const HomeValuation = () => {
       propertyType: "Office",
       propertyCondition: "Good",
       acres: "",
+      // Commercial property features
       isCornerLot: false,
       hasParkingLot: false,
       hasLoadingDock: false,
       recentRenovations: false,
+      // Land-specific features
+      hasWater: false,
+      hasRoad: false,
+      isLevelLot: false,
+      hasMountainView: false,
     },
   });
 
   const propertyType = form.watch("propertyType");
+  const isLandProperty = propertyType === "Land";
 
   const handleAddressSelect = (address: string) => {
     form.setValue("address", address);
@@ -111,6 +125,14 @@ const HomeValuation = () => {
         recentRenovations: values.recentRenovations,
         acres: values.acres,
       };
+      
+      // Add land-specific features if the property type is Land
+      if (isLandProperty) {
+        propertyDetails.hasWater = values.hasWater;
+        propertyDetails.hasRoad = values.hasRoad;
+        propertyDetails.isLevelLot = values.isLevelLot;
+        propertyDetails.hasMountainView = values.hasMountainView;
+      }
       
       await triggerValuationWebhook(propertyDetails);
       setSubmitted(true);
@@ -310,7 +332,7 @@ const HomeValuation = () => {
                       )}
                     />
                     
-                    {propertyType === "Land" && (
+                    {isLandProperty && (
                       <FormField
                         control={form.control}
                         name="acres"
@@ -335,98 +357,197 @@ const HomeValuation = () => {
                     )}
                   </div>
                   
-                  <div className="space-y-4 pt-4">
-                    <h2 className="text-xl font-semibold flex items-center">
-                      <Building className="h-5 w-5 text-estate-blue mr-2" />
-                      Features & Amenities
-                    </h2>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="isCornerLot"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Corner Lot</FormLabel>
-                              <FormDescription>
-                                Property is located on a corner lot
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
+                  {/* Standard Commercial Features Section */}
+                  {!isLandProperty && (
+                    <div className="space-y-4 pt-4">
+                      <h2 className="text-xl font-semibold flex items-center">
+                        <Building className="h-5 w-5 text-estate-blue mr-2" />
+                        Commercial Features & Amenities
+                      </h2>
                       
-                      <FormField
-                        control={form.control}
-                        name="hasParkingLot"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Parking Lot</FormLabel>
-                              <FormDescription>
-                                Property includes a dedicated parking lot
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="hasLoadingDock"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Loading Dock</FormLabel>
-                              <FormDescription>
-                                Property has a loading dock for deliveries
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="recentRenovations"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Recent Renovations</FormLabel>
-                              <FormDescription>
-                                Property has been renovated in the last 5 years
-                              </FormDescription>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="isCornerLot"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Corner Lot</FormLabel>
+                                <FormDescription>
+                                  Property is located on a corner lot
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="hasParkingLot"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Parking Lot</FormLabel>
+                                <FormDescription>
+                                  Property includes a dedicated parking lot
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="hasLoadingDock"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Loading Dock</FormLabel>
+                                <FormDescription>
+                                  Property has a loading dock for deliveries
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="recentRenovations"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Recent Renovations</FormLabel>
+                                <FormDescription>
+                                  Property has been renovated in the last 5 years
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
+                  
+                  {/* Land Features Section - Only shown when Property Type is Land */}
+                  {isLandProperty && (
+                    <div className="space-y-4 pt-4">
+                      <h2 className="text-xl font-semibold flex items-center">
+                        <TreePine className="h-5 w-5 text-estate-blue mr-2" />
+                        Land Features
+                      </h2>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="hasWater"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Water Access</FormLabel>
+                                <FormDescription>
+                                  Property has access to water (stream, river, or lake)
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="hasRoad"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Road Access</FormLabel>
+                                <FormDescription>
+                                  Property has direct access to a paved road
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="isLevelLot"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Level Lot</FormLabel>
+                                <FormDescription>
+                                  Property is primarily flat and level
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="hasMountainView"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="space-y-1 leading-none">
+                                <FormLabel>Mountain View</FormLabel>
+                                <FormDescription>
+                                  Property has scenic mountain or hill views
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  )}
                   
                   <Button 
                     type="submit" 
