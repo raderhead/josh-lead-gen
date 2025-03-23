@@ -36,12 +36,12 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
   const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
   
   try {
-    await fetch(webhookUrl, {
+    const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      mode: "no-cors", // Handle CORS issues
+      // Removed mode: "no-cors" to allow proper response handling
       body: JSON.stringify({
         propertyDetails: property,
         timestamp: new Date().toISOString(),
@@ -49,13 +49,17 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
       }),
     });
     
-    // Since we're using no-cors, we can't access the response status
-    console.log("Webhook triggered successfully");
+    console.log("Webhook response:", response);
     
-    toast({
-      title: "Notification Sent",
-      description: "The valuation request has been sent to our system.",
-    });
+    if (response.ok) {
+      console.log("Webhook triggered successfully");
+      toast({
+        title: "Notification Sent",
+        description: "The valuation request has been sent to our system.",
+      });
+    } else {
+      throw new Error(`Failed to trigger webhook: ${response.status} ${response.statusText}`);
+    }
   } catch (error) {
     console.error("Error triggering webhook:", error);
     
