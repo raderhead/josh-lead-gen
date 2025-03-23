@@ -60,6 +60,7 @@ export const triggerValuationWebhook = async (propertyDetails: PropertyDetails) 
       zip: propertyDetails.zip,
       propertyType: propertyDetails.propertyType,
       propertyCondition: propertyDetails.propertyCondition,
+      fullName: `${propertyDetails.firstName} ${propertyDetails.lastName}` // Added a combined name field
     };
     
     // Add conditional fields
