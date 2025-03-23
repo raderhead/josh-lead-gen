@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import { formSchema } from './formSchema';
+import ContactInfoSection from './ContactInfoSection';
 import PropertyLocationSection from './PropertyLocationSection';
 import PropertyDetailsSection from './PropertyDetailsSection';
 import CommercialFeaturesSection from './CommercialFeaturesSection';
@@ -38,6 +39,8 @@ const ValuationForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <ContactInfoSection control={form.control} />
+        
         <PropertyLocationSection 
           control={form.control} 
           onAddressSelect={handleAddressSelect} 

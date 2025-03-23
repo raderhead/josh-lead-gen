@@ -51,6 +51,11 @@ const HomeValuation = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      // Contact information
+      name: "",
+      email: "",
+      phone: "",
+      // Property information
       address: "",
       city: "Abilene",
       state: "TX",
@@ -93,6 +98,9 @@ const HomeValuation = () => {
     
     try {
       const propertyDetails: PropertyDetails = {
+        name: values.name,
+        email: values.email, 
+        phone: values.phone,
         address: values.address,
         city: values.city,
         state: values.state,
