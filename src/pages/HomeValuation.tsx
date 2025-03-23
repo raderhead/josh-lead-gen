@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -10,7 +9,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Building, CheckCircle } from 'lucide-react';
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import { PropertyDetails, triggerValuationWebhook } from '@/utils/valuationUtils';
@@ -38,6 +37,7 @@ const formSchema = z.object({
   propertyCondition: z.string({
     required_error: "Please select the property condition.",
   }),
+  acres: z.string().optional(),
   isCornerLot: z.boolean().default(false),
   hasParkingLot: z.boolean().default(false),
   hasLoadingDock: z.boolean().default(false),
@@ -79,12 +79,15 @@ const HomeValuation = () => {
       sqft: "",
       propertyType: "Office",
       propertyCondition: "Good",
+      acres: "",
       isCornerLot: false,
       hasParkingLot: false,
       hasLoadingDock: false,
       recentRenovations: false,
     },
   });
+
+  const propertyType = form.watch("propertyType");
 
   const handleAddressSelect = (address: string) => {
     form.setValue("address", address);
@@ -94,7 +97,6 @@ const HomeValuation = () => {
     setLoading(true);
     
     try {
-      // Convert form values to property details
       const propertyDetails: PropertyDetails = {
         address: values.address,
         city: values.city,
@@ -107,9 +109,9 @@ const HomeValuation = () => {
         hasParkingLot: values.hasParkingLot,
         hasLoadingDock: values.hasLoadingDock,
         recentRenovations: values.recentRenovations,
+        acres: values.acres,
       };
       
-      // Trigger the webhook with property details
       await triggerValuationWebhook(propertyDetails);
       setSubmitted(true);
       
@@ -307,6 +309,30 @@ const HomeValuation = () => {
                         </FormItem>
                       )}
                     />
+                    
+                    {propertyType === "Land" && (
+                      <FormField
+                        control={form.control}
+                        name="acres"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Land Size (acres)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                placeholder="2.5" 
+                                step="0.01"
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormDescription>
+                              Please specify the size of the land in acres
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
                   
                   <div className="space-y-4 pt-4">

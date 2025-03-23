@@ -13,6 +13,7 @@ export interface PropertyDetails {
   hasParkingLot: boolean;
   hasLoadingDock: boolean;
   recentRenovations: boolean;
+  acres?: string;
 }
 
 // Function to trigger the webhook with property details
@@ -30,6 +31,11 @@ export async function triggerValuationWebhook(property: PropertyDetails): Promis
       propertyType: property.propertyType,
       propertyCondition: property.propertyCondition,
     };
+    
+    // Add acres if provided (for Land properties)
+    if (property.acres) {
+      webhookData.acres = property.acres;
+    }
     
     // Only add the feature if it's true, and use descriptive names
     if (property.isCornerLot) {
