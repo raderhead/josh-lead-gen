@@ -16,6 +16,7 @@ const UserMenu = () => {
   const { user, logout } = useUser();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   if (!user) {
     return (
@@ -30,10 +31,15 @@ const UserMenu = () => {
     );
   }
 
-  const handleLogout = () => {
-    logout();
-    setOpen(false);
-    navigate('/');
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      setOpen(false);
+      navigate('/');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -68,9 +74,22 @@ const UserMenu = () => {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+        <DropdownMenuItem 
+          onClick={handleLogout} 
+          className="cursor-pointer"
+          disabled={isLoggingOut}
+        >
+          {isLoggingOut ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+              <span>Logging out...</span>
+            </>
+          ) : (
+            <>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </>
+          )}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

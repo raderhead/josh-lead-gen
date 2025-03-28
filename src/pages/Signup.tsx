@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -32,9 +32,16 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const Signup = () => {
-  const { signup } = useUser();
+  const { signup, user, isLoading } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !isLoading) {
+      navigate('/');
+    }
+  }, [user, isLoading, navigate]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -49,19 +56,25 @@ const Signup = () => {
   const onSubmit = async (values: FormValues) => {
     try {
       await signup(values.email, values.name, values.password);
-      toast({
-        title: 'Account created',
-        description: 'Your account has been successfully created.',
-      });
-      navigate('/');
+      // No need to navigate here as useEffect will handle it
     } catch (error) {
-      toast({
-        title: 'Signup failed',
-        description: error instanceof Error ? error.message : 'An unexpected error occurred',
-        variant: 'destructive',
-      });
+      // Error already handled in the signup function
+      console.error('Signup error:', error);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="container max-w-md mx-auto py-10 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-estate-blue mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -130,9 +143,22 @@ const Signup = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Create Account
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={form.formState.isSubmitting || isLoading}
+              >
+                {form.formState.isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Create Account
+                  </>
+                )}
               </Button>
             </form>
           </Form>
