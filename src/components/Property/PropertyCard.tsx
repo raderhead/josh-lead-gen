@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -48,7 +47,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       openModal();
     } else {
       setIsAuthDialogOpen(true);
-      setShowSignInForm(false); // Default to signup form
+      setShowSignInForm(false);
     }
   };
 
@@ -66,22 +65,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
   const onSubmit = async (values: SignupFormValues) => {
     try {
-      // Using phone as password as requested
       await signup(values.email, values.name, values.phone);
       setIsAuthDialogOpen(false);
-      openModal(); // Open the property modal after successful signup
+      openModal();
       toast({
         title: "Account created successfully",
         description: "You can now view property details and save favorites.",
       });
     } catch (error) {
-      // Error already handled in the signup function
       console.error('Signup error:', error);
     }
   };
 
   const toggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent opening the property modal
+    e.stopPropagation();
     
     if (!user) {
       setIsAuthDialogOpen(true);
@@ -175,7 +172,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                 </div>
                 
                 <Button className="w-full text-lg py-6" type="submit">
-                  Continue to Photos >
+                  Continue to Photos {'>'}
                 </Button>
                 
                 <div className="text-center mt-4">
@@ -252,7 +249,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                         Creating Account...
                       </>
                     ) : (
-                      "Continue to Photos >"
+                      "Continue to Photos {'>'}"
                     )}
                   </Button>
                 </form>
