@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Property } from '@/types/property';
 import PropertyCard from '../Property/PropertyCard';
@@ -7,6 +8,13 @@ import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const FeaturedListings = () => {
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
@@ -224,7 +232,7 @@ const FeaturedListings = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
               <div key={i} className="rounded-lg overflow-hidden">
                 <Skeleton className="h-48 w-full" />
@@ -268,11 +276,21 @@ const FeaturedListings = () => {
             </div>
           </div>
         ) : featuredProperties.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProperties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
+          <Carousel className="w-full">
+            <CarouselContent>
+              {featuredProperties.map((property) => (
+                <CarouselItem key={property.id} className="md:basis-1/3">
+                  <div className="p-1">
+                    <PropertyCard property={property} />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center gap-4 mt-6">
+              <CarouselPrevious className="relative static" />
+              <CarouselNext className="relative static" />
+            </div>
+          </Carousel>
         ) : (
           <div className="text-center py-10">
             <h3 className="text-lg font-medium text-gray-900">No featured properties found</h3>

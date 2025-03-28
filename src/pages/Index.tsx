@@ -3,7 +3,6 @@ import Layout from '@/components/Layout/Layout';
 import HeroSection from '@/components/Home/HeroSection';
 import FeaturedListings from '@/components/Home/FeaturedListings';
 import HomeFeatures from '@/components/Home/HomeFeatures';
-import NeighborhoodGuides from '@/components/Home/NeighborhoodGuides';
 import CallToAction from '@/components/Home/CallToAction';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -12,7 +11,6 @@ import { Phone, BarChart2, Building } from 'lucide-react';
 const Index = () => {
   return <Layout>
       <HeroSection />
-      <NeighborhoodGuides />
       <FeaturedListings />
       <HomeFeatures />
       <CallToAction />

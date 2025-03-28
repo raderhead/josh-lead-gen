@@ -15,8 +15,6 @@ import Contact from "./pages/Contact";
 import SavedProperties from "./pages/SavedProperties";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Neighborhoods from "./pages/Neighborhoods";
-import NeighborhoodDetail from "./pages/NeighborhoodDetail";
 
 const queryClient = new QueryClient();
 
@@ -37,8 +35,6 @@ const App = () => (
               <Route path="/saved-properties" element={<SavedProperties />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/neighborhoods" element={<Neighborhoods />} />
-              <Route path="/neighborhoods/:slug" element={<NeighborhoodDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
