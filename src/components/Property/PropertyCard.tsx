@@ -44,7 +44,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
         <div className="p-4">
           <div className="flex justify-between items-center mb-1">
-            <h3 className="text-3xl font-bold text-primary">
+            <h3 className="text-3xl font-bold text-primary dark:text-estate-dark-blue">
               {formatCurrency(property.price)}
             </h3>
             {property.mls && (

@@ -136,3 +136,12 @@
 .dark .text-gray-900 {
   color: #e2e8f0 !important;
 }
+
+/* Price color in dark mode */
+.dark .text-primary {
+  color: #4d7cc2 !important; /* Softer blue that's less bright */
+}
+
+.dark .text-estate-dark-blue {
+  color: #7295c3 !important; /* Muted blue-gray for dark mode */
+}

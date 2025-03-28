@@ -198,8 +198,8 @@ const Properties = () => {
   useEffect(() => {
     fetchProperties();
     
-    // Set up a polling interval to fetch new data periodically
-    const intervalId = setInterval(fetchProperties, 30000); // Poll every 30 seconds
+    // Set up a polling interval to fetch new data periodically - increase to 2 minutes to reduce blinking
+    const intervalId = setInterval(fetchProperties, 120000); // Poll every 2 minutes instead of 30 seconds
     
     return () => {
       clearInterval(intervalId); // Clean up on component unmount
@@ -210,8 +210,8 @@ const Properties = () => {
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Commercial Properties</h1>
-          <p className="text-gray-600 mt-2">Find your perfect commercial space in Abilene and surrounding areas</p>
+          <h1 className="text-3xl font-bold text-foreground">Commercial Properties</h1>
+          <p className="text-muted-foreground mt-2">Find your perfect commercial space in Abilene and surrounding areas</p>
         </div>
 
         {loading ? (

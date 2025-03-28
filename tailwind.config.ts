@@ -65,7 +65,7 @@ export default {
 				},
 				estate: {
 					'blue': '#1a73e8',
-					'dark-blue': '#0d47a1',
+					'dark-blue': '#7295c3',
 					'light-blue': '#e8f0fe',
 					'gray': '#f8f9fa',
 					'dark-gray': '#0f172a',
