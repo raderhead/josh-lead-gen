@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '@/components/Layout/Layout';
@@ -6,16 +5,15 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, MapPin, School, Building, Home, BarChart2, Pool, DollarSign, BadgePercent, Map, Shield } from 'lucide-react';
+import { ChevronLeft, MapPin, School, Building, Home, BarChart2, Pool, DollarSign, BadgePercent, Map, Shield, Phone } from 'lucide-react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
-// This would typically come from an API
 const neighborhoodData = {
   'abilene': {
     name: 'Abilene',
-    longDescription: 'Abilene is the commercial heart of the region, offering a diverse range of properties from retail spaces to office buildings. With strong foot traffic and growing business community, it's an ideal location for both established businesses and startups.',
+    longDescription: "Abilene is the commercial heart of the region, offering a diverse range of properties from retail spaces to office buildings. With strong foot traffic and growing business community, it's an ideal location for both established businesses and startups.",
     imageUrl: '/public/lovable-uploads/55deabfb-d38d-4cf3-ad88-d5e416c3ae39.png',
     stats: {
       totalListings: 42,
@@ -65,7 +63,7 @@ const neighborhoodData = {
   },
   'buffalo-gap': {
     name: 'Buffalo Gap',
-    longDescription: 'Buffalo Gap offers the perfect blend of rural charm and commercial opportunity. Properties here feature generous space, lower costs than downtown, while still maintaining proximity to major transportation routes.',
+    longDescription: "Buffalo Gap offers the perfect blend of rural charm and commercial opportunity. Properties here feature generous space, lower costs than downtown, while still maintaining proximity to major transportation routes.",
     imageUrl: '/public/lovable-uploads/55deabfb-d38d-4cf3-ad88-d5e416c3ae39.png',
     stats: {
       totalListings: 28,
@@ -114,7 +112,7 @@ const neighborhoodData = {
   },
   'eastland': {
     name: 'Eastland',
-    longDescription: 'Eastland is known for its premium commercial spaces and luxury developments. This area attracts high-end retail, professional services, and businesses looking for prestige locations with modern amenities and upscale surroundings.',
+    longDescription: "Eastland is known for its premium commercial spaces and luxury developments. This area attracts high-end retail, professional services, and businesses looking for prestige locations with modern amenities and upscale surroundings.",
     imageUrl: '/public/lovable-uploads/55deabfb-d38d-4cf3-ad88-d5e416c3ae39.png',
     stats: {
       totalListings: 24,
@@ -163,7 +161,7 @@ const neighborhoodData = {
   },
   'tuscola': {
     name: 'Tuscola',
-    longDescription: 'Tuscola is an emerging commercial hub with rapid development and growth. Businesses benefit from newer infrastructure, competitive pricing, and a strategic location that's becoming increasingly connected to the broader regional economy.',
+    longDescription: "Tuscola is an emerging commercial hub with rapid development and growth. Businesses benefit from newer infrastructure, competitive pricing, and a strategic location that's becoming increasingly connected to the broader regional economy.",
     imageUrl: '/public/lovable-uploads/55deabfb-d38d-4cf3-ad88-d5e416c3ae39.png',
     stats: {
       totalListings: 32,
@@ -242,7 +240,6 @@ const NeighborhoodDetail = () => {
 
   return (
     <Layout>
-      {/* Header & Introduction */}
       <section className="relative">
         <div className="h-64 md:h-96 w-full overflow-hidden">
           <img
@@ -264,7 +261,6 @@ const NeighborhoodDetail = () => {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* City Snapshot */}
         <section className="mb-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
@@ -296,7 +292,6 @@ const NeighborhoodDetail = () => {
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Location</h3>
               <div className="bg-gray-200 rounded-lg overflow-hidden flex-grow">
                 <div className="h-full w-full">
-                  {/* This would be replaced with an actual map */}
                   <div className="h-full w-full flex items-center justify-center bg-estate-light-blue p-6 text-center">
                     <div>
                       <Map className="h-10 w-10 mx-auto mb-3 text-estate-blue" />
@@ -312,7 +307,6 @@ const NeighborhoodDetail = () => {
           </div>
         </section>
 
-        {/* Market Report */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Market Report</h2>
           
@@ -367,7 +361,6 @@ const NeighborhoodDetail = () => {
           </div>
         </section>
         
-        {/* Price Trends */}
         <section className="mb-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Price Trends</h2>
@@ -466,7 +459,6 @@ const NeighborhoodDetail = () => {
           </div>
         </section>
         
-        {/* Special Property Types */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Specialized Property Types</h2>
           
@@ -528,7 +520,6 @@ const NeighborhoodDetail = () => {
           </div>
         </section>
         
-        {/* School District Data */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             <div className="flex items-center gap-2">
@@ -567,7 +558,6 @@ const NeighborhoodDetail = () => {
           </Table>
         </section>
         
-        {/* Call to Action */}
         <section className="rounded-lg bg-estate-light-blue p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Interested in {neighborhood.name} Properties?</h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-6">
