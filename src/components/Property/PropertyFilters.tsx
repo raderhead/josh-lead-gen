@@ -31,7 +31,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFilterChange }) => 
     maxPrice: 1000000,
     beds: 0,
     baths: 0,
-    propertyType: '',
+    propertyType: 'any',
     hasPool: false,
     hasGarage: false
   });
@@ -151,7 +151,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFilterChange }) => 
                   <SelectValue placeholder="Any" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="any">Any</SelectItem>
                   <SelectItem value="Single Family">Single Family</SelectItem>
                   <SelectItem value="Condo">Condo</SelectItem>
                   <SelectItem value="Townhouse">Townhouse</SelectItem>

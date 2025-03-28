@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Property } from '@/types/property';
 import PropertyCard from './PropertyCard';
@@ -24,6 +25,11 @@ const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
       // Apply filters
       if (filters.city) {
         query = query.ilike('address', `%${filters.city}%`);
+      }
+      
+      // Apply property type filter (skip if "any" is selected)
+      if (filters.propertyType && filters.propertyType !== 'any') {
+        query = query.eq('type', filters.propertyType);
       }
       
       if (filters.minPrice > 0 || filters.maxPrice < 1000000) {
