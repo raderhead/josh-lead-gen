@@ -1,69 +1,73 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Bath, Bed, MapPin } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { formatCurrency } from "@/lib/utils";
 import { Property } from "@/types/property";
+import PropertyModal from "./PropertyModal";
 
 interface PropertyCardProps {
   property: Property;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
-    <Card className="bg-card text-card-foreground shadow-md hover:shadow-lg transition-shadow duration-300">
-      <Link to={`/property/${property.id}`}>
+    <>
+      <div 
+        className="rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1"
+        onClick={openModal}
+      >
         <div className="relative">
           <AspectRatio ratio={4 / 3}>
             <img
               src={property.images[0]}
               alt={property.address.street}
-              className="rounded-md object-cover"
+              className="object-cover w-full h-full"
             />
           </AspectRatio>
-          {property.status === "For Sale" && (
-            <Badge className="absolute top-2 left-2 bg-estate-blue text-white">
-              For Sale
-            </Badge>
-          )}
-          {property.status === "Sold" && (
-            <Badge className="absolute top-2 left-2 bg-estate-green text-white">
-              Sold
-            </Badge>
-          )}
           {property.isFeatured && (
-            <Badge className="absolute top-2 right-2 bg-estate-yellow text-gray-800">
+            <Badge className="absolute top-2 right-2 bg-[#F0C66A] text-black font-semibold">
               Featured
             </Badge>
           )}
-        </div>
-        <CardContent className="p-4">
-          <h3 className="text-lg font-semibold line-clamp-1">{property.address.street}</h3>
-          <p className="text-sm text-muted-foreground line-clamp-1">
-            <MapPin className="mr-1 inline-block h-4 w-4" />
-            {property.address.city}, {property.address.state} {property.address.zipCode}
-          </p>
-          <div className="mt-2 flex items-center space-x-2 text-sm">
-            <span>
-              <Bed className="mr-1 inline-block h-4 w-4" />
-              {property.beds} Beds
-            </span>
-            <span>
-              <Bath className="mr-1 inline-block h-4 w-4" />
-              {property.baths} Baths
-            </span>
-          </div>
-        </CardContent>
-        <CardFooter className="flex items-center justify-between p-4">
-          <span className="text-lg font-bold">{formatCurrency(property.price)}</span>
           {property.propertyType && (
-            <Badge variant="secondary">{property.propertyType}</Badge>
+            <Badge className="absolute top-2 left-2 bg-black bg-opacity-70 text-white">
+              {property.propertyType}
+            </Badge>
           )}
-        </CardFooter>
-      </Link>
-    </Card>
+        </div>
+
+        <div className="bg-black text-white p-4">
+          <div className="flex justify-between items-center mb-1">
+            <h3 className="text-3xl font-bold text-[#F0C66A]">
+              {formatCurrency(property.price)}
+            </h3>
+            {property.mls && (
+              <div className="text-right">
+                <span className="text-xs text-gray-400">MLS</span>
+                <p className="text-sm">{property.mls}</p>
+              </div>
+            )}
+          </div>
+          
+          <p className="text-lg">{property.address.street}</p>
+          <p className="text-gray-400">
+            {property.address.city} {property.address.state}, {property.address.zipCode} USA
+          </p>
+        </div>
+      </div>
+      
+      <PropertyModal 
+        property={property} 
+        isOpen={isModalOpen} 
+        onClose={closeModal}
+      />
+    </>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Property } from '@/types/property';
 import PropertyCard from '../Property/PropertyCard';
@@ -66,6 +65,7 @@ const FeaturedListings = () => {
             email: 'contact@abilenecommercial.com',
           },
           isFeatured: true,
+          mls: item.mls || '',
         } as Property));
         
         setFeaturedProperties(properties);

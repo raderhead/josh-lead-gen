@@ -34,4 +34,5 @@ export interface Property {
   latitude?: number;
   longitude?: number;
   isFeatured?: boolean;
+  mls?: string;
 }

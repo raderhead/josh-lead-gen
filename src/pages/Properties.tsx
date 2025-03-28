@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout/Layout';
 import PropertyList from '@/components/Property/PropertyList';
@@ -62,6 +63,7 @@ const Properties = () => {
             email: 'contact@abilenecommercial.com',
           },
           isFeatured: item.featured || false,
+          mls: item.mls || '',
         } as Property));
         
         setAllProperties(properties);
