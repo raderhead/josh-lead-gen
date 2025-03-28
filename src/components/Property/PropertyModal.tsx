@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatCurrency } from '@/lib/utils';
@@ -40,15 +39,30 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
 
   if (!property) return null;
 
+  const getVirtualTourUrl = () => {
+    if (!propertyDetails?.virtualtour) return null;
+    
+    try {
+      if (propertyDetails.virtualtour.startsWith('[')) {
+        const parsed = JSON.parse(propertyDetails.virtualtour);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+      }
+      return propertyDetails.virtualtour;
+    } catch (error) {
+      console.error('Error parsing virtual tour URL:', error);
+      return null;
+    }
+  };
+
+  const virtualTourUrl = getVirtualTourUrl();
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background text-foreground border-0">
         <div className="grid grid-cols-1 md:grid-cols-5">
-          {/* Left side (3/5) - Details */}
           <div className="col-span-3 p-0">
             <ScrollArea className="h-[80vh] md:h-[90vh]">
               <div className="p-6">
-                {/* Header with price and address */}
                 <div className="mb-6">
                   <h2 className="text-4xl font-bold text-primary dark:text-estate-dark-blue">{formatCurrency(property.price)}</h2>
                   <p className="text-xl mt-2">
@@ -66,7 +80,6 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                   </div>
                 </div>
 
-                {/* MLS Section */}
                 {property.mls && (
                   <div className="mb-6 text-right">
                     <div className="bg-secondary inline-block p-3 rounded">
@@ -76,7 +89,6 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                   </div>
                 )}
 
-                {/* Property Overview Section */}
                 <div className="mb-6 bg-secondary p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
@@ -86,7 +98,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                       <h3 className="text-xl font-semibold text-primary">Property Overview</h3>
                     </div>
                     
-                    {propertyDetails?.virtualtour && (
+                    {virtualTourUrl && (
                       <Button 
                         size="sm" 
                         variant="outline"
@@ -94,7 +106,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                         asChild
                       >
                         <a 
-                          href={propertyDetails.virtualtour} 
+                          href={virtualTourUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
                         >
@@ -130,7 +142,6 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                   )}
                 </div>
 
-                {/* Description Section */}
                 <div className="mb-6 bg-secondary p-4 rounded-lg">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
@@ -143,7 +154,6 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                   </p>
                 </div>
 
-                {/* Location Section */}
                 <div className="mb-6 bg-secondary p-4 rounded-lg">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
@@ -159,7 +169,6 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                   </div>
                 </div>
 
-                {/* Additional Listing Info */}
                 {propertyDetails?.listingby && (
                   <div className="text-muted-foreground mt-6 ml-10">
                     <p>Listed by: {propertyDetails.listingby}</p>
@@ -169,7 +178,6 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
             </ScrollArea>
           </div>
           
-          {/* Right side (2/5) - Image */}
           <div className="col-span-2 h-full">
             <div className="h-full">
               <img 

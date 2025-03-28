@@ -1,6 +1,7 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import { 
   Bath, 
   Bed, 
@@ -11,7 +12,8 @@ import {
   MapPin, 
   Ruler, 
   Share2,
-  User as UserIcon
+  User as UserIcon,
+  ExternalLink
 } from "lucide-react";
 import { 
   Carousel,
@@ -89,6 +91,48 @@ const PropertyDetail: React.FC = () => {
   const [contactPhone, setContactPhone] = useState("");
   const [message, setMessage] = useState("");
   const [showingDialogOpen, setShowingDialogOpen] = useState(false);
+
+  // Fetch virtual tour URL from Supabase
+  const { data: propertyDetails } = useQuery({
+    queryKey: ['propertyDetails', id],
+    queryFn: async () => {
+      if (!id) return null;
+      
+      const { data, error } = await supabase
+        .from('property_details')
+        .select('*')
+        .eq('property_id', id)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error fetching property details:', error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Parse the virtualtour URL - some entries in the database have it stored as an array
+  const getVirtualTourUrl = () => {
+    if (!propertyDetails?.virtualtour) return null;
+    
+    try {
+      // If it's a JSON string (array), parse it and take the first item
+      if (propertyDetails.virtualtour.startsWith('[')) {
+        const parsed = JSON.parse(propertyDetails.virtualtour);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
+      }
+      // Otherwise, use it directly
+      return propertyDetails.virtualtour;
+    } catch (error) {
+      console.error('Error parsing virtual tour URL:', error);
+      return null;
+    }
+  };
+
+  const virtualTourUrl = getVirtualTourUrl();
 
   // Check if the property is already saved
   useEffect(() => {
@@ -277,11 +321,14 @@ const PropertyDetail: React.FC = () => {
               </div>
             </div>
             <div className="mt-6 flex flex-wrap gap-2">
-              <Button asChild>
-                <a href={property.virtualTourUrl} target="_blank" rel="noopener noreferrer">
-                  Virtual Tour
-                </a>
-              </Button>
+              {virtualTourUrl && (
+                <Button asChild>
+                  <a href={virtualTourUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Virtual Tour
+                  </a>
+                </Button>
+              )}
               
               <Dialog open={showingDialogOpen} onOpenChange={setShowingDialogOpen}>
                 <DialogTrigger asChild>
