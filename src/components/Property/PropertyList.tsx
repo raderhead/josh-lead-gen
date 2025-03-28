@@ -13,10 +13,12 @@ interface PropertyListProps {
 const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
   const [properties, setProperties] = useState<Property[]>(initialProperties);
   const [loading, setLoading] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
   const { toast } = useToast();
 
   const handleFilterChange = async (filters: any) => {
     setLoading(true);
+    setIsFiltering(true);
     
     try {
       // Start with a base query
@@ -141,6 +143,10 @@ const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
       setProperties(initialProperties);
     } finally {
       setLoading(false);
+      // Add a short delay before removing the filtering state to ensure smooth transition
+      setTimeout(() => {
+        setIsFiltering(false);
+      }, 300);
     }
   };
 
@@ -155,7 +161,7 @@ const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
           ))}
         </div>
       ) : (
-        <>
+        <div className={`transition-opacity duration-500 ${isFiltering ? 'opacity-70' : 'opacity-100'}`}>
           {properties.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
               {properties.map((property) => (
@@ -168,7 +174,7 @@ const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
               <p className="mt-1 text-gray-500">Try adjusting your filters to find what you're looking for.</p>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
