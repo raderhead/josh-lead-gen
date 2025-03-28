@@ -5,10 +5,31 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, MapPin, School, Building, Home, BarChart2, Pool, DollarSign, BadgePercent, Map, Shield, Phone } from 'lucide-react';
+import { ChevronLeft, MapPin, School, Building, Home, BarChart2, DollarSign, BadgePercent, Map, Shield, Phone } from 'lucide-react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+
+// Create a custom Pool icon since it's not available in lucide-react
+const Pool = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M2 12.5h20"></path>
+    <path d="M2 8.5c4-1 4 3 8 3s4-4 8-3"></path>
+    <path d="M2 16.5c4-1 4 3 8 3s4-4 8-3"></path>
+    <path d="M22 12.5v-4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4"></path>
+  </svg>
+);
 
 const neighborhoodData = {
   'abilene': {
