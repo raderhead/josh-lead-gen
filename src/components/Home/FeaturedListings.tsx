@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from "@/hooks/use-toast";
+import { Property } from '@/types/property';
 
 // Define the property structure from webhook
 interface WebhookProperty {
@@ -19,7 +20,7 @@ interface WebhookProperty {
 }
 
 // Transform webhook properties to match our Property type format
-const transformProperty = (property: WebhookProperty) => {
+const transformProperty = (property: WebhookProperty): Property => {
   // Extract address parts
   const addressParts = property.address?.split(',') || [];
   const street = addressParts[0] || '';
@@ -30,6 +31,14 @@ const transformProperty = (property: WebhookProperty) => {
 
   // Parse price from string to number
   const priceValue = parseInt(property.price?.replace(/[^0-9]/g, '') || '0');
+  
+  // Ensure propertyType is one of the valid types in the Property interface
+  const validPropertyTypes = ['Single Family', 'Condo', 'Townhouse', 'Multi Family', 'Land', 'Other'] as const;
+  let propertyType: Property['propertyType'] = 'Other';
+  
+  if (property.type && validPropertyTypes.includes(property.type as any)) {
+    propertyType = property.type as Property['propertyType'];
+  }
   
   return {
     id: property.id,
@@ -44,7 +53,7 @@ const transformProperty = (property: WebhookProperty) => {
     beds: 0, // Default values
     baths: 0,
     sqft: 0,
-    propertyType: property.type || 'Other',
+    propertyType,
     description: property.title || 'Commercial property in Abilene',
     features: [],
     hasPool: false,
@@ -62,7 +71,7 @@ const transformProperty = (property: WebhookProperty) => {
 };
 
 const FeaturedListings = () => {
-  const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
+  const [featuredProperties, setFeaturedProperties] = useState<WebhookProperty[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
