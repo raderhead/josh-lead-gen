@@ -21,11 +21,14 @@ const FeaturedListings = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [testingWebhook, setTestingWebhook] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
 
-  const fetchProperties = async () => {
+  const fetchProperties = async (showLoadingState = true) => {
     try {
-      setLoading(true);
+      if (showLoadingState) {
+        setIsUpdating(true);
+      }
       
       // Fetch directly from Supabase properties table
       const { data, error: fetchError } = await supabase
@@ -138,14 +141,17 @@ const FeaturedListings = () => {
       console.error('Error fetching featured properties:', err);
       setError(err.message);
       
-      // Notify the user about the error
-      toast({
-        title: 'Error fetching properties',
-        description: 'Could not load featured properties from Supabase.',
-        variant: 'destructive',
-      });
+      // Notify the user about the error only when initially loading
+      if (showLoadingState) {
+        toast({
+          title: 'Error fetching properties',
+          description: 'Could not load featured properties from Supabase.',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setLoading(false);
+      setIsUpdating(false);
     }
   };
 
@@ -208,8 +214,10 @@ const FeaturedListings = () => {
   useEffect(() => {
     fetchProperties();
     
-    // Set up a polling interval to fetch new data periodically
-    const intervalId = setInterval(fetchProperties, 30000); // Poll every 30 seconds
+    // Set up a polling interval to fetch new data periodically - increase to 5 minutes to reduce flickering
+    const intervalId = setInterval(() => {
+      fetchProperties(false); // Don't show loading state for periodic updates
+    }, 300000); // Poll every 5 minutes instead of 30 seconds
     
     return () => {
       clearInterval(intervalId); // Clean up on component unmount
@@ -257,7 +265,7 @@ const FeaturedListings = () => {
             <p className="mt-1 text-gray-500">Please try again later.</p>
             <div className="flex justify-center gap-4 mt-4">
               <Button 
-                onClick={fetchProperties} 
+                onClick={() => fetchProperties()}
                 variant="outline" 
                 className="flex items-center gap-2"
               >
@@ -276,27 +284,29 @@ const FeaturedListings = () => {
             </div>
           </div>
         ) : featuredProperties.length > 0 ? (
-          <Carousel 
-            opts={{
-              loop: true,
-              align: "start",
-            }}
-            className="w-full"
-          >
-            <CarouselContent>
-              {featuredProperties.map((property) => (
-                <CarouselItem key={property.id} className="md:basis-1/3">
-                  <div className="p-1">
-                    <PropertyCard property={property} />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="flex justify-center gap-4 mt-6">
-              <CarouselPrevious className="relative static" />
-              <CarouselNext className="relative static" />
-            </div>
-          </Carousel>
+          <div className={`transition-opacity duration-500 ${isUpdating ? 'opacity-70' : 'opacity-100'}`}>
+            <Carousel 
+              opts={{
+                loop: true,
+                align: "start",
+              }}
+              className="w-full"
+            >
+              <CarouselContent>
+                {featuredProperties.map((property) => (
+                  <CarouselItem key={property.id} className="md:basis-1/3">
+                    <div className="p-1">
+                      <PropertyCard property={property} />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="flex justify-center gap-4 mt-6">
+                <CarouselPrevious className="relative static" />
+                <CarouselNext className="relative static" />
+              </div>
+            </Carousel>
+          </div>
         ) : (
           <div className="text-center py-10">
             <h3 className="text-lg font-medium text-gray-900">No featured properties found</h3>
