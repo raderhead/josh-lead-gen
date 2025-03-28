@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout/Layout';
 import PropertyList from '@/components/Property/PropertyList';
@@ -6,7 +5,6 @@ import { Property } from '@/types/property';
 import { Button } from '@/components/ui/button';
 import { Webhook, RefreshCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 
 const Properties = () => {
@@ -55,7 +53,7 @@ const Properties = () => {
           hasGarage: false,
           garageSpaces: 0,
           images: item.image_url ? [item.image_url] : ['/placeholder.svg'],
-          status: 'For Sale',
+          status: (item.status as "For Sale" | "For Rent" | "Sold" | "Pending") || 'For Sale',
           listedDate: item.received_at || new Date().toISOString(),
           agent: {
             id: '1',
@@ -64,7 +62,7 @@ const Properties = () => {
             email: 'contact@abilenecommercial.com',
           },
           isFeatured: item.featured || false,
-        }));
+        } as Property));
         
         setAllProperties(properties);
         setError(null);
@@ -103,7 +101,7 @@ const Properties = () => {
             hasGarage: item.hasGarage || false,
             garageSpaces: item.garageSpaces,
             images: item.images || ['/placeholder.svg'],
-            status: item.status || 'For Sale',
+            status: (item.status as "For Sale" | "For Rent" | "Sold" | "Pending") || 'For Sale',
             listedDate: item.listedDate || new Date().toISOString(),
             agent: item.agent || {
               id: '1',
@@ -112,7 +110,7 @@ const Properties = () => {
               email: 'contact@abilenecommercial.com',
             },
             isFeatured: item.isFeatured || false,
-          }));
+          } as Property));
           
           setAllProperties(properties);
           setError(null);

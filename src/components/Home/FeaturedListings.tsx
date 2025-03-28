@@ -57,7 +57,7 @@ const FeaturedListings = () => {
           hasGarage: false,
           garageSpaces: 0,
           images: item.image_url ? [item.image_url] : ['/placeholder.svg'],
-          status: 'For Sale',
+          status: (item.status as "For Sale" | "For Rent" | "Sold" | "Pending") || 'For Sale',
           listedDate: item.received_at || new Date().toISOString(),
           agent: {
             id: '1',
@@ -66,7 +66,7 @@ const FeaturedListings = () => {
             email: 'contact@abilenecommercial.com',
           },
           isFeatured: true,
-        }));
+        } as Property));
         
         setFeaturedProperties(properties);
         setError(null);
@@ -105,7 +105,7 @@ const FeaturedListings = () => {
             hasGarage: item.hasGarage || false,
             garageSpaces: item.garageSpaces,
             images: item.images || ['/placeholder.svg'],
-            status: item.status || 'For Sale',
+            status: (item.status as "For Sale" | "For Rent" | "Sold" | "Pending") || 'For Sale',
             listedDate: item.listedDate || new Date().toISOString(),
             agent: item.agent || {
               id: '1',
@@ -114,7 +114,7 @@ const FeaturedListings = () => {
               email: 'contact@abilenecommercial.com',
             },
             isFeatured: true,
-          }));
+          } as Property));
           
           setFeaturedProperties(properties);
           setError(null);
