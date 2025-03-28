@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Mail, Phone, Calendar, MessageSquare, User } from 'lucide-react';
+import { Mail, Phone, Calendar, MessageSquare, User, Loader2 } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 import BuyerQuiz from '@/components/Quiz/BuyerQuiz';
+import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -31,6 +32,8 @@ const formSchema = z.object({
 });
 
 const Contact = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,17 +45,37 @@ const Contact = () => {
     }
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-
-    // Simulate API submission
-    setTimeout(() => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setIsSubmitting(true);
+      
+      // Send the form data to our Edge Function
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: values,
+      });
+      
+      if (error) {
+        throw new Error(error.message || 'Something went wrong while sending your message');
+      }
+      
+      console.log('Email sent successfully:', data);
+      
       toast({
         title: "Message Sent",
         description: "Thank you for contacting us. We'll get back to you soon!"
       });
+      
       form.reset();
-    }, 1000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: error.message || "There was a problem sending your message. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return <Layout>
@@ -148,8 +171,19 @@ const Contact = () => {
                         <FormMessage />
                       </FormItem>} />
                   
-                  <Button type="submit" className="w-full bg-estate-blue hover:bg-estate-dark-blue">
-                    Send Message
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-estate-blue hover:bg-estate-dark-blue"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      'Send Message'
+                    )}
                   </Button>
                 </form>
               </Form>
