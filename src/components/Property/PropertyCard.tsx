@@ -5,6 +5,17 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { formatCurrency } from "@/lib/utils";
 import { Property } from "@/types/property";
 import PropertyModal from "./PropertyModal";
+import { useUser } from "@/contexts/UserContext";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface PropertyCardProps {
   property: Property;
@@ -12,6 +23,16 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const { user } = useUser();
+
+  const handlePropertyClick = () => {
+    if (user) {
+      openModal();
+    } else {
+      setIsAuthDialogOpen(true);
+    }
+  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -20,7 +41,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     <>
       <div 
         className="rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1 bg-card"
-        onClick={openModal}
+        onClick={handlePropertyClick}
       >
         <div className="relative">
           <AspectRatio ratio={4 / 3}>
@@ -67,6 +88,29 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         isOpen={isModalOpen} 
         onClose={closeModal}
       />
+
+      <Dialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Sign in required</DialogTitle>
+            <DialogDescription>
+              Please sign in or create an account to view property details. This helps our agents provide you with better service.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <Link to="/signup" onClick={() => setIsAuthDialogOpen(false)}>
+                Create Account
+              </Link>
+            </Button>
+            <Button asChild className="w-full sm:w-auto">
+              <Link to="/login" onClick={() => setIsAuthDialogOpen(false)}>
+                Sign In
+              </Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
