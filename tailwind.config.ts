@@ -68,7 +68,7 @@ export default {
 					'dark-blue': '#0d47a1',
 					'light-blue': '#e8f0fe',
 					'gray': '#f8f9fa',
-					'dark-gray': '#202124',
+					'dark-gray': '#0f172a',
 					'green': '#34a853',
 					'red': '#ea4335',
 					'yellow': '#fbbc04',
@@ -78,6 +78,9 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			boxShadow: {
+				'glow': '0 0 10px rgba(59, 130, 246, 0.5)',
 			},
 			keyframes: {
 				'accordion-down': {
