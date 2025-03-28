@@ -35,11 +35,18 @@ const signupSchema = z.object({
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 
+const loginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
-  const { user, signup, isLoading } = useUser();
+  const { user, signup, login, isLoading } = useUser();
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -55,7 +62,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const form = useForm<SignupFormValues>({
+  const signupForm = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: '',
@@ -64,7 +71,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     },
   });
 
-  const onSubmit = async (values: SignupFormValues) => {
+  const loginForm = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      phone: '',
+    },
+  });
+
+  const onSignup = async (values: SignupFormValues) => {
     try {
       await signup(values.email, values.name, values.phone);
       setIsAuthDialogOpen(false);
@@ -75,6 +90,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       });
     } catch (error) {
       console.error('Signup error:', error);
+    }
+  };
+
+  const onLogin = async (values: LoginFormValues) => {
+    try {
+      await login(values.email, values.phone);
+      setIsAuthDialogOpen(false);
+      openModal();
+      toast({
+        title: "Welcome back!",
+        description: "You can now view property details and save favorites.",
+      });
+    } catch (error) {
+      console.error('Login error:', error);
     }
   };
 
@@ -164,23 +193,60 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="mt-4 space-y-4">
-                <div>
-                  <Input placeholder="Email" type="email" className="w-full" />
-                </div>
-                <div>
-                  <Input placeholder="Phone (used as your password)" type="tel" className="w-full" />
-                </div>
-                
-                <Button className="w-full text-lg py-6" type="submit">
-                  Continue to Photos →
-                </Button>
-                
-                <div className="text-center mt-4">
-                  <p className="text-blue-600 hover:underline cursor-pointer" onClick={() => setShowSignInForm(false)}>
-                    Don't have an account?
-                  </p>
-                </div>
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
+                  <FormField
+                    control={loginForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="you@example.com" {...field} className="py-6" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={loginForm.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input type="tel" placeholder="(555) 555-5555" {...field} className="py-6" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Button 
+                    className="w-full text-lg py-6" 
+                    type="submit"
+                    disabled={loginForm.formState.isSubmitting || isLoading}
+                  >
+                    {loginForm.formState.isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Signing in...
+                      </>
+                    ) : (
+                      <>
+                        <LogIn className="mr-2 h-5 w-5" />
+                        Sign In
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
+              
+              <div className="text-center mt-4">
+                <p className="text-blue-600 hover:underline cursor-pointer" onClick={() => setShowSignInForm(false)}>
+                  Don't have an account?
+                </p>
               </div>
             </>
           ) : (
@@ -193,10 +259,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                 </DialogDescription>
               </DialogHeader>
               
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+              <Form {...signupForm}>
+                <form onSubmit={signupForm.handleSubmit(onSignup)} className="space-y-4 mt-4">
                   <FormField
-                    control={form.control}
+                    control={signupForm.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
@@ -209,7 +275,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                   />
 
                   <FormField
-                    control={form.control}
+                    control={signupForm.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
@@ -222,7 +288,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                   />
 
                   <FormField
-                    control={form.control}
+                    control={signupForm.control}
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
@@ -242,9 +308,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                   <Button 
                     type="submit" 
                     className="w-full text-lg py-6" 
-                    disabled={form.formState.isSubmitting || isLoading}
+                    disabled={signupForm.formState.isSubmitting || isLoading}
                   >
-                    {form.formState.isSubmitting ? (
+                    {signupForm.formState.isSubmitting ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                         Creating Account...
