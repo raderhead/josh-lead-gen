@@ -31,7 +31,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             />
           </AspectRatio>
           {property.isFeatured && (
-            <Badge className="absolute top-2 right-2 bg-[#F0C66A] text-black font-semibold">
+            <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-semibold">
               Featured
             </Badge>
           )}
@@ -42,21 +42,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           )}
         </div>
 
-        <div className="bg-black text-white p-4">
+        <div className="bg-background text-foreground p-4">
           <div className="flex justify-between items-center mb-1">
-            <h3 className="text-3xl font-bold text-[#F0C66A]">
+            <h3 className="text-3xl font-bold text-primary">
               {formatCurrency(property.price)}
             </h3>
             {property.mls && (
               <div className="text-right">
-                <span className="text-xs text-gray-400">MLS</span>
+                <span className="text-xs text-muted-foreground">MLS</span>
                 <p className="text-sm">{property.mls}</p>
               </div>
             )}
           </div>
           
           <p className="text-lg">{property.address.street}</p>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             {property.address.city} {property.address.state}, {property.address.zipCode} USA
           </p>
         </div>
