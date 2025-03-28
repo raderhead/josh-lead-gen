@@ -1,13 +1,15 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatCurrency } from '@/lib/utils';
 import { Property } from '@/types/property';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { MapPin, ExternalLink } from 'lucide-react';
+import { MapPin, ExternalLink, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogContent } from '@/components/ui/alert-dialog';
 
 interface PropertyModalProps {
   property: Property | null;
@@ -16,6 +18,8 @@ interface PropertyModalProps {
 }
 
 const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose }) => {
+  const [virtualTourOpen, setVirtualTourOpen] = useState(false);
+  
   const { data: propertyDetails, isLoading } = useQuery({
     queryKey: ['propertyDetails', property?.id],
     queryFn: async () => {
@@ -57,139 +61,159 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
   const virtualTourUrl = getVirtualTourUrl();
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background text-foreground border-0">
-        <div className="grid grid-cols-1 md:grid-cols-5">
-          <div className="col-span-3 p-0">
-            <ScrollArea className="h-[80vh] md:h-[90vh]">
-              <div className="p-6">
-                <div className="mb-6">
-                  <h2 className="text-4xl font-bold text-primary dark:text-estate-dark-blue">{formatCurrency(property.price)}</h2>
-                  <p className="text-xl mt-2">
-                    {property.address.street}, {property.address.city} {property.address.state}, {property.address.zipCode} USA
-                  </p>
-                  <div className="flex gap-2 mt-3">
-                    <Badge variant="outline" className="bg-background text-primary border-primary">
-                      {property.propertyType}
-                    </Badge>
-                    {property.status === "For Sale" && (
-                      <Badge className="bg-background border-primary text-primary">
-                        {property.status}
+    <>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background text-foreground border-0">
+          <div className="grid grid-cols-1 md:grid-cols-5">
+            <div className="col-span-3 p-0">
+              <ScrollArea className="h-[80vh] md:h-[90vh]">
+                <div className="p-6">
+                  <div className="mb-6">
+                    <h2 className="text-4xl font-bold text-primary dark:text-estate-dark-blue">{formatCurrency(property.price)}</h2>
+                    <p className="text-xl mt-2">
+                      {property.address.street}, {property.address.city} {property.address.state}, {property.address.zipCode} USA
+                    </p>
+                    <div className="flex gap-2 mt-3">
+                      <Badge variant="outline" className="bg-background text-primary border-primary">
+                        {property.propertyType}
                       </Badge>
-                    )}
-                  </div>
-                </div>
-
-                {property.mls && (
-                  <div className="mb-6 text-right">
-                    <div className="bg-secondary inline-block p-3 rounded">
-                      <p className="text-sm text-muted-foreground">MLS</p>
-                      <p className="text-lg">{property.mls}</p>
+                      {property.status === "For Sale" && (
+                        <Badge className="bg-background border-primary text-primary">
+                          {property.status}
+                        </Badge>
+                      )}
                     </div>
                   </div>
-                )}
 
-                <div className="mb-6 bg-secondary p-4 rounded-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
-                        <span className="text-primary">ⓘ</span>
+                  {property.mls && (
+                    <div className="mb-6 text-right">
+                      <div className="bg-secondary inline-block p-3 rounded">
+                        <p className="text-sm text-muted-foreground">MLS</p>
+                        <p className="text-lg">{property.mls}</p>
                       </div>
-                      <h3 className="text-xl font-semibold text-primary">Property Overview</h3>
                     </div>
-                    
-                    {virtualTourUrl && (
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="gap-1 border-primary text-primary"
-                        asChild
-                      >
-                        <a 
-                          href={virtualTourUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
+                  )}
+
+                  <div className="mb-6 bg-secondary p-4 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
+                          <span className="text-primary">ⓘ</span>
+                        </div>
+                        <h3 className="text-xl font-semibold text-primary">Property Overview</h3>
+                      </div>
+                      
+                      {virtualTourUrl && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="gap-1 border-primary text-primary"
+                          onClick={() => setVirtualTourOpen(true)}
                         >
                           <ExternalLink size={14} />
                           Open Virtual Tour
-                        </a>
-                      </Button>
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {propertyDetails?.landsize && (
+                      <div className="flex items-center gap-3 ml-10 mb-3">
+                        <div className="w-6 h-6 flex items-center justify-center">
+                          <span className="text-primary">📏</span>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Land Size</p>
+                          <p>{propertyDetails.landsize}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {propertyDetails?.propertysize && (
+                      <div className="flex items-center gap-3 ml-10">
+                        <div className="w-6 h-6 flex items-center justify-center">
+                          <span className="text-primary">🏠</span>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Property Size</p>
+                          <p>{propertyDetails.propertysize}</p>
+                        </div>
+                      </div>
                     )}
                   </div>
-                  
-                  {propertyDetails?.landsize && (
-                    <div className="flex items-center gap-3 ml-10 mb-3">
-                      <div className="w-6 h-6 flex items-center justify-center">
-                        <span className="text-primary">📏</span>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Land Size</p>
-                        <p>{propertyDetails.landsize}</p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {propertyDetails?.propertysize && (
-                    <div className="flex items-center gap-3 ml-10">
-                      <div className="w-6 h-6 flex items-center justify-center">
-                        <span className="text-primary">🏠</span>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Property Size</p>
-                        <p>{propertyDetails.propertysize}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
 
-                <div className="mb-6 bg-secondary p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
-                      <span className="text-primary">ⓘ</span>
+                  <div className="mb-6 bg-secondary p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
+                        <span className="text-primary">ⓘ</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-primary">Description</h3>
                     </div>
-                    <h3 className="text-xl font-semibold text-primary">Description</h3>
-                  </div>
-                  <p className="ml-10 text-foreground whitespace-pre-line">
-                    {propertyDetails?.remarks || property.description}
-                  </p>
-                </div>
-
-                <div className="mb-6 bg-secondary p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
-                      <span className="text-primary">📍</span>
-                    </div>
-                    <h3 className="text-xl font-semibold text-primary">Location</h3>
-                  </div>
-                  <div className="ml-10">
-                    <p className="flex items-center text-foreground">
-                      <MapPin className="mr-2 text-primary" size={16} />
-                      {property.address.street}, {property.address.city}, {property.address.state} {property.address.zipCode}
+                    <p className="ml-10 text-foreground whitespace-pre-line">
+                      {propertyDetails?.remarks || property.description}
                     </p>
                   </div>
-                </div>
 
-                {propertyDetails?.listingby && (
-                  <div className="text-muted-foreground mt-6 ml-10">
-                    <p>Listed by: {propertyDetails.listingby}</p>
+                  <div className="mb-6 bg-secondary p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
+                        <span className="text-primary">📍</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-primary">Location</h3>
+                    </div>
+                    <div className="ml-10">
+                      <p className="flex items-center text-foreground">
+                        <MapPin className="mr-2 text-primary" size={16} />
+                        {property.address.street}, {property.address.city}, {property.address.state} {property.address.zipCode}
+                      </p>
+                    </div>
                   </div>
-                )}
+
+                  {propertyDetails?.listingby && (
+                    <div className="text-muted-foreground mt-6 ml-10">
+                      <p>Listed by: {propertyDetails.listingby}</p>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </div>
+            
+            <div className="col-span-2 h-full">
+              <div className="h-full">
+                <img 
+                  src={property.images[0]} 
+                  alt={property.address.street}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            </ScrollArea>
-          </div>
-          
-          <div className="col-span-2 h-full">
-            <div className="h-full">
-              <img 
-                src={property.images[0]} 
-                alt={property.address.street}
-                className="w-full h-full object-cover"
-              />
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {/* Virtual Tour Dialog */}
+      {virtualTourUrl && (
+        <AlertDialog open={virtualTourOpen} onOpenChange={setVirtualTourOpen}>
+          <AlertDialogContent className="max-w-5xl p-0 border-0 overflow-hidden">
+            <div className="relative w-full h-[80vh]">
+              <Button 
+                onClick={() => setVirtualTourOpen(false)}
+                variant="outline"
+                size="icon"
+                className="absolute top-2 right-2 z-50 bg-white/80 hover:bg-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              <iframe 
+                src={virtualTourUrl} 
+                title="Virtual Tour"
+                className="w-full h-full border-0"
+                allowFullScreen
+              />
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </>
   );
 };
 
