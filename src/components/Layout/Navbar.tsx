@@ -4,38 +4,41 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Building, Search, BarChart2, Phone } from 'lucide-react';
 import UserMenu from './UserMenu';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50">
+    <nav className="bg-background border-b border-border sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
               <Building className="h-8 w-8 text-estate-blue" />
-              <span className="ml-2 text-xl font-bold text-estate-dark-blue">Abilene Commercial</span>
+              <span className="ml-2 text-xl font-bold text-foreground">Abilene Commercial</span>
             </Link>
           </div>
           
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex space-x-1">
-              <Link to="/" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Home</Link>
-              <Link to="/properties" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Properties</Link>
-              <Link to="/valuation" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Valuation</Link>
-              <Link to="/contact" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-estate-blue">Contact</Link>
+              <Link to="/" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Home</Link>
+              <Link to="/properties" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Properties</Link>
+              <Link to="/valuation" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Valuation</Link>
+              <Link to="/contact" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Contact</Link>
             </div>
-            <div className="ml-4 flex items-center">
+            <div className="ml-4 flex items-center gap-2">
+              <ThemeToggle />
               <UserMenu />
             </div>
           </div>
           
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle />
             <UserMenu />
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="ml-2 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-foreground hover:text-estate-blue hover:bg-background focus:outline-none"
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
@@ -50,11 +53,11 @@ const Navbar = () => {
       </div>
 
       {isOpen && (
-        <div className="md:hidden animate-fade-in">
+        <div className="md:hidden animate-fade-in bg-background">
           <div className="pt-2 pb-3 space-y-1">
             <Link 
               to="/" 
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-estate-blue hover:bg-gray-50"
+              className="block px-3 py-2 text-base font-medium text-foreground hover:text-estate-blue hover:bg-secondary"
               onClick={() => setIsOpen(false)}
             >
               <div className="flex items-center">
@@ -64,7 +67,7 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/properties"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-estate-blue hover:bg-gray-50"
+              className="block px-3 py-2 text-base font-medium text-foreground hover:text-estate-blue hover:bg-secondary"
               onClick={() => setIsOpen(false)}
             >
               <div className="flex items-center">
@@ -74,7 +77,7 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/valuation"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-estate-blue hover:bg-gray-50"
+              className="block px-3 py-2 text-base font-medium text-foreground hover:text-estate-blue hover:bg-secondary"
               onClick={() => setIsOpen(false)}
             >
               <div className="flex items-center">
@@ -84,7 +87,7 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/contact"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-estate-blue hover:bg-gray-50"
+              className="block px-3 py-2 text-base font-medium text-foreground hover:text-estate-blue hover:bg-secondary"
               onClick={() => setIsOpen(false)}
             >
               <div className="flex items-center">

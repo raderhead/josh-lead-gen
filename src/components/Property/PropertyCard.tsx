@@ -19,7 +19,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   return (
     <>
       <div 
-        className="rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1"
+        className="rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1 bg-card"
         onClick={openModal}
       >
         <div className="relative">
@@ -36,13 +36,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             </Badge>
           )}
           {property.propertyType && (
-            <Badge className="absolute top-2 left-2 bg-black bg-opacity-70 text-white">
+            <Badge className="absolute top-2 left-2 bg-black/70 dark:bg-white/20 text-white">
               {property.propertyType}
             </Badge>
           )}
         </div>
 
-        <div className="bg-background text-foreground p-4">
+        <div className="p-4">
           <div className="flex justify-between items-center mb-1">
             <h3 className="text-3xl font-bold text-primary">
               {formatCurrency(property.price)}
@@ -55,7 +55,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             )}
           </div>
           
-          <p className="text-lg">{property.address.street}</p>
+          <p className="text-lg text-foreground">{property.address.street}</p>
           <p className="text-muted-foreground">
             {property.address.city} {property.address.state}, {property.address.zipCode} USA
           </p>
