@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Property } from '@/types/property';
 import PropertyCard from '../Property/PropertyCard';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, Webhook } from 'lucide-react';
+import { ChevronRight, Webhook, RefreshCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -20,17 +20,21 @@ const FeaturedListings = () => {
     try {
       setLoading(true);
       
-      // Fetch from the Supabase webhook endpoint
-      const response = await fetch('https://xfmguaamogzirnnqktwz.supabase.co/functions/v1/receive-webhook');
+      // Fetch directly from Supabase properties table
+      const { data, error: fetchError } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('featured', true)
+        .limit(6);
       
-      if (!response.ok) {
-        throw new Error(`Failed to fetch properties: ${response.status} ${response.statusText}`);
+      if (fetchError) {
+        throw new Error(`Failed to fetch properties: ${fetchError.message}`);
       }
       
-      const data = await response.json();
+      console.log('Properties from Supabase:', data);
       
-      if (Array.isArray(data)) {
-        // Transform the webhook data to match our Property type if needed
+      if (Array.isArray(data) && data.length > 0) {
+        // Transform the data to match our Property type
         const properties = data.map((item: any) => ({
           id: item.id || String(Math.random()),
           address: {
@@ -38,24 +42,24 @@ const FeaturedListings = () => {
             city: item.city || 'Abilene',
             state: item.state || 'TX',
             zipCode: item.zipCode || '',
-            neighborhood: item.neighborhood,
+            neighborhood: item.neighborhood || '',
           },
-          price: item.price ? Number(item.price) : 0,
+          price: item.price ? Number(item.price.replace(/[^0-9.-]+/g, '')) : 0,
           beds: item.beds ? Number(item.beds) : 0,
           baths: item.baths ? Number(item.baths) : 0,
-          sqft: item.sqft ? Number(item.sqft) : 0,
-          lotSize: item.lotSize,
-          yearBuilt: item.yearBuilt,
-          propertyType: item.propertyType || 'Other',
+          sqft: item.size ? Number(item.size.replace(/[^0-9.-]+/g, '')) : 0,
+          lotSize: 0,
+          yearBuilt: 0,
+          propertyType: item.type || 'Other',
           description: item.description || '',
-          features: item.features || [],
-          hasPool: item.hasPool || false,
-          hasGarage: item.hasGarage || false,
-          garageSpaces: item.garageSpaces,
-          images: item.images || ['/placeholder.svg'],
-          status: item.status || 'For Sale',
-          listedDate: item.listedDate || new Date().toISOString(),
-          agent: item.agent || {
+          features: [],
+          hasPool: false,
+          hasGarage: false,
+          garageSpaces: 0,
+          images: item.image_url ? [item.image_url] : ['/placeholder.svg'],
+          status: 'For Sale',
+          listedDate: item.received_at || new Date().toISOString(),
+          agent: {
             id: '1',
             name: 'Abilene Commercial',
             phone: '123-456-7890',
@@ -67,7 +71,60 @@ const FeaturedListings = () => {
         setFeaturedProperties(properties);
         setError(null);
       } else {
-        throw new Error('Invalid data format received from webhook');
+        // If no data, try the webhook as a fallback
+        const response = await fetch('https://xfmguaamogzirnnqktwz.supabase.co/functions/v1/receive-webhook');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch properties from webhook: ${response.status} ${response.statusText}`);
+        }
+        
+        const webhookData = await response.json();
+        console.log('Webhook response:', webhookData);
+        
+        if (Array.isArray(webhookData) && webhookData.length > 0) {
+          // Process webhook data
+          const properties = webhookData.map((item: any) => ({
+            id: item.id || String(Math.random()),
+            address: {
+              street: item.address || '',
+              city: item.city || 'Abilene',
+              state: item.state || 'TX',
+              zipCode: item.zipCode || '',
+              neighborhood: item.neighborhood,
+            },
+            price: item.price ? Number(item.price) : 0,
+            beds: item.beds ? Number(item.beds) : 0,
+            baths: item.baths ? Number(item.baths) : 0,
+            sqft: item.sqft ? Number(item.sqft) : 0,
+            lotSize: item.lotSize,
+            yearBuilt: item.yearBuilt,
+            propertyType: item.propertyType || 'Other',
+            description: item.description || '',
+            features: item.features || [],
+            hasPool: item.hasPool || false,
+            hasGarage: item.hasGarage || false,
+            garageSpaces: item.garageSpaces,
+            images: item.images || ['/placeholder.svg'],
+            status: item.status || 'For Sale',
+            listedDate: item.listedDate || new Date().toISOString(),
+            agent: item.agent || {
+              id: '1',
+              name: 'Abilene Commercial',
+              phone: '123-456-7890',
+              email: 'contact@abilenecommercial.com',
+            },
+            isFeatured: true,
+          }));
+          
+          setFeaturedProperties(properties);
+          setError(null);
+        } else if (webhookData && webhookData.success) {
+          // If webhook returns success but no data
+          setFeaturedProperties([]);
+          setError('No properties found');
+        } else {
+          throw new Error('No properties found in database or webhook');
+        }
       }
     } catch (err: any) {
       console.error('Error fetching featured properties:', err);
@@ -76,7 +133,7 @@ const FeaturedListings = () => {
       // Notify the user about the error
       toast({
         title: 'Error fetching properties',
-        description: 'Could not load featured properties from the webhook.',
+        description: 'Could not load featured properties from Supabase.',
         variant: 'destructive',
       });
     } finally {
@@ -190,13 +247,25 @@ const FeaturedListings = () => {
           <div className="text-center py-10">
             <h3 className="text-lg font-medium text-gray-900">Could not load properties</h3>
             <p className="mt-1 text-gray-500">Please try again later.</p>
-            <Button 
-              onClick={fetchProperties} 
-              variant="outline" 
-              className="mt-4"
-            >
-              Retry
-            </Button>
+            <div className="flex justify-center gap-4 mt-4">
+              <Button 
+                onClick={fetchProperties} 
+                variant="outline" 
+                className="flex items-center gap-2"
+              >
+                <RefreshCcw size={16} />
+                Retry
+              </Button>
+              <Button 
+                onClick={testWebhook} 
+                disabled={testingWebhook}
+                variant="estate" 
+                className="flex items-center gap-2"
+              >
+                <Webhook size={16} />
+                {testingWebhook ? "Sending test data..." : "Test Webhook"}
+              </Button>
+            </div>
           </div>
         ) : featuredProperties.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
