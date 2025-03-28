@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { MapPin, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 
 interface PropertyModalProps {
   property: Property | null;
@@ -49,7 +50,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
               <div className="p-6">
                 {/* Header with price and address */}
                 <div className="mb-6">
-                  <h2 className="text-4xl font-bold text-primary">{formatCurrency(property.price)}</h2>
+                  <h2 className="text-4xl font-bold text-primary dark:text-estate-dark-blue">{formatCurrency(property.price)}</h2>
                   <p className="text-xl mt-2">
                     {property.address.street}, {property.address.city} {property.address.state}, {property.address.zipCode} USA
                   </p>
@@ -77,11 +78,31 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
 
                 {/* Property Overview Section */}
                 <div className="mb-6 bg-secondary p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
-                      <span className="text-primary">ⓘ</span>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center">
+                        <span className="text-primary">ⓘ</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-primary">Property Overview</h3>
                     </div>
-                    <h3 className="text-xl font-semibold text-primary">Property Overview</h3>
+                    
+                    {propertyDetails?.virtualtour && (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        className="gap-1 border-primary text-primary"
+                        asChild
+                      >
+                        <a 
+                          href={propertyDetails.virtualtour} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink size={14} />
+                          Open Virtual Tour
+                        </a>
+                      </Button>
+                    )}
                   </div>
                   
                   {propertyDetails?.landsize && (
@@ -105,20 +126,6 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                         <p className="text-sm text-muted-foreground">Property Size</p>
                         <p>{propertyDetails.propertysize}</p>
                       </div>
-                    </div>
-                  )}
-                  
-                  {propertyDetails?.virtualtour && (
-                    <div className="mt-4 ml-10">
-                      <a 
-                        href={propertyDetails.virtualtour} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/80 transition-colors"
-                      >
-                        <ExternalLink size={16} />
-                        Open Virtual Tour
-                      </a>
                     </div>
                   )}
                 </div>
