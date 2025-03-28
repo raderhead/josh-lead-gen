@@ -6,6 +6,8 @@ import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from "@/hooks/use-toast";
 import { Property } from '@/types/property';
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Define the property structure from webhook
 interface WebhookProperty {
@@ -78,6 +80,9 @@ const FeaturedListings = () => {
     const fetchProperties = async () => {
       try {
         setLoading(true);
+        console.log('Fetching properties from webhook...');
+        
+        // Use the Supabase edge function
         const response = await fetch('https://xfmguaamogzirnnqktwz.supabase.co/functions/v1/receive-webhook');
         
         if (!response.ok) {
@@ -85,10 +90,13 @@ const FeaturedListings = () => {
         }
         
         const data = await response.json();
-        console.log('Raw webhook response:', data);
+        console.log('Webhook response:', data);
         
-        // If no properties are returned, create demo properties for testing
+        // If no properties are returned or if we got a success message but no properties array
         if (!Array.isArray(data) || data.length === 0) {
+          console.log('No featured properties found, using demo data');
+          
+          // Create demo properties for testing
           const demoProperties = [
             {
               id: "demo1",
@@ -118,18 +126,32 @@ const FeaturedListings = () => {
               featured: true
             }
           ];
+          
           setFeaturedProperties(demoProperties);
           console.log('Using demo properties:', demoProperties);
+          
+          toast({
+            title: "Using demo properties",
+            description: "No properties found in database. Showing demo data.",
+            variant: "default"
+          });
         } else {
           // Filter to get only featured properties and limit to 3
-          const featured = data.filter((property: WebhookProperty) => property.featured)
-            .slice(0, 3);
+          const featured = Array.isArray(data) ? data.filter((property: WebhookProperty) => property.featured).slice(0, 3) : [];
           
-          setFeaturedProperties(featured);
-          console.log('Fetched featured properties:', featured);
+          if (featured.length === 0) {
+            // If no featured properties, use all properties up to 3
+            const properties = data.slice(0, 3);
+            setFeaturedProperties(properties);
+            console.log('No featured properties, using first 3 properties:', properties);
+          } else {
+            setFeaturedProperties(featured);
+            console.log('Fetched featured properties:', featured);
+          }
         }
       } catch (error) {
         console.error('Error fetching properties:', error);
+        
         // Create demo properties on error
         const demoProperties = [
           {
@@ -160,6 +182,7 @@ const FeaturedListings = () => {
             featured: true
           }
         ];
+        
         setFeaturedProperties(demoProperties);
         console.log('Using demo properties after error:', demoProperties);
         
@@ -175,8 +198,8 @@ const FeaturedListings = () => {
 
     fetchProperties();
     
-    // Set up polling every 60 seconds for live updates
-    const interval = setInterval(fetchProperties, 60000);
+    // Set up polling every 30 seconds for live updates
+    const interval = setInterval(fetchProperties, 30000);
     
     return () => clearInterval(interval);
   }, []);
@@ -199,7 +222,21 @@ const FeaturedListings = () => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-gray-200 animate-pulse h-80 rounded-lg"></div>
+              <div key={i} className="rounded-lg overflow-hidden">
+                <Skeleton className="h-48 w-full" />
+                <div className="p-4 space-y-2">
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <div className="flex gap-4 mt-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                  <div className="flex justify-between mt-2">
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-6 w-20" />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         ) : featuredProperties.length > 0 ? (
