@@ -9,7 +9,7 @@ import { MapPin, ExternalLink, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { AlertDialog, AlertDialogContent } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription } from '@/components/ui/alert-dialog';
 
 interface PropertyModalProps {
   property: Property | null;
@@ -59,6 +59,11 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
   };
 
   const virtualTourUrl = getVirtualTourUrl();
+
+  // Handle closing the virtual tour properly
+  const handleCloseVirtualTour = () => {
+    setVirtualTourOpen(false);
+  };
 
   return (
     <>
@@ -192,11 +197,15 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
 
       {/* Virtual Tour Dialog */}
       {virtualTourUrl && (
-        <AlertDialog open={virtualTourOpen} onOpenChange={setVirtualTourOpen}>
+        <AlertDialog open={virtualTourOpen} onOpenChange={handleCloseVirtualTour}>
           <AlertDialogContent className="max-w-5xl p-0 border-0 overflow-hidden">
+            <AlertDialogTitle className="sr-only">Virtual Tour</AlertDialogTitle>
+            <AlertDialogDescription className="sr-only">
+              Virtual tour of the property
+            </AlertDialogDescription>
             <div className="relative w-full h-[80vh]">
               <Button 
-                onClick={() => setVirtualTourOpen(false)}
+                onClick={handleCloseVirtualTour}
                 variant="outline"
                 size="icon"
                 className="absolute top-2 right-2 z-50 bg-white/80 hover:bg-white"
