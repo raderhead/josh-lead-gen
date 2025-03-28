@@ -175,7 +175,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                 </div>
                 
                 <Button className="w-full text-lg py-6" type="submit">
-                  Continue to Photos &gt;
+                  Continue to Photos >
                 </Button>
                 
                 <div className="text-center mt-4">
@@ -252,7 +252,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                         Creating Account...
                       </>
                     ) : (
-                      "Continue to Photos &gt;"
+                      "Continue to Photos >"
                     )}
                   </Button>
                 </form>
