@@ -276,7 +276,13 @@ const FeaturedListings = () => {
             </div>
           </div>
         ) : featuredProperties.length > 0 ? (
-          <Carousel className="w-full">
+          <Carousel 
+            opts={{
+              loop: true,
+              align: "start",
+            }}
+            className="w-full"
+          >
             <CarouselContent>
               {featuredProperties.map((property) => (
                 <CarouselItem key={property.id} className="md:basis-1/3">
