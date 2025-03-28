@@ -9,7 +9,7 @@ import { MapPin, ExternalLink, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription } from '@/components/ui/alert-dialog';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 interface PropertyModalProps {
   property: Property | null;
@@ -195,23 +195,21 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
         </DialogContent>
       </Dialog>
 
-      {/* Virtual Tour Dialog */}
+      {/* Virtual Tour Sheet instead of AlertDialog */}
       {virtualTourUrl && (
-        <AlertDialog open={virtualTourOpen} onOpenChange={handleCloseVirtualTour}>
-          <AlertDialogContent className="max-w-5xl p-0 border-0 overflow-hidden">
-            <AlertDialogTitle className="sr-only">Virtual Tour</AlertDialogTitle>
-            <AlertDialogDescription className="sr-only">
-              Virtual tour of the property
-            </AlertDialogDescription>
-            <div className="relative w-full h-[80vh]">
-              <Button 
-                onClick={handleCloseVirtualTour}
-                variant="outline"
-                size="icon"
-                className="absolute top-2 right-2 z-50 bg-white/80 hover:bg-white"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+        <Sheet open={virtualTourOpen} onOpenChange={setVirtualTourOpen}>
+          <SheetContent side="bottom" className="p-0 h-[90vh] max-w-full border-t-0 rounded-t-lg">
+            <div className="relative w-full h-full pt-10">
+              <div className="absolute top-2 right-4 z-50">
+                <Button 
+                  onClick={handleCloseVirtualTour}
+                  variant="outline"
+                  size="icon"
+                  className="bg-white/80 hover:bg-white"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
               <iframe 
                 src={virtualTourUrl} 
                 title="Virtual Tour"
@@ -219,8 +217,8 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                 allowFullScreen
               />
             </div>
-          </AlertDialogContent>
-        </AlertDialog>
+          </SheetContent>
+        </Sheet>
       )}
     </>
   );
