@@ -39,7 +39,6 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
-// Create a custom Pool icon since it's not available in lucide-react
 const Pool = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +59,6 @@ const Pool = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Types for our saved properties
 interface SavedProperty {
   id: string;
   address: string;
@@ -92,7 +90,6 @@ const PropertyDetail: React.FC = () => {
   const [message, setMessage] = useState("");
   const [showingDialogOpen, setShowingDialogOpen] = useState(false);
 
-  // Fetch virtual tour URL from Supabase
   const { data: propertyDetails } = useQuery({
     queryKey: ['propertyDetails', id],
     queryFn: async () => {
@@ -114,17 +111,14 @@ const PropertyDetail: React.FC = () => {
     enabled: !!id,
   });
 
-  // Parse the virtualtour URL - some entries in the database have it stored as an array
   const getVirtualTourUrl = () => {
     if (!propertyDetails?.virtualtour) return null;
     
     try {
-      // If it's a JSON string (array), parse it and take the first item
       if (propertyDetails.virtualtour.startsWith('[')) {
         const parsed = JSON.parse(propertyDetails.virtualtour);
         return Array.isArray(parsed) && parsed.length > 0 ? parsed[0] : null;
       }
-      // Otherwise, use it directly
       return propertyDetails.virtualtour;
     } catch (error) {
       console.error('Error parsing virtual tour URL:', error);
@@ -134,11 +128,9 @@ const PropertyDetail: React.FC = () => {
 
   const virtualTourUrl = getVirtualTourUrl();
 
-  // Check if the property is already saved
   useEffect(() => {
     if (!property) return;
     
-    // Get saved properties from localStorage
     const savedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
     const isAlreadySaved = savedProperties.some((p: SavedProperty) => p.id === property.id);
     setIsFavorite(isAlreadySaved);
@@ -149,13 +141,11 @@ const PropertyDetail: React.FC = () => {
   }
 
   const toggleFavorite = () => {
-    // Get existing saved properties
     const savedProperties: SavedProperty[] = JSON.parse(
       localStorage.getItem("savedProperties") || "[]"
     );
 
     if (isFavorite) {
-      // Remove from favorites
       const updatedProperties = savedProperties.filter(
         (p: SavedProperty) => p.id !== property.id
       );
@@ -166,7 +156,6 @@ const PropertyDetail: React.FC = () => {
         description: "You can add it back anytime.",
       });
     } else {
-      // Add to favorites
       const propertyToSave: SavedProperty = {
         id: property.id,
         address: `${property.address.street}, ${property.address.city}`,
@@ -195,7 +184,6 @@ const PropertyDetail: React.FC = () => {
       return;
     }
 
-    // Create showing request object
     const showingRequest: ShowingRequest = {
       propertyId: property.id,
       date: showingDate,
@@ -206,19 +194,16 @@ const PropertyDetail: React.FC = () => {
       message: message
     };
 
-    // Save showing request to localStorage for now
     const showingRequests = JSON.parse(
       localStorage.getItem("showingRequests") || "[]"
     );
     localStorage.setItem("showingRequests", JSON.stringify([...showingRequests, showingRequest]));
 
-    // Show success toast
     toast({
       title: "Showing request sent",
       description: `An agent will contact you soon to confirm your showing on ${showingDate} at ${showingTime}.`,
     });
 
-    // Close the dialog and reset form
     setShowingDialogOpen(false);
     setShowingDate("");
     setShowingTime("");
@@ -232,7 +217,6 @@ const PropertyDetail: React.FC = () => {
     <Layout>
       <div className="container mx-auto py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Image Gallery */}
           <div>
             <Carousel className="w-full">
               <CarouselContent>
@@ -255,7 +239,6 @@ const PropertyDetail: React.FC = () => {
             </Carousel>
           </div>
 
-          {/* Property Details */}
           <div>
             <div className="flex justify-between items-start">
               <div>

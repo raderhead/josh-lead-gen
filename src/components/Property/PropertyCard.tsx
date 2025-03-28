@@ -20,7 +20,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Link } from "react-router-dom";
-import { UserPlus, LogIn } from "lucide-react";
+import { Heart, LogIn } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PropertyCardProps {
   property: Property;
@@ -29,11 +30,7 @@ interface PropertyCardProps {
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -43,6 +40,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
   const { user, signup, isLoading } = useUser();
+  const { toast } = useToast();
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const handlePropertyClick = () => {
     if (user) {
@@ -61,27 +60,45 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     defaultValues: {
       name: '',
       email: '',
-      password: '',
-      confirmPassword: '',
+      phone: '',
     },
   });
 
   const onSubmit = async (values: SignupFormValues) => {
     try {
-      await signup(values.email, values.name, values.password);
+      // Using phone as password as requested
+      await signup(values.email, values.name, values.phone);
       setIsAuthDialogOpen(false);
       openModal(); // Open the property modal after successful signup
+      toast({
+        title: "Account created successfully",
+        description: "You can now view property details and save favorites.",
+      });
     } catch (error) {
       // Error already handled in the signup function
       console.error('Signup error:', error);
     }
   };
 
+  const toggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent opening the property modal
+    
+    if (!user) {
+      setIsAuthDialogOpen(true);
+      return;
+    }
+    
+    setIsFavorite(!isFavorite);
+    toast({
+      title: isFavorite ? "Removed from favorites" : "Added to favorites",
+      description: isFavorite ? "Property removed from your favorites" : "Property added to your favorites",
+    });
+  };
+
   return (
     <>
       <div 
-        className="rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1 bg-card"
-        onClick={handlePropertyClick}
+        className="rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl cursor-pointer hover:-translate-y-1 bg-card relative"
       >
         <div className="relative">
           <AspectRatio ratio={4 / 3}>
@@ -89,6 +106,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               src={property.images[0]}
               alt={property.address.street}
               className="object-cover w-full h-full"
+              onClick={handlePropertyClick}
             />
           </AspectRatio>
           {property.isFeatured && (
@@ -101,9 +119,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               {property.propertyType}
             </Badge>
           )}
+          <Button 
+            variant={isFavorite ? "default" : "outline"} 
+            size="icon" 
+            onClick={toggleFavorite}
+            className={`absolute top-2 right-2 ${isFavorite ? "bg-rose-500 hover:bg-rose-600" : "bg-white/80 hover:bg-white"} ${property.isFeatured ? "top-12" : "top-2"}`}
+          >
+            <Heart className={isFavorite ? "fill-white" : ""} />
+          </Button>
         </div>
 
-        <div className="p-4">
+        <div className="p-4" onClick={handlePropertyClick}>
           <div className="flex justify-between items-center mb-1">
             <h3 className="text-3xl font-bold text-primary dark:text-estate-dark-blue">
               {formatCurrency(property.price)}
@@ -130,41 +156,42 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       />
 
       <Dialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-md">
           {showSignInForm ? (
             <>
               <DialogHeader>
-                <DialogTitle>Sign in to your account</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-center text-2xl font-bold">Sign In</DialogTitle>
+                <DialogDescription className="text-center">
                   Sign in to view property details and save your favorite listings.
                 </DialogDescription>
               </DialogHeader>
-              <div className="mt-4 flex justify-center">
-                <Button asChild className="w-full">
-                  <Link to="/login" onClick={() => setIsAuthDialogOpen(false)}>
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Continue to sign in
-                  </Link>
+              
+              <div className="mt-4 space-y-4">
+                <div>
+                  <Input placeholder="Email" type="email" className="w-full" />
+                </div>
+                <div>
+                  <Input placeholder="Phone (used as your password)" type="tel" className="w-full" />
+                </div>
+                
+                <Button className="w-full text-lg py-6" type="submit">
+                  Continue to Photos &gt;
                 </Button>
-              </div>
-              <div className="mt-4 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Don't have an account?{' '}
-                  <button 
-                    onClick={() => setShowSignInForm(false)} 
-                    className="text-estate-blue hover:underline font-medium"
-                  >
-                    Create one
-                  </button>
-                </p>
+                
+                <div className="text-center mt-4">
+                  <p className="text-blue-600 hover:underline cursor-pointer" onClick={() => setShowSignInForm(false)}>
+                    Don't have an account?
+                  </p>
+                </div>
               </div>
             </>
           ) : (
             <>
               <DialogHeader>
-                <DialogTitle>Create an account</DialogTitle>
-                <DialogDescription>
-                  Create an account to view property details and save your favorite listings.
+                <DialogTitle className="text-center text-2xl font-bold">Free Access</DialogTitle>
+                <DialogDescription className="text-center mt-2">
+                  Access full property details and exclusive listings.
+                  <p className="italic mt-1">(Prices and inventory current as of {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })})</p>
                 </DialogDescription>
               </DialogHeader>
               
@@ -175,9 +202,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Smith" {...field} />
+                          <Input placeholder="Full Name" {...field} className="py-6" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -189,9 +215,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="you@example.com" {...field} />
+                          <Input placeholder="Email" {...field} className="py-6" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -200,26 +225,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
                   <FormField
                     control={form.control}
-                    name="password"
+                    name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} />
+                          <Input 
+                            type="tel" 
+                            placeholder="Phone (also used as your password)" 
+                            {...field} 
+                            className="py-6" 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -228,7 +243,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
                   <Button 
                     type="submit" 
-                    className="w-full" 
+                    className="w-full text-lg py-6" 
                     disabled={form.formState.isSubmitting || isLoading}
                   >
                     {form.formState.isSubmitting ? (
@@ -237,25 +252,25 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                         Creating Account...
                       </>
                     ) : (
-                      <>
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Create Account
-                      </>
+                      "Continue to Photos &gt;"
                     )}
                   </Button>
                 </form>
               </Form>
               
-              <div className="mt-4 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Already have an account?{' '}
-                  <button 
-                    onClick={() => setShowSignInForm(true)} 
-                    className="text-estate-blue hover:underline font-medium"
-                  >
-                    Sign in
-                  </button>
+              <div className="text-center mt-2">
+                <p className="text-blue-600 hover:underline cursor-pointer" onClick={() => setShowSignInForm(true)}>
+                  Already have an account?
                 </p>
+              </div>
+
+              <div className="text-xs text-muted-foreground text-center mt-4">
+                By clicking "Continue to Photos" you are expressly consenting, in writing, to 
+                receive telemarketing and other messages, including artificial or prerecorded 
+                voices, via automated calls or texts from <span className="font-semibold">estatesearch.com</span> at the 
+                number you provided above. This consent is not required to purchase any 
+                good or service. Message and data rates may apply, frequency varies. Text 
+                HELP for help or STOP to cancel.
               </div>
             </>
           )}
