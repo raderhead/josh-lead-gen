@@ -7,16 +7,23 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface PropertyListProps {
-  initialProperties: Property[];
+  initialProperties?: Property[];
+  searchTerm?: string;  // Add searchTerm prop
+  filters?: any;        // Add filters prop
 }
 
-const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
+const PropertyList: React.FC<PropertyListProps> = ({ 
+  initialProperties = [], 
+  searchTerm = "",     // Set default value
+  filters = {}         // Set default value
+}) => {
   const [properties, setProperties] = useState<Property[]>(initialProperties);
   const [loading, setLoading] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
   const { toast } = useToast();
 
-  const handleFilterChange = async (filters: any) => {
+  // This function will use both the passed filters and searchTerm
+  const handleFilterChange = async (newFilters: any) => {
     setLoading(true);
     setIsFiltering(true);
     
@@ -24,17 +31,22 @@ const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
       // Start with a base query
       let query = supabase.from('properties').select('*');
       
-      // Apply filters
-      if (filters.city) {
-        query = query.ilike('address', `%${filters.city}%`);
+      // Apply search term if it exists
+      if (searchTerm) {
+        query = query.or(`address.ilike.%${searchTerm}%,city.ilike.%${searchTerm}%`);
+      }
+      
+      // Apply city filter
+      if (newFilters.city) {
+        query = query.ilike('address', `%${newFilters.city}%`);
       }
       
       // Apply property type filter (skip if "any" is selected)
-      if (filters.propertyType && filters.propertyType !== 'any') {
-        query = query.eq('type', filters.propertyType);
+      if (newFilters.propertyType && newFilters.propertyType !== 'any') {
+        query = query.eq('type', newFilters.propertyType);
       }
       
-      if (filters.minPrice > 0 || filters.maxPrice < 1000000) {
+      if (newFilters.minPrice > 0 || newFilters.maxPrice < 1000000) {
         // This is a simplified approach since price is stored as text
         // For a more robust solution, consider storing price as numeric in the database
         const { data, error } = await query;
@@ -47,7 +59,7 @@ const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
         const filteredProperties = data
           .filter(item => {
             const price = Number(item.price?.replace(/[^0-9.-]+/g, '')) || 0;
-            return price >= filters.minPrice && price <= filters.maxPrice;
+            return price >= newFilters.minPrice && price <= newFilters.maxPrice;
           })
           .map((item: any) => ({
             id: item.id || String(Math.random()),
@@ -149,6 +161,13 @@ const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
       }, 300);
     }
   };
+
+  // Call handleFilterChange whenever searchTerm or filters change
+  useState(() => {
+    if (searchTerm || Object.keys(filters).length > 0) {
+      handleFilterChange({ ...filters, searchTerm });
+    }
+  }, [searchTerm, filters]);
 
   return (
     <div className="w-full">

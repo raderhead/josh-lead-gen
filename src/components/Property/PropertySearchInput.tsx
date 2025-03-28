@@ -18,12 +18,14 @@ interface PropertySearchInputProps {
     lat: number;
     lng: number;
   }) => void;
+  onSearch?: (term: string) => void; // Added the missing onSearch prop
 }
 
 const PropertySearchInput: React.FC<PropertySearchInputProps> = ({
   placeholder = "Enter an address, city, or zip code",
   className = "",
-  onAddressSelected
+  onAddressSelected,
+  onSearch // Add this to the destructured props
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [address, setAddress] = useState('');
@@ -32,6 +34,11 @@ const PropertySearchInput: React.FC<PropertySearchInputProps> = ({
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAddress = e.target.value;
     setAddress(newAddress);
+    
+    // Call onSearch if it's provided
+    if (onSearch) {
+      onSearch(newAddress);
+    }
   };
 
   const handleAddressSubmit = () => {
