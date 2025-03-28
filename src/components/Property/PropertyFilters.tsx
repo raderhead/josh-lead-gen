@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { 
   Select, 
@@ -47,20 +48,6 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFilterChange }) => 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onFilterChange(filters);
-  };
-
-  const handleReset = () => {
-    setFilters({
-      city: '',
-      minPrice: 0,
-      maxPrice: 1000000,
-      beds: 0,
-      baths: 0,
-      propertyType: '',
-      hasPool: false,
-      hasGarage: false
-    });
-    onFilterChange({});
   };
 
   return (
@@ -116,13 +103,10 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFilterChange }) => 
           </Select>
         </div>
         
-        <div className="w-full md:w-auto flex gap-2">
-          <Button type="submit" className="bg-estate-blue hover:bg-estate-dark-blue flex-1">
+        <div className="w-full md:w-auto">
+          <Button type="submit" className="bg-estate-blue hover:bg-estate-dark-blue flex-1 w-full">
             <Search className="mr-2 h-4 w-4" />
             Search
-          </Button>
-          <Button type="button" variant="outline" onClick={handleReset} className="flex-1 md:flex-none">
-            Reset
           </Button>
         </div>
       </div>

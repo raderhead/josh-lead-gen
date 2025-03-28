@@ -1,9 +1,9 @@
-
 import { useState } from 'react';
 import { Property } from '@/types/property';
 import PropertyCard from './PropertyCard';
 import PropertyFilters from './PropertyFilters';
-import { getPropertiesByFilter } from '@/data/properties';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface PropertyListProps {
   initialProperties: Property[];
@@ -12,15 +12,130 @@ interface PropertyListProps {
 const PropertyList: React.FC<PropertyListProps> = ({ initialProperties }) => {
   const [properties, setProperties] = useState<Property[]>(initialProperties);
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleFilterChange = (filters: any) => {
+  const handleFilterChange = async (filters: any) => {
     setLoading(true);
-    // Simulate API call delay
-    setTimeout(() => {
-      const filteredProperties = getPropertiesByFilter(filters);
-      setProperties(filteredProperties);
+    
+    try {
+      // Start with a base query
+      let query = supabase.from('properties').select('*');
+      
+      // Apply filters
+      if (filters.city) {
+        query = query.ilike('address', `%${filters.city}%`);
+      }
+      
+      if (filters.minPrice > 0 || filters.maxPrice < 1000000) {
+        // This is a simplified approach since price is stored as text
+        // For a more robust solution, consider storing price as numeric in the database
+        const { data, error } = await query;
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Filter the properties based on price range client-side
+        const filteredProperties = data
+          .filter(item => {
+            const price = Number(item.price?.replace(/[^0-9.-]+/g, '')) || 0;
+            return price >= filters.minPrice && price <= filters.maxPrice;
+          })
+          .map((item: any) => ({
+            id: item.id || String(Math.random()),
+            address: {
+              street: item.address || '',
+              city: item.city || 'Abilene',
+              state: item.state || 'TX',
+              zipCode: item.zipCode || '',
+              neighborhood: item.neighborhood || '',
+            },
+            price: item.price ? Number(item.price.replace(/[^0-9.-]+/g, '')) : 0,
+            beds: item.beds ? Number(item.beds) : 0,
+            baths: item.baths ? Number(item.baths) : 0,
+            sqft: item.size ? Number(item.size.replace(/[^0-9.-]+/g, '')) : 0,
+            lotSize: 0,
+            yearBuilt: 0,
+            propertyType: item.type || 'Other',
+            description: item.description || '',
+            features: [],
+            hasPool: false,
+            hasGarage: false,
+            garageSpaces: 0,
+            images: item.image_url ? [item.image_url] : ['/placeholder.svg'],
+            status: (item.status as "For Sale" | "For Rent" | "Sold" | "Pending") || 'For Sale',
+            listedDate: item.received_at || new Date().toISOString(),
+            agent: {
+              id: '1',
+              name: 'Abilene Commercial',
+              phone: '123-456-7890',
+              email: 'contact@abilenecommercial.com',
+            },
+            isFeatured: item.featured || false,
+            mls: item.mls || '',
+          } as Property));
+          
+        setProperties(filteredProperties);
+      } else {
+        // If no price filter, just fetch all
+        const { data, error } = await query;
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Transform data to match Property type
+        const transformedProperties = data.map((item: any) => ({
+          id: item.id || String(Math.random()),
+          address: {
+            street: item.address || '',
+            city: item.city || 'Abilene',
+            state: item.state || 'TX',
+            zipCode: item.zipCode || '',
+            neighborhood: item.neighborhood || '',
+          },
+          price: item.price ? Number(item.price.replace(/[^0-9.-]+/g, '')) : 0,
+          beds: item.beds ? Number(item.beds) : 0,
+          baths: item.baths ? Number(item.baths) : 0,
+          sqft: item.size ? Number(item.size.replace(/[^0-9.-]+/g, '')) : 0,
+          lotSize: 0,
+          yearBuilt: 0,
+          propertyType: item.type || 'Other',
+          description: item.description || '',
+          features: [],
+          hasPool: false,
+          hasGarage: false,
+          garageSpaces: 0,
+          images: item.image_url ? [item.image_url] : ['/placeholder.svg'],
+          status: (item.status as "For Sale" | "For Rent" | "Sold" | "Pending") || 'For Sale',
+          listedDate: item.received_at || new Date().toISOString(),
+          agent: {
+            id: '1',
+            name: 'Abilene Commercial',
+            phone: '123-456-7890',
+            email: 'contact@abilenecommercial.com',
+          },
+          isFeatured: item.featured || false,
+          mls: item.mls || '',
+        } as Property));
+        
+        setProperties(transformedProperties);
+      }
+    } catch (err: any) {
+      console.error('Error filtering properties:', err);
+      
+      // Show error toast
+      toast({
+        title: 'Error filtering properties',
+        description: 'Could not filter properties. Please try again later.',
+        variant: 'destructive',
+      });
+      
+      // Keep showing the initial properties
+      setProperties(initialProperties);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   return (
