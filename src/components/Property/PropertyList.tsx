@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Property } from '@/types/property';
 import PropertyCard from './PropertyCard';
 import PropertyFilters from './PropertyFilters';
@@ -162,8 +162,8 @@ const PropertyList: React.FC<PropertyListProps> = ({
     }
   };
 
-  // Call handleFilterChange whenever searchTerm or filters change
-  useState(() => {
+  // Changed useState to useEffect to properly handle side effects when dependencies change
+  useEffect(() => {
     if (searchTerm || Object.keys(filters).length > 0) {
       handleFilterChange({ ...filters, searchTerm });
     }
