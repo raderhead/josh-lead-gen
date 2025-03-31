@@ -102,13 +102,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("Attempting signup with:", { email, name });
       
-      // Explicitly set the name in the user_metadata
+      // IMPORTANT: We need to pass the name in the signup options to ensure it's stored correctly
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            name: name, // Setting the name explicitly
+            name: name, // This is the critical line that sets the user metadata
+            full_name: name, // Adding a second field as a backup
+            display_name: name // Adding a third field to ensure it's captured
           },
         },
       });
@@ -118,24 +120,31 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
       
-      console.log("Signup successful, user data:", data);
+      console.log("Signup response:", data);
       
-      // Immediately update user_metadata to ensure name is set
-      // This is needed because sometimes the metadata might not be properly set during signUp
+      // After signup, explicitly update the user metadata again to ensure it's set
       if (data.user) {
-        console.log("Updating user metadata with name:", name);
-        const { error: updateError } = await supabase.auth.updateUser({
-          data: { name: name }
-        });
+        console.log("User created, updating metadata for:", data.user.id);
         
-        if (updateError) {
-          console.error("Error updating user metadata:", updateError);
-        } else {
-          console.log("User metadata updated successfully");
+        try {
+          const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+            data: { 
+              name: name,
+              full_name: name,
+              display_name: name
+            }
+          });
+          
+          if (updateError) {
+            console.error("Error updating user metadata:", updateError);
+          } else {
+            console.log("User metadata updated successfully:", updateData);
+          }
+        } catch (updateErr) {
+          console.error("Exception during metadata update:", updateErr);
         }
       }
       
-      // User set by the onAuthStateChange listener
       toast({
         title: 'Account created',
         description: 'Your account has been successfully created.',

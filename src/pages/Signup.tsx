@@ -55,7 +55,8 @@ const Signup = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      console.log("Signup form submitted with full name:", values.name);
+      console.log("Signup form submitted with name:", values.name);
+      // Pass the name exactly as entered by the user
       await signup(values.email, values.name, values.password);
       // No need to navigate here as useEffect will handle it
     } catch (error) {
