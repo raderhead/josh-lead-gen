@@ -58,10 +58,12 @@ const Signup = () => {
   const onSubmit = async (values: FormValues) => {
     try {
       console.log("Signup form submitted with:", values);
-      // Log the phone number to ensure it's passed correctly
-      console.log("Phone number being sent:", values.phone);
       
-      // Pass the name and phone exactly as entered by the user
+      // Log the phone number specifically to ensure it's passed correctly
+      console.log("Phone number from form:", values.phone);
+      console.log("Phone number type:", typeof values.phone);
+      
+      // Just pass the phone number as-is - the formatting will be handled in UserContext
       await signup(values.email, values.name, values.password, values.phone);
       
       toast({
@@ -147,6 +149,11 @@ const Signup = () => {
                           type="tel" 
                           placeholder="(555) 123-4567" 
                           {...field} 
+                          // Log on change to debug
+                          onChange={(e) => {
+                            console.log("Phone input changed:", e.target.value);
+                            field.onChange(e);
+                          }}
                         />
                         <Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       </div>

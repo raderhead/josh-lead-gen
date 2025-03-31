@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -107,23 +108,31 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const origin = window.location.origin;
       console.log("Setting redirectTo to:", `${origin}/email-verified`);
       
-      // Format the phone number to clean it up, but don't add country code as we're not using SMS
+      // CRITICAL: Make sure phone is always stored correctly
+      // Remove all non-numeric characters from phone number
       const cleanedPhone = phone ? phone.replace(/\D/g, '') : '';
-      console.log("Cleaned phone:", cleanedPhone);
+      console.log("Raw phone input:", phone);
+      console.log("Cleaned phone (digits only):", cleanedPhone);
       
-      // Signup with all user metadata in one place
+      // Create a complete user metadata object with all phone fields
+      const userMetadata = {
+        name,
+        full_name: name,
+        display_name: name,
+        // Store phone in multiple fields to ensure it's captured somewhere
+        phone: cleanedPhone,
+        phone_number: cleanedPhone,
+        user_phone: cleanedPhone
+      };
+      
+      console.log("Sending user metadata to Supabase:", userMetadata);
+      
+      // Signup with user metadata
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            name,
-            full_name: name,
-            display_name: name,
-            phone: cleanedPhone || '',
-            phone_number: cleanedPhone || '',
-            user_phone: cleanedPhone || ''
-          },
+          data: userMetadata,
           emailRedirectTo: `${origin}/email-verified`,
         },
       });
@@ -141,20 +150,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         
         try {
           const { data: updateData, error: updateError } = await supabase.auth.updateUser({
-            data: { 
-              name,
-              full_name: name,
-              display_name: name,
-              phone: cleanedPhone || '',
-              phone_number: cleanedPhone || '',
-              user_phone: cleanedPhone || ''
-            }
+            data: userMetadata
           });
           
           if (updateError) {
             console.error("Error updating user metadata:", updateError);
           } else {
             console.log("User metadata updated successfully:", updateData);
+            
+            // Verify the phone number was stored in metadata
+            console.log("Updated user metadata phone:", 
+              updateData.user.user_metadata?.phone,
+              updateData.user.user_metadata?.phone_number,
+              updateData.user.user_metadata?.user_phone
+            );
           }
         } catch (updateErr) {
           console.error("Exception during metadata update:", updateErr);
