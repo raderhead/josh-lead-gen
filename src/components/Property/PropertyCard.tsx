@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -20,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Link } from "react-router-dom";
-import { Heart, LogIn, Phone } from "lucide-react";
+import { Heart, LogIn, Phone, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -52,6 +51,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
+  const [showVerificationWarning, setShowVerificationWarning] = useState(false);
   const { user, signup, login, isLoading } = useUser();
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
@@ -95,6 +95,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     } else {
       setIsAuthDialogOpen(true);
       setShowSignInForm(false);
+      setShowVerificationWarning(false);
     }
   };
 
@@ -122,14 +123,22 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
   const onSignup = async (values: SignupFormValues) => {
     try {
+      console.log("Signup form submitted with:", values);
+
+      // Log the phone number specifically to ensure it's passed correctly
+      console.log("Phone number from form:", values.phone);
+      console.log("Phone number type:", typeof values.phone);
+
+      // Pass the phone number as-is - the formatting will be handled in UserContext
       await signup(values.email, values.name, values.password, values.phone);
-      setIsAuthDialogOpen(false);
-      openModal();
-      toast({
-        title: "Account created successfully",
-        description: "You can now view property details and save favorites.",
-      });
+      
+      // Show verification warning instead of property details immediately
+      setShowVerificationWarning(true);
+      
+      // Clear the form
+      signupForm.reset();
     } catch (error) {
+      // Error already handled in the signup function
       console.error('Signup error:', error);
     }
   };
@@ -292,7 +301,47 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
       <Dialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen}>
         <DialogContent className="sm:max-w-md">
-          {showSignInForm ? (
+          {showVerificationWarning ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl font-bold">Account Created</DialogTitle>
+                <DialogDescription className="text-center">
+                  Your account has been created successfully.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="my-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+                <div className="flex items-start">
+                  <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-800">Email Verification Required</p>
+                    <p className="text-sm text-amber-700 mt-1">
+                      You can now view this property's details, but to access all features of the site 
+                      (saving favorites, contacting agents, etc.), please verify your email address.
+                      Check your inbox for a verification link.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-center gap-3 mt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsAuthDialogOpen(false)}
+                >
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setIsAuthDialogOpen(false);
+                    openModal();
+                  }}
+                >
+                  View Property Details
+                </Button>
+              </div>
+            </>
+          ) : showSignInForm ? (
             <>
               <DialogHeader>
                 <DialogTitle className="text-center text-2xl font-bold">Sign In</DialogTitle>

@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout/Layout';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const EmailVerified = () => {
   const { user } = useUser();
@@ -89,12 +90,12 @@ const EmailVerified = () => {
             </AlertDescription>
           </Alert>
           <div className="flex justify-center mt-4">
-            <button 
+            <Button 
               onClick={() => navigate('/login')} 
               className="px-4 py-2 bg-estate-blue text-white rounded hover:bg-estate-blue/90"
             >
               Return to Login
-            </button>
+            </Button>
           </div>
         </div>
       </Layout>
@@ -109,12 +110,28 @@ const EmailVerified = () => {
           <AlertTitle className="text-green-800">Verification Successful</AlertTitle>
           <AlertDescription className="text-green-700">
             Thank you{user?.name ? `, ${user.name}` : ''}. Your email has been verified.
+            <p className="mt-2">You now have full access to all features including:</p>
+            <ul className="list-disc list-inside mt-1 ml-2">
+              <li>Saving favorite properties</li>
+              <li>Contacting listing agents</li>
+              <li>Scheduling property viewings</li>
+              <li>Accessing exclusive listings</li>
+            </ul>
           </AlertDescription>
         </Alert>
         
         <p className="text-center text-muted-foreground">
           You will be redirected to the homepage in {countdown} seconds...
         </p>
+        
+        <div className="flex justify-center mt-4">
+          <Button 
+            onClick={() => navigate('/')} 
+            className="px-4 py-2 bg-estate-blue text-white rounded hover:bg-estate-blue/90"
+          >
+            Go to Homepage Now
+          </Button>
+        </div>
       </div>
     </Layout>
   );
