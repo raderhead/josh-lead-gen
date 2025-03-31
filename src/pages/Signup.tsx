@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { UserPlus, Phone } from 'lucide-react';
+
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
@@ -20,7 +21,9 @@ const formSchema = z.object({
   message: "Passwords don't match",
   path: ["confirmPassword"]
 });
+
 type FormValues = z.infer<typeof formSchema>;
+
 const Signup = () => {
   const {
     signup,
@@ -38,6 +41,7 @@ const Signup = () => {
       navigate('/');
     }
   }, [user, isLoading, navigate]);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,6 +52,7 @@ const Signup = () => {
       confirmPassword: ''
     }
   });
+
   const onSubmit = async (values: FormValues) => {
     try {
       console.log("Signup form submitted with:", values);
@@ -76,6 +81,7 @@ const Signup = () => {
       console.error('Signup error:', error);
     }
   };
+
   if (isLoading) {
     return <Layout>
         <div className="container max-w-md mx-auto py-10 flex items-center justify-center">
@@ -86,90 +92,117 @@ const Signup = () => {
         </div>
       </Layout>;
   }
+
   return <Layout>
       <div className="container max-w-md mx-auto py-10">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">Create an Account</h1>
-          <p className="text-muted-foreground mt-2">Join EstateView today</p>
-        </div>
-
         <div className="bg-card p-6 rounded-lg shadow-sm border">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField control={form.control} name="name" render={({
-              field
-            }) => <FormItem>
-                    <FormLabel className="py-0">First Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Smith" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>} />
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>First Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John" {...field} className="py-6" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField control={form.control} name="email" render={({
-              field
-            }) => <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="you@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>} />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="you@example.com" {...field} className="py-6" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField control={form.control} name="phone" render={({
-              field
-            }) => <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input type="tel" placeholder="(555) 123-4567" {...field}
-                  // Log on change to debug
-                  onChange={e => {
-                    console.log("Phone input changed:", e.target.value);
-                    field.onChange(e);
-                  }} />
-                        <Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>} />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        type="tel"
+                        placeholder="(555) 123-4567"
+                        {...field}
+                        className="py-6 pr-10"
+                        onChange={e => {
+                          console.log("Phone input changed:", e.target.value);
+                          field.onChange(e);
+                        }}
+                      />
+                      <Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField control={form.control} name="password" render={({
-              field
-            }) => <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>} />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} className="py-6" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField control={form.control} name="confirmPassword" render={({
-              field
-            }) => <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>} />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} className="py-6" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || isLoading}>
-                {form.formState.isSubmitting ? <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Creating Account...
-                  </> : <>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Create Account
-                  </>}
-              </Button>
-            </form>
-          </Form>
+            <Button 
+              type="submit" 
+              className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700 mt-4" 
+              onClick={form.handleSubmit(onSubmit)}
+              disabled={form.formState.isSubmitting || isLoading}
+            >
+              {form.formState.isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="mr-2 h-5 w-5" />
+                  Create Account
+                </>
+              )}
+            </Button>
+          </div>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
+            <p>
               Already have an account?{' '}
-              <Link to="/login" className="text-estate-blue hover:underline font-medium">
+              <Link to="/login" className="text-blue-600 hover:underline font-medium">
                 Sign in
               </Link>
             </p>
@@ -178,4 +211,5 @@ const Signup = () => {
       </div>
     </Layout>;
 };
+
 export default Signup;

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -19,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Link } from "react-router-dom";
-import { Heart, LogIn } from "lucide-react";
+import { Heart, LogIn, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -31,6 +32,11 @@ const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"]
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
@@ -101,6 +107,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       name: '',
       email: '',
       phone: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
@@ -114,7 +122,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
   const onSignup = async (values: SignupFormValues) => {
     try {
-      await signup(values.email, values.name, values.phone);
+      await signup(values.email, values.name, values.password, values.phone);
       setIsAuthDialogOpen(false);
       openModal();
       toast({
@@ -330,7 +338,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                   >
                     {loginForm.formState.isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
                         Signing in...
                       </>
                     ) : (
@@ -366,8 +374,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
+                        <FormLabel>First Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Full Name" {...field} className="py-6" />
+                          <Input placeholder="John" {...field} className="py-6" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -379,8 +388,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="Email" {...field} className="py-6" />
+                          <Input placeholder="you@example.com" {...field} className="py-6" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -392,13 +402,45 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="tel" 
-                            placeholder="Phone (also used as your password)" 
-                            {...field} 
-                            className="py-6" 
-                          />
+                          <div className="relative">
+                            <Input 
+                              type="tel" 
+                              placeholder="(555) 123-4567" 
+                              {...field} 
+                              className="py-6 pr-10" 
+                            />
+                            <Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signupForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} className="py-6" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signupForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} className="py-6" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -407,29 +449,38 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
                   <Button 
                     type="submit" 
-                    className="w-full text-lg py-6" 
+                    className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700" 
                     disabled={signupForm.formState.isSubmitting || isLoading}
                   >
                     {signupForm.formState.isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
                         Creating Account...
                       </>
                     ) : (
-                      "Continue to Photos →"
+                      <>
+                        <LogIn className="mr-2 h-5 w-5" />
+                        Create Account
+                      </>
                     )}
                   </Button>
                 </form>
               </Form>
               
               <div className="text-center mt-2">
-                <p className="text-blue-600 hover:underline cursor-pointer" onClick={() => setShowSignInForm(true)}>
-                  Already have an account?
+                <p>
+                  Already have an account? 
+                  <span 
+                    className="text-blue-600 hover:underline cursor-pointer ml-1" 
+                    onClick={() => setShowSignInForm(true)}
+                  >
+                    Sign in
+                  </span>
                 </p>
               </div>
 
               <div className="text-xs text-muted-foreground text-center mt-4">
-                By clicking "Continue to Photos" you are expressly consenting, in writing, to 
+                By clicking "Create Account" you are expressly consenting, in writing, to 
                 receive telemarketing and other messages, including artificial or prerecorded 
                 voices, via automated calls or texts from <span className="font-semibold">estatesearch.com</span> at the 
                 number you provided above. This consent is not required to purchase any 
