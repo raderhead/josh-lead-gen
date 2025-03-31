@@ -33,7 +33,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return {
       id: supabaseUser.id,
       email: supabaseUser.email || '',
-      // Use the user's metadata name or fall back to email name
+      // First try to get name from user_metadata, then fall back to email username
       name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
       role: 'user', // Default role
     };
@@ -120,12 +120,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       
       console.log("Signup successful, user data:", data);
       
-      // Update display name if needed
-      if (data.user && (!data.user.user_metadata?.name || data.user.user_metadata.name !== name)) {
+      // Immediately update user_metadata to ensure name is set
+      // This is needed because sometimes the metadata might not be properly set during signUp
+      if (data.user) {
         console.log("Updating user metadata with name:", name);
-        await supabase.auth.updateUser({
+        const { error: updateError } = await supabase.auth.updateUser({
           data: { name: name }
         });
+        
+        if (updateError) {
+          console.error("Error updating user metadata:", updateError);
+        } else {
+          console.log("User metadata updated successfully");
+        }
       }
       
       // User set by the onAuthStateChange listener
