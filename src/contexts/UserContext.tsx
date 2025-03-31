@@ -14,8 +14,8 @@ export interface User {
 interface UserContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, phone: string) => Promise<void>;
-  signup: (email: string, name: string, phone: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, name: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -60,16 +60,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, phone: string) => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Clean phone number (remove any non-digit characters)
-      const cleanedPhone = phone.replace(/\D/g, '');
-      console.log("Attempting login with:", { email, phone: cleanedPhone });
+      console.log("Attempting login with:", { email });
       
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
-        password: cleanedPhone // We're using phone as password
+        password
       });
       
       if (error) {
@@ -98,20 +96,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signup = async (email: string, name: string, phone: string) => {
+  const signup = async (email: string, name: string, password: string) => {
     setIsLoading(true);
     try {
-      // Clean phone number (remove any non-digit characters)
-      const cleanedPhone = phone.replace(/\D/g, '');
-      console.log("Attempting signup with:", { email, name, phone: cleanedPhone });
+      console.log("Attempting signup with:", { email, name });
       
       const { data, error } = await supabase.auth.signUp({
         email,
-        password: cleanedPhone, // Using phone as password
+        password,
         options: {
           data: {
             name,
-            phone: cleanedPhone,
           },
         },
       });
