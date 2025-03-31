@@ -60,23 +60,7 @@ const Contact = () => {
     try {
       setIsSubmitting(true);
       
-      // First send the data to the webhook
-      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
-      const webhookResponse = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-      
-      if (!webhookResponse.ok) {
-        throw new Error(`Webhook error: ${webhookResponse.status} ${webhookResponse.statusText}`);
-      }
-      
-      console.log('Webhook triggered successfully');
-      
-      // Then also send to our Edge Function for email notifications
+      // Send the form data to our Edge Function
       const { data, error } = await supabase.functions.invoke('send-contact-email', {
         body: values,
       });
