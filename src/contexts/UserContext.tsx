@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -8,6 +7,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  phone?: string;
   role: 'user' | 'agent' | 'admin';
 }
 
@@ -15,7 +15,7 @@ interface UserContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, name: string, password: string) => Promise<void>;
+  signup: (email: string, name: string, password: string, phone?: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -35,6 +35,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       email: supabaseUser.email || '',
       // First try to get name from user_metadata, then fall back to email username
       name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
+      phone: supabaseUser.user_metadata?.phone || '',
       role: 'user', // Default role
     };
   };
@@ -97,10 +98,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const signup = async (email: string, name: string, password: string) => {
+  const signup = async (email: string, name: string, password: string, phone?: string) => {
     setIsLoading(true);
     try {
-      console.log("Attempting signup with:", { email, name });
+      console.log("Attempting signup with:", { email, name, phone });
       
       // IMPORTANT: We need to pass the name in the signup options to ensure it's stored correctly
       const { data, error } = await supabase.auth.signUp({
@@ -110,7 +111,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           data: {
             name: name, // This is the critical line that sets the user metadata
             full_name: name, // Adding a second field as a backup
-            display_name: name // Adding a third field to ensure it's captured
+            display_name: name, // Adding a third field to ensure it's captured
+            phone: phone || '' // Add the phone number to user metadata
           },
         },
       });
@@ -131,7 +133,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             data: { 
               name: name,
               full_name: name,
-              display_name: name
+              display_name: name,
+              phone: phone || ''
             }
           });
           

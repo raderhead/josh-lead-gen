@@ -17,11 +17,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Phone } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -48,6 +49,7 @@ const Signup = () => {
     defaultValues: {
       name: '',
       email: '',
+      phone: '',
       password: '',
       confirmPassword: '',
     },
@@ -55,9 +57,9 @@ const Signup = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      console.log("Signup form submitted with name:", values.name);
-      // Pass the name exactly as entered by the user
-      await signup(values.email, values.name, values.password);
+      console.log("Signup form submitted with name:", values.name, "and phone:", values.phone);
+      // Pass the name and phone exactly as entered by the user
+      await signup(values.email, values.name, values.password, values.phone);
       // No need to navigate here as useEffect will handle it
     } catch (error) {
       // Error already handled in the signup function
@@ -111,6 +113,27 @@ const Signup = () => {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input placeholder="you@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input 
+                          type="tel" 
+                          placeholder="(555) 123-4567" 
+                          {...field} 
+                        />
+                        <Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
