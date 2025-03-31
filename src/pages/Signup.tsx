@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { UserPlus, Phone } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { MailCheck } from 'lucide-react';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -35,6 +37,7 @@ const Signup = () => {
   const {
     toast
   } = useToast();
+  const [isSuccess, setIsSuccess] = React.useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -64,24 +67,67 @@ const Signup = () => {
 
       // Just pass the phone number as-is - the formatting will be handled in UserContext
       await signup(values.email, values.name, values.password, values.phone);
+      
+      // Show success message on the page instead of redirecting immediately
+      setIsSuccess(true);
+      
+      // Show toast notification
       toast({
-        title: 'Verification Required',
+        title: 'Account Created!',
         description: 'Please check your email for a verification link.',
         variant: 'default',
-        // Keep this as 'default' but we'll style it differently
-        className: 'bg-amber-50 border-amber-200 text-amber-800' // Add yellow styling
+        className: 'bg-amber-50 border-amber-200 text-amber-800'
       });
 
       // Clear the form
       form.reset();
-
-      // Redirect to login page
-      navigate('/login');
     } catch (error) {
       // Error already handled in the signup function
       console.error('Signup error:', error);
     }
   };
+
+  if (isSuccess) {
+    return (
+      <Layout>
+        <div className="container max-w-md mx-auto py-10">
+          <Alert className="bg-amber-50 border-amber-200 mb-6">
+            <MailCheck className="h-5 w-5 text-amber-800" />
+            <AlertTitle className="text-amber-800 text-lg font-medium">Email Verification Required</AlertTitle>
+            <AlertDescription className="text-amber-700">
+              <p className="mb-2">
+                Your account has been created successfully! A verification link has been sent to your email.
+              </p>
+              <p className="mb-2">
+                <strong>Important:</strong> You can now view property details, but to access all features of our site, 
+                please verify your email by clicking the link we just sent you.
+              </p>
+              <p>
+                After verification, you'll have full access to save properties, 
+                get property valuations, and more.
+              </p>
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex flex-col items-center justify-center gap-4">
+            <Button 
+              onClick={() => navigate('/properties')} 
+              className="w-full py-6 bg-blue-600 hover:bg-blue-700"
+            >
+              Browse Properties Now
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/login')} 
+              className="w-full py-6"
+            >
+              Go to Login
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (isLoading) {
     return <Layout>
