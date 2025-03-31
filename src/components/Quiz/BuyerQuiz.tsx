@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import { Loader2 } from 'lucide-react';
 
 type QuizStep = {
   id: number;
@@ -87,6 +89,7 @@ const BuyerQuiz = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUser();
   
   // Prefill contact information when user is logged in
@@ -132,7 +135,31 @@ const BuyerQuiz = () => {
     return (answers[questionId] || []).includes(option);
   };
   
-  const handleSubmit = () => {
+  const sendToWebhook = async (formData: any) => {
+    try {
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
+      
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Webhook error: ${response.status}`);
+      }
+      
+      console.log('Webhook response:', await response.text());
+      return true;
+    } catch (error) {
+      console.error('Error sending data to webhook:', error);
+      throw error;
+    }
+  };
+  
+  const handleSubmit = async () => {
     if (!name || !email || !phone) {
       toast({
         title: "Missing Information",
@@ -142,33 +169,58 @@ const BuyerQuiz = () => {
       return;
     }
     
-    const formData = {
-      name,
-      email,
-      phone,
-      quizAnswers: Object.entries(answers).map(([questionId, answer]) => {
+    setIsSubmitting(true);
+    
+    try {
+      const formattedAnswers = Object.entries(answers).map(([questionId, answer]) => {
         const question = quizSteps.find(step => step.id === Number(questionId));
         return {
           question: question?.question,
-          answer
+          answer: Array.isArray(answer) ? answer.join(", ") : answer
         };
-      })
-    };
-    
-    console.log('Quiz submission:', formData);
-    
-    setCurrentStep(0);
-    setAnswers({});
-    setName('');
-    setEmail('');
-    setPhone('');
-    
-    toast({
-      title: "Thank You!",
-      description: "Your preferences have been submitted. Our agent will contact you soon."
-    });
-    
-    setIsOpen(false);
+      });
+      
+      const formData = {
+        name,
+        email,
+        phone,
+        formType: "Commercial Property Questionnaire",
+        answers: formattedAnswers,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('Submitting quiz data:', formData);
+      
+      // Send data to webhook
+      await sendToWebhook(formData);
+      
+      // If webhook succeeds, reset form and show success message
+      setCurrentStep(0);
+      setAnswers({});
+      
+      // Don't reset user info since they might want to fill out another form
+      if (!user) {
+        setName('');
+        setEmail('');
+        setPhone('');
+      }
+      
+      toast({
+        title: "Thank You!",
+        description: "Your preferences have been submitted. Our agent will contact you soon."
+      });
+      
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast({
+        title: "Submission Error",
+        description: "There was a problem submitting your information. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderQuestion = () => {
@@ -212,11 +264,18 @@ const BuyerQuiz = () => {
             </div>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={handlePrevious}>
+            <Button variant="outline" onClick={handlePrevious} disabled={isSubmitting}>
               Back
             </Button>
-            <Button onClick={handleSubmit}>
-              Submit
+            <Button onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                'Submit'
+              )}
             </Button>
           </CardFooter>
         </>
