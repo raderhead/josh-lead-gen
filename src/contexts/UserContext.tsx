@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -36,7 +35,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       email: supabaseUser.email || '',
       // First try to get name from user_metadata, then fall back to email username
       name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
-      phone: supabaseUser.phone || supabaseUser.user_metadata?.phone || supabaseUser.user_metadata?.phone_number || '',
+      phone: supabaseUser.user_metadata?.phone || supabaseUser.user_metadata?.phone_number || supabaseUser.user_metadata?.user_phone || '',
       role: 'user', // Default role
     };
   };
@@ -108,28 +107,22 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const origin = window.location.origin;
       console.log("Setting redirectTo to:", `${origin}/email-verified`);
       
-      // IMPORTANT: Format phone number for Supabase (must include country code)
-      let formattedPhone = phone;
-      if (phone && !phone.startsWith('+')) {
-        // If US number and doesn't have country code, add +1
-        formattedPhone = `+1${phone.replace(/\D/g, '')}`;
-      }
+      // Format the phone number to clean it up, but don't add country code as we're not using SMS
+      const cleanedPhone = phone ? phone.replace(/\D/g, '') : '';
+      console.log("Cleaned phone:", cleanedPhone);
       
-      console.log("Formatted phone:", formattedPhone);
-      
-      // First try to register the phone number directly with Supabase
+      // Signup with all user metadata in one place
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        phone: formattedPhone,
         options: {
           data: {
             name,
             full_name: name,
             display_name: name,
-            phone: phone || '',
-            phone_number: phone || '',
-            user_phone: phone || ''
+            phone: cleanedPhone || '',
+            phone_number: cleanedPhone || '',
+            user_phone: cleanedPhone || ''
           },
           emailRedirectTo: `${origin}/email-verified`,
         },
@@ -148,14 +141,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         
         try {
           const { data: updateData, error: updateError } = await supabase.auth.updateUser({
-            phone: formattedPhone,
             data: { 
               name,
               full_name: name,
               display_name: name,
-              phone: phone || '',
-              phone_number: phone || '',
-              user_phone: phone || ''
+              phone: cleanedPhone || '',
+              phone_number: cleanedPhone || '',
+              user_phone: cleanedPhone || ''
             }
           });
           
