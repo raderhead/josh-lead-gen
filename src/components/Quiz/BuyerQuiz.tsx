@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -92,7 +91,6 @@ const BuyerQuiz = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUser();
   
-  // Prefill contact information when user is logged in
   useEffect(() => {
     if (user) {
       setName(user.name || '');
@@ -139,12 +137,15 @@ const BuyerQuiz = () => {
     try {
       const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/4813340d-f86b-46d7-a82a-39db8631e043";
       
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
+      const queryParams = new URLSearchParams();
+      
+      queryParams.append('data', JSON.stringify(formData));
+      
+      const response = await fetch(`${webhookUrl}?${queryParams.toString()}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
       });
       
       if (!response.ok) {
@@ -191,14 +192,11 @@ const BuyerQuiz = () => {
       
       console.log('Submitting quiz data:', formData);
       
-      // Send data to webhook
       await sendToWebhook(formData);
       
-      // If webhook succeeds, reset form and show success message
       setCurrentStep(0);
       setAnswers({});
       
-      // Don't reset user info since they might want to fill out another form
       if (!user) {
         setName('');
         setEmail('');
@@ -399,4 +397,3 @@ const BuyerQuiz = () => {
 };
 
 export default BuyerQuiz;
-
