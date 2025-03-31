@@ -64,7 +64,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           .from('saved_properties')
           .select('id')
           .eq('property_id', property.id)
-          .maybeSingle();
+          .maybeSingle()
+          .returns<any>();
 
         if (error) {
           console.error("Error checking favorite status:", error);
@@ -154,7 +155,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           .from('saved_properties')
           .select('id')
           .eq('property_id', property.id)
-          .maybeSingle();
+          .maybeSingle()
+          .returns<any>();
           
         if (findError) {
           throw findError;
@@ -165,7 +167,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           const { error: deleteError } = await supabase
             .from('saved_properties')
             .delete()
-            .eq('id', savedProperty.id);
+            .eq('id', savedProperty.id)
+            .returns<any>();
             
           if (deleteError) {
             throw deleteError;
@@ -185,12 +188,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             address: `${property.address.street}, ${property.address.city}`,
             price: property.price,
             image: property.images[0],
-          }
+          },
+          user_id: user.id
         };
         
         const { error: insertError } = await supabase
           .from('saved_properties')
-          .insert(propertyToSave);
+          .insert(propertyToSave)
+          .returns<any>();
           
         if (insertError) {
           throw insertError;

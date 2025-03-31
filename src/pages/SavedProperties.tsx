@@ -36,10 +36,12 @@ const SavedProperties: React.FC = () => {
     const fetchSavedProperties = async () => {
       try {
         setIsLoading(true);
+        // Use a more typesafe approach with explicit typing
         const { data, error } = await supabase
           .from('saved_properties')
           .select('*')
-          .order('saved_at', { ascending: false });
+          .order('saved_at', { ascending: false })
+          .returns<any[]>();
         
         if (error) {
           console.error("Error fetching saved properties:", error);
@@ -55,7 +57,7 @@ const SavedProperties: React.FC = () => {
         
         // Transform the data to match our component's expected format
         const formattedProperties = data.map(item => {
-          const propertyData = item.property_data;
+          const propertyData = item.property_data || {};
           return {
             id: item.id,
             property_id: item.property_id,
@@ -102,10 +104,12 @@ const SavedProperties: React.FC = () => {
 
   const removeProperty = async (id: string) => {
     try {
+      // Use a typesafe approach
       const { error } = await supabase
         .from('saved_properties')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .returns<any>();
         
       if (error) {
         console.error("Error removing property:", error);

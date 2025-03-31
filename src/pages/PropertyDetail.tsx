@@ -60,12 +60,6 @@ const Pool = ({ className }: { className?: string }) => (
   </svg>
 );
 
-interface SavedProperty {
-  id: string;
-  property_id: string;
-  saved_at: string;
-}
-
 interface ShowingRequest {
   propertyId: string;
   date: string;
@@ -82,7 +76,7 @@ const PropertyDetail: React.FC = () => {
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
   const [checkingFavoriteStatus, setCheckingFavoriteStatus] = useState(true);
-  const { user } = useUser(); // Add this line to get the user
+  const { user } = useUser();
   const [showingDate, setShowingDate] = useState("");
   const [showingTime, setShowingTime] = useState("");
   const [contactName, setContactName] = useState("");
@@ -141,7 +135,8 @@ const PropertyDetail: React.FC = () => {
           .from('saved_properties')
           .select('id')
           .eq('property_id', property.id)
-          .maybeSingle();
+          .maybeSingle()
+          .returns<any>();
 
         if (error) {
           console.error("Error checking favorite status:", error);
@@ -180,7 +175,8 @@ const PropertyDetail: React.FC = () => {
           .from('saved_properties')
           .select('id')
           .eq('property_id', property.id)
-          .maybeSingle();
+          .maybeSingle()
+          .returns<any>();
           
         if (findError) {
           throw findError;
@@ -191,7 +187,8 @@ const PropertyDetail: React.FC = () => {
           const { error: deleteError } = await supabase
             .from('saved_properties')
             .delete()
-            .eq('id', savedProperty.id);
+            .eq('id', savedProperty.id)
+            .returns<any>();
             
           if (deleteError) {
             throw deleteError;
@@ -211,12 +208,14 @@ const PropertyDetail: React.FC = () => {
             address: `${property.address.street}, ${property.address.city}`,
             price: property.price,
             image: property.images[0],
-          }
+          },
+          user_id: user.id
         };
         
         const { error: insertError } = await supabase
           .from('saved_properties')
-          .insert(propertyToSave);
+          .insert(propertyToSave)
+          .returns<any>();
           
         if (insertError) {
           throw insertError;
