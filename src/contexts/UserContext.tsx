@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -112,7 +113,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             name: name, // This is the critical line that sets the user metadata
             full_name: name, // Adding a second field as a backup
             display_name: name, // Adding a third field to ensure it's captured
-            phone: phone || '' // Add the phone number to user metadata
+            phone: phone || '', // Add the phone number to user metadata
+            phone_number: phone || '', // Add additional phone field as backup
+            user_phone: phone || '' // Add yet another phone field to ensure it's captured
           },
         },
       });
@@ -134,7 +137,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
               name: name,
               full_name: name,
               display_name: name,
-              phone: phone || ''
+              phone: phone || '',
+              phone_number: phone || '',
+              user_phone: phone || ''
             }
           });
           
