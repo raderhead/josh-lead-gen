@@ -67,11 +67,16 @@ const Signup = () => {
       toast({
         title: 'Verification Required',
         description: 'Please check your email for a verification link.',
-        variant: 'default', // Changed from 'warning' to 'default'
+        variant: 'default', // Keep this as 'default' but we'll style it differently
+        className: 'bg-amber-50 border-amber-200 text-amber-800', // Add yellow styling
       });
       
       // Clear the form
       form.reset();
+      
+      // Redirect to login page
+      navigate('/login');
+      
     } catch (error) {
       // Error already handled in the signup function
       console.error('Signup error:', error);
