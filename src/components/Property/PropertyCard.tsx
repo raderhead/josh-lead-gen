@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { formatCurrency } from "@/lib/utils";
@@ -49,6 +49,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const { user, signup, login, isLoading } = useUser();
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
+
+  // Check if the property is already in favorites when component mounts
+  useEffect(() => {
+    const savedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+    const isAlreadySaved = savedProperties.some(p => p.id === property.id);
+    setIsFavorite(isAlreadySaved);
+  }, [property.id]);
 
   const handlePropertyClick = () => {
     if (user) {
@@ -115,11 +122,34 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       return;
     }
     
-    setIsFavorite(!isFavorite);
-    toast({
-      title: isFavorite ? "Removed from favorites" : "Added to favorites",
-      description: isFavorite ? "Property removed from your favorites" : "Property added to your favorites",
-    });
+    const savedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+    
+    if (isFavorite) {
+      // Remove from favorites
+      const updatedProperties = savedProperties.filter(p => p.id !== property.id);
+      localStorage.setItem("savedProperties", JSON.stringify(updatedProperties));
+      setIsFavorite(false);
+      toast({
+        title: "Removed from favorites",
+        description: "Property removed from your saved properties",
+      });
+    } else {
+      // Add to favorites
+      const propertyToSave = {
+        id: property.id,
+        address: `${property.address.street}, ${property.address.city}`,
+        price: property.price,
+        image: property.images[0],
+        savedAt: new Date().toISOString(),
+      };
+      
+      localStorage.setItem("savedProperties", JSON.stringify([...savedProperties, propertyToSave]));
+      setIsFavorite(true);
+      toast({
+        title: "Added to favorites",
+        description: "Property saved to your favorites",
+      });
+    }
   };
 
   return (

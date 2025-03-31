@@ -134,6 +134,19 @@ const PropertyDetail: React.FC = () => {
     const savedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
     const isAlreadySaved = savedProperties.some((p: SavedProperty) => p.id === property.id);
     setIsFavorite(isAlreadySaved);
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "savedProperties") {
+        const updatedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+        setIsFavorite(updatedProperties.some((p: SavedProperty) => p.id === property.id));
+      }
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, [property]);
 
   if (!property) {
@@ -172,6 +185,8 @@ const PropertyDetail: React.FC = () => {
         description: "You can view all your saved properties in your dashboard.",
       });
     }
+    
+    window.dispatchEvent(new Event("storage"));
   };
 
   const handleRequestShowing = () => {

@@ -28,10 +28,29 @@ const SavedProperties: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
+  // Load saved properties from localStorage
   useEffect(() => {
-    // Load saved properties from localStorage
-    const properties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
-    setSavedProperties(properties);
+    const loadSavedProperties = () => {
+      const properties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+      console.log("Loaded saved properties:", properties);
+      setSavedProperties(properties);
+    };
+    
+    // Load saved properties when component mounts
+    loadSavedProperties();
+    
+    // Set up event listener for localStorage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "savedProperties") {
+        loadSavedProperties();
+      }
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const removeProperty = (id: string) => {
@@ -43,6 +62,9 @@ const SavedProperties: React.FC = () => {
       title: "Property removed",
       description: "The property has been removed from your saved list."
     });
+    
+    // Trigger a storage event to update other tabs/components
+    window.dispatchEvent(new Event("storage"));
   };
 
   return (
