@@ -1,7 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
+import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout/Layout';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Check } from 'lucide-react';
@@ -9,24 +10,96 @@ import { Check } from 'lucide-react';
 const EmailVerified = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
   const [countdown, setCountdown] = useState(3);
+  const [verifying, setVerifying] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Start countdown to redirect
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          navigate('/');
-          return 0;
+    // Handle hash fragment if present (for Supabase auth redirects)
+    const handleHashParameters = async () => {
+      try {
+        setVerifying(true);
+        
+        // If we have a hash in the URL, it might contain auth tokens
+        if (location.hash) {
+          console.log("Processing auth redirect with hash:", location.hash);
+          
+          // Let Supabase auth handle the hash parameters
+          const { data, error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.error("Error processing authentication redirect:", error);
+            setError(error.message);
+          } else {
+            console.log("Successfully processed auth redirect:", data);
+          }
         }
-        return prev - 1;
-      });
-    }, 1000);
+      } catch (err) {
+        console.error("Error handling auth redirect:", err);
+        setError("Failed to process verification");
+      } finally {
+        setVerifying(false);
+      }
+    };
+    
+    handleHashParameters();
+  }, [location]);
 
-    // Cleanup timer on unmount
-    return () => clearInterval(timer);
-  }, [navigate]);
+  useEffect(() => {
+    // Start countdown to redirect only after verification is complete
+    if (!verifying && !error) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            navigate('/');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      // Cleanup timer on unmount
+      return () => clearInterval(timer);
+    }
+  }, [navigate, verifying, error]);
+
+  if (verifying) {
+    return (
+      <Layout>
+        <div className="container max-w-md mx-auto py-10">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-estate-blue mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Verifying your email...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="container max-w-md mx-auto py-10">
+          <Alert className="bg-red-50 border-red-200 mb-4">
+            <AlertTitle className="text-red-800">Verification Failed</AlertTitle>
+            <AlertDescription className="text-red-700">
+              {error}
+            </AlertDescription>
+          </Alert>
+          <div className="flex justify-center mt-4">
+            <button 
+              onClick={() => navigate('/login')} 
+              className="px-4 py-2 bg-estate-blue text-white rounded hover:bg-estate-blue/90"
+            >
+              Return to Login
+            </button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

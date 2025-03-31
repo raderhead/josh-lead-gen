@@ -104,6 +104,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("Attempting signup with:", { email, name, phone: phone || "No phone provided" });
       
+      // Use window.location.origin to get the current URL dynamically
+      const origin = window.location.origin;
+      console.log("Setting redirectTo to:", `${origin}/email-verified`);
+      
       // IMPORTANT: We need to pass the name in the signup options to ensure it's stored correctly
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -117,7 +121,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             phone_number: phone || '',
             user_phone: phone || ''
           },
-          emailRedirectTo: `${window.location.origin}/email-verified`,
+          emailRedirectTo: `${origin}/email-verified`,
         },
       });
       
