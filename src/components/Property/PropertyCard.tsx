@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -20,10 +19,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Link } from "react-router-dom";
-import { Heart, LogIn, Phone, ArrowRight, User, UserPlus } from "lucide-react";
+import { Heart, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Label } from "@/components/ui/label";
 
 interface PropertyCardProps {
   property: Property;
@@ -33,18 +31,13 @@ const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -108,8 +101,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       name: '',
       email: '',
       phone: '',
-      password: '',
-      confirmPassword: '',
     },
   });
 
@@ -117,13 +108,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
-      password: '',
+      phone: '',
     },
   });
 
   const onSignup = async (values: SignupFormValues) => {
     try {
-      await signup(values.email, values.name, values.password, values.phone);
+      await signup(values.email, values.name, values.phone);
       setIsAuthDialogOpen(false);
       openModal();
       toast({
@@ -137,7 +128,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
 
   const onLogin = async (values: LoginFormValues) => {
     try {
-      await login(values.email, values.password);
+      await login(values.email, values.phone);
       setIsAuthDialogOpen(false);
       openModal();
       toast({
@@ -320,12 +311,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                   
                   <FormField
                     control={loginForm.control}
-                    name="password"
+                    name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="••••••••" {...field} className="py-6" />
+                          <Input type="tel" placeholder="(555) 555-5555" {...field} className="py-6" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -368,94 +359,82 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="space-y-4 mt-4">
-                <div>
-                  <Input 
-                    placeholder="Full Name" 
-                    className="py-6 text-base" 
-                    value={signupForm.watch('name')}
-                    onChange={(e) => signupForm.setValue('name', e.target.value)}
+              <Form {...signupForm}>
+                <form onSubmit={signupForm.handleSubmit(onSignup)} className="space-y-4 mt-4">
+                  <FormField
+                    control={signupForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="Full Name" {...field} className="py-6" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {signupForm.formState.errors.name && (
-                    <p className="text-sm text-red-500 mt-1">{signupForm.formState.errors.name.message}</p>
-                  )}
-                </div>
 
-                <div>
-                  <Input 
-                    placeholder="Email" 
-                    className="py-6 text-base"
-                    value={signupForm.watch('email')}
-                    onChange={(e) => signupForm.setValue('email', e.target.value)}
+                  <FormField
+                    control={signupForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="Email" {...field} className="py-6" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {signupForm.formState.errors.email && (
-                    <p className="text-sm text-red-500 mt-1">{signupForm.formState.errors.email.message}</p>
-                  )}
-                </div>
 
-                <div className="relative">
-                  <Input 
-                    type="tel" 
-                    placeholder="Phone Number" 
-                    className="py-6 text-base pr-10"
-                    value={signupForm.watch('phone')}
-                    onChange={(e) => signupForm.setValue('phone', e.target.value)}
+                  <FormField
+                    control={signupForm.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input 
+                            type="tel" 
+                            placeholder="Phone (also used as your password)" 
+                            {...field} 
+                            className="py-6" 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <Phone className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  {signupForm.formState.errors.phone && (
-                    <p className="text-sm text-red-500 mt-1">{signupForm.formState.errors.phone.message}</p>
-                  )}
-                </div>
 
-                <div>
-                  <Input 
-                    type="password" 
-                    placeholder="Password" 
-                    className="py-6 text-base"
-                    value={signupForm.watch('password')}
-                    onChange={(e) => signupForm.setValue('password', e.target.value)}
-                  />
-                  {signupForm.formState.errors.password && (
-                    <p className="text-sm text-red-500 mt-1">{signupForm.formState.errors.password.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <Input 
-                    type="password" 
-                    placeholder="Confirm Password" 
-                    className="py-6 text-base"
-                    value={signupForm.watch('confirmPassword')}
-                    onChange={(e) => signupForm.setValue('confirmPassword', e.target.value)}
-                  />
-                  {signupForm.formState.errors.confirmPassword && (
-                    <p className="text-sm text-red-500 mt-1">{signupForm.formState.errors.confirmPassword.message}</p>
-                  )}
-                </div>
-
-                <Button 
-                  onClick={signupForm.handleSubmit(onSignup)}
-                  className="w-full text-lg py-6 bg-blue-600 hover:bg-blue-700" 
-                  disabled={signupForm.formState.isSubmitting || isLoading}
-                >
-                  {signupForm.formState.isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Creating Account...
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="mr-2 h-5 w-5" />
-                      Create Account
-                    </>
-                  )}
-                </Button>
-              </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full text-lg py-6" 
+                    disabled={signupForm.formState.isSubmitting || isLoading}
+                  >
+                    {signupForm.formState.isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Creating Account...
+                      </>
+                    ) : (
+                      "Continue to Photos →"
+                    )}
+                  </Button>
+                </form>
+              </Form>
               
-              <div className="text-center mt-4">
+              <div className="text-center mt-2">
                 <p className="text-blue-600 hover:underline cursor-pointer" onClick={() => setShowSignInForm(true)}>
-                  Already have an account? <span className="font-semibold">Sign in</span>
+                  Already have an account?
                 </p>
+              </div>
+
+              <div className="text-xs text-muted-foreground text-center mt-4">
+                By clicking "Continue to Photos" you are expressly consenting, in writing, to 
+                receive telemarketing and other messages, including artificial or prerecorded 
+                voices, via automated calls or texts from <span className="font-semibold">estatesearch.com</span> at the 
+                number you provided above. This consent is not required to purchase any 
+                good or service. Message and data rates may apply, frequency varies. Text 
+                HELP for help or STOP to cancel.
               </div>
             </>
           )}
