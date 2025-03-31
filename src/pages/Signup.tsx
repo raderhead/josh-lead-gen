@@ -66,18 +66,8 @@ const Signup = () => {
       // Just pass the phone number as-is - the formatting will be handled in UserContext
       await signup(values.email, values.name, values.password, values.phone);
       
-      toast({
-        title: 'Verification Required',
-        description: 'Please check your email for a verification link.',
-        variant: 'default', // Keep this as 'default' but we'll style it differently
-        className: 'bg-amber-50 border-amber-200 text-amber-800', // Add yellow styling
-      });
-      
-      // Clear the form
-      form.reset();
-      
-      // Redirect to login page
-      navigate('/login');
+      // Redirect to homepage - user should be automatically logged in now
+      navigate('/');
       
     } catch (error) {
       // Error already handled in the signup function
@@ -193,7 +183,7 @@ const Signup = () => {
 
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full bg-blue-600 hover:bg-blue-700" 
                 disabled={form.formState.isSubmitting || isLoading}
               >
                 {form.formState.isSubmitting ? (
@@ -214,7 +204,7 @@ const Signup = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{' '}
-              <Link to="/login" className="text-estate-blue hover:underline font-medium">
+              <Link to="/login" className="text-blue-600 hover:underline font-medium">
                 Sign in
               </Link>
             </p>

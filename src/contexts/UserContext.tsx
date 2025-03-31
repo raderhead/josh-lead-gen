@@ -104,10 +104,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("Attempting signup with:", { email, name, phone: phone || "No phone provided" });
       
-      // Use window.location.origin to get the current URL dynamically
-      const origin = window.location.origin;
-      console.log("Setting redirectTo to:", `${origin}/email-verified`);
-      
       // CRITICAL: Make sure phone is always stored correctly
       // Remove all non-numeric characters from phone number
       const cleanedPhone = phone ? phone.replace(/\D/g, '') : '';
@@ -133,7 +129,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         password,
         options: {
           data: userMetadata,
-          emailRedirectTo: `${origin}/email-verified`,
+          // Skip email verification
+          emailRedirectTo: undefined,
         },
       });
       
@@ -168,14 +165,32 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         } catch (updateErr) {
           console.error("Exception during metadata update:", updateErr);
         }
+        
+        // Auto-confirm the email since we've disabled email verification
+        try {
+          const { error: adminError } = await supabase.functions.invoke('auto-confirm-user', {
+            body: { user_id: data.user.id },
+          });
+          
+          if (adminError) {
+            console.error("Error auto-confirming user:", adminError);
+          }
+        } catch (confirmErr) {
+          console.error("Exception during auto-confirmation:", confirmErr);
+        }
       }
       
       toast({
-        title: 'Verification Required',
-        description: 'Please check your email for a verification link.',
+        title: 'Account created successfully',
+        description: 'You can now access property details and save favorites.',
         variant: 'default',
-        className: 'bg-amber-50 border-amber-200 text-amber-800', // Add yellow styling
       });
+      
+      // Automatically log the user in if they were created successfully
+      if (data.user) {
+        await login(email, password);
+      }
+      
     } catch (error: any) {
       console.error("Signup error full:", error);
       toast({
