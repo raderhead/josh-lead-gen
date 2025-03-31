@@ -36,7 +36,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       email: supabaseUser.email || '',
       // First try to get name from user_metadata, then fall back to email username
       name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
-      phone: supabaseUser.user_metadata?.phone || '',
+      phone: supabaseUser.user_metadata?.phone || supabaseUser.user_metadata?.phone_number || '',
       role: 'user', // Default role
     };
   };
@@ -102,7 +102,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const signup = async (email: string, name: string, password: string, phone?: string) => {
     setIsLoading(true);
     try {
-      console.log("Attempting signup with:", { email, name, phone });
+      console.log("Attempting signup with:", { email, name, phone: phone || "No phone provided" });
       
       // IMPORTANT: We need to pass the name in the signup options to ensure it's stored correctly
       const { data, error } = await supabase.auth.signUp({
@@ -110,13 +110,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         password,
         options: {
           data: {
-            name: name, // This is the critical line that sets the user metadata
-            full_name: name, // Adding a second field as a backup
-            display_name: name, // Adding a third field to ensure it's captured
-            phone: phone || '', // Add the phone number to user metadata
-            phone_number: phone || '', // Add additional phone field as backup
-            user_phone: phone || '' // Add yet another phone field to ensure it's captured
+            name,
+            full_name: name,
+            display_name: name,
+            phone: phone || '',
+            phone_number: phone || '',
+            user_phone: phone || ''
           },
+          emailRedirectTo: `${window.location.origin}/email-verified`,
         },
       });
       
@@ -134,7 +135,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         try {
           const { data: updateData, error: updateError } = await supabase.auth.updateUser({
             data: { 
-              name: name,
+              name,
               full_name: name,
               display_name: name,
               phone: phone || '',
@@ -154,8 +155,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
       
       toast({
-        title: 'Account created',
-        description: 'Your account has been successfully created.',
+        title: 'Verification Required',
+        description: 'Please check your email for a verification link.',
+        variant: 'warning',
       });
     } catch (error: any) {
       console.error("Signup error full:", error);

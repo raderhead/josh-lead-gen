@@ -15,6 +15,7 @@ import Contact from "./pages/Contact";
 import SavedProperties from "./pages/SavedProperties";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import EmailVerified from "./pages/EmailVerified";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/saved-properties" element={<SavedProperties />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/email-verified" element={<EmailVerified />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

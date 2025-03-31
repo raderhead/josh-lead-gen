@@ -57,10 +57,21 @@ const Signup = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      console.log("Signup form submitted with name:", values.name, "and phone:", values.phone);
+      console.log("Signup form submitted with:", values);
+      // Log the phone number to ensure it's passed correctly
+      console.log("Phone number being sent:", values.phone);
+      
       // Pass the name and phone exactly as entered by the user
       await signup(values.email, values.name, values.password, values.phone);
-      // No need to navigate here as useEffect will handle it
+      
+      toast({
+        title: 'Verification Required',
+        description: 'Please check your email for a verification link.',
+        variant: 'warning',
+      });
+      
+      // Clear the form
+      form.reset();
     } catch (error) {
       // Error already handled in the signup function
       console.error('Signup error:', error);
