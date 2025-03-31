@@ -10,7 +10,6 @@ export interface User {
   name: string;
   phone?: string;
   role: 'user' | 'agent' | 'admin';
-  emailVerified?: boolean;
 }
 
 interface UserContextType {
@@ -39,7 +38,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
       phone: supabaseUser.user_metadata?.phone || supabaseUser.user_metadata?.phone_number || supabaseUser.user_metadata?.user_phone || '',
       role: 'user', // Default role
-      emailVerified: supabaseUser.email_confirmed_at !== null,
     };
   };
 
@@ -51,24 +49,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setSession(currentSession);
         setUser(currentSession?.user ? formatUser(currentSession.user) : null);
         setIsLoading(false);
-        
-        // Show appropriate toasts based on auth events
-        if (event === 'SIGNED_IN') {
-          const isVerified = currentSession?.user?.email_confirmed_at !== null;
-          if (isVerified) {
-            toast({
-              title: 'Welcome back!',
-              description: 'You have successfully logged in.',
-            });
-          } else {
-            toast({
-              title: 'Email verification needed',
-              description: 'Please check your email to verify your account for full access.',
-              variant: 'default',
-              className: 'bg-amber-50 border-amber-200 text-amber-800',
-            });
-          }
-        }
       }
     );
 
@@ -81,7 +61,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [toast]);
+  }, []);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -101,21 +81,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       if (data.user) {
         console.log("Login successful:", data.user);
         // User set by the onAuthStateChange listener
-        
-        // If email not verified, show a notification
-        if (!data.user.email_confirmed_at) {
-          toast({
-            title: 'Email not verified',
-            description: 'Please check your email to verify your account for full access.',
-            variant: 'default',
-            className: 'bg-amber-50 border-amber-200 text-amber-800',
-          });
-        } else {
-          toast({
-            title: 'Welcome back!',
-            description: 'You have successfully logged in.',
-          });
-        }
+        toast({
+          title: 'Welcome back!',
+          description: 'You have successfully logged in.',
+        });
       }
     } catch (error: any) {
       console.error("Login error full:", error);
@@ -200,6 +169,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           console.error("Exception during metadata update:", updateErr);
         }
       }
+      
+      toast({
+        title: 'Verification Required',
+        description: 'Please check your email for a verification link.',
+        variant: 'default',
+        className: 'bg-amber-50 border-amber-200 text-amber-800', // Add yellow styling
+      });
     } catch (error: any) {
       console.error("Signup error full:", error);
       toast({
