@@ -48,6 +48,7 @@ const Login = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
+      console.log("Login form submitted with:", values);
       await login(values.email, values.phone);
       // No need to navigate here as useEffect will handle it
     } catch (error) {
