@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -55,7 +54,7 @@ const Signup = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      console.log("Signup form submitted with name:", values.name);
+      console.log("Signup form submitted with full name:", values.name);
       await signup(values.email, values.name, values.password);
       // No need to navigate here as useEffect will handle it
     } catch (error) {

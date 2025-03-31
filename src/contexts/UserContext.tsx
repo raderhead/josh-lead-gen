@@ -29,6 +29,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   // Convert Supabase user to our application User type
   const formatUser = (supabaseUser: SupabaseUser): User => {
+    console.log("Formatting user with metadata:", supabaseUser.user_metadata);
     return {
       id: supabaseUser.id,
       email: supabaseUser.email || '',
@@ -101,13 +102,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("Attempting signup with:", { email, name });
       
-      // Ensure we're properly sending the name in the user_metadata
+      // Explicitly set the name in the user_metadata
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            name: name, // Ensure the name is explicitly set from the parameter
+            name: name, // Setting the name explicitly
           },
         },
       });
@@ -117,7 +118,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
       
-      console.log("Signup successful:", data);
+      console.log("Signup successful, user data:", data);
+      
+      // Update display name if needed
+      if (data.user && (!data.user.user_metadata?.name || data.user.user_metadata.name !== name)) {
+        console.log("Updating user metadata with name:", name);
+        await supabase.auth.updateUser({
+          data: { name: name }
+        });
+      }
       
       // User set by the onAuthStateChange listener
       toast({
