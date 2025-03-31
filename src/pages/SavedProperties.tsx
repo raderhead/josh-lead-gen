@@ -9,17 +9,20 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useUser } from "@/contexts/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SavedProperty {
   id: string;
+  property_id: string;
   address: string;
   price: number;
   image: string;
-  savedAt: string;
+  saved_at: string;
 }
 
 const SavedProperties: React.FC = () => {
   const [savedProperties, setSavedProperties] = useState<SavedProperty[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { user } = useUser();
 
@@ -28,43 +31,107 @@ const SavedProperties: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // Load saved properties from localStorage
+  // Load saved properties from Supabase
   useEffect(() => {
-    const loadSavedProperties = () => {
-      const properties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
-      console.log("Loaded saved properties:", properties);
-      setSavedProperties(properties);
-    };
-    
-    // Load saved properties when component mounts
-    loadSavedProperties();
-    
-    // Set up event listener for localStorage changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "savedProperties") {
-        loadSavedProperties();
+    const fetchSavedProperties = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('saved_properties')
+          .select('*')
+          .order('saved_at', { ascending: false });
+        
+        if (error) {
+          console.error("Error fetching saved properties:", error);
+          toast({
+            title: "Error loading saved properties",
+            description: error.message,
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        console.log("Loaded saved properties:", data);
+        
+        // Transform the data to match our component's expected format
+        const formattedProperties = data.map(item => {
+          const propertyData = item.property_data;
+          return {
+            id: item.id,
+            property_id: item.property_id,
+            address: propertyData.address,
+            price: propertyData.price,
+            image: propertyData.image,
+            saved_at: item.saved_at
+          };
+        });
+        
+        setSavedProperties(formattedProperties);
+      } catch (err) {
+        console.error("Error in fetchSavedProperties:", err);
+        toast({
+          title: "Error loading saved properties",
+          description: "There was a problem loading your saved properties.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
     
-    window.addEventListener("storage", handleStorageChange);
+    if (user) {
+      fetchSavedProperties();
+    }
+    
+    // Set up realtime subscription for saved properties changes
+    const channel = supabase
+      .channel('public:saved_properties')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'saved_properties' 
+      }, () => {
+        fetchSavedProperties();
+      })
+      .subscribe();
     
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
+      supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user, toast]);
 
-  const removeProperty = (id: string) => {
-    const updatedProperties = savedProperties.filter(p => p.id !== id);
-    localStorage.setItem("savedProperties", JSON.stringify(updatedProperties));
-    setSavedProperties(updatedProperties);
-    
-    toast({
-      title: "Property removed",
-      description: "The property has been removed from your saved list."
-    });
-    
-    // Trigger a storage event to update other tabs/components
-    window.dispatchEvent(new Event("storage"));
+  const removeProperty = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('saved_properties')
+        .delete()
+        .eq('id', id);
+        
+      if (error) {
+        console.error("Error removing property:", error);
+        toast({
+          title: "Error removing property",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Update local state immediately for a responsive UI
+      setSavedProperties(prevProperties => prevProperties.filter(p => p.id !== id));
+      
+      toast({
+        title: "Property removed",
+        description: "The property has been removed from your saved list."
+      });
+    } catch (err) {
+      console.error("Error in removeProperty:", err);
+      toast({
+        title: "Error removing property",
+        description: "There was a problem removing the property.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -79,7 +146,11 @@ const SavedProperties: React.FC = () => {
           </div>
         </div>
 
-        {savedProperties.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : savedProperties.length === 0 ? (
           <div className="text-center py-20 bg-gray-50 rounded-lg">
             <Heart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900">No saved properties</h3>
@@ -116,13 +187,13 @@ const SavedProperties: React.FC = () => {
                     {property.address}
                   </h3>
                   <p className="text-gray-500 text-sm">
-                    Saved on {new Date(property.savedAt).toLocaleDateString()}
+                    Saved on {new Date(property.saved_at).toLocaleDateString()}
                   </p>
                 </CardContent>
                 <CardFooter className="flex justify-between items-center p-4 pt-0">
                   <span className="font-bold">{formatCurrency(property.price)}</span>
                   <Button asChild variant="secondary" size="sm">
-                    <Link to={`/property/${property.id}`}>View Details</Link>
+                    <Link to={`/property/${property.property_id}`}>View Details</Link>
                   </Button>
                 </CardFooter>
               </Card>

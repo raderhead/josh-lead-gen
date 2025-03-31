@@ -160,6 +160,30 @@ export type Database = {
           },
         ]
       }
+      saved_properties: {
+        Row: {
+          id: string
+          property_data: Json
+          property_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          property_data: Json
+          property_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          property_data?: Json
+          property_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sync_operations: {
         Row: {
           id: string

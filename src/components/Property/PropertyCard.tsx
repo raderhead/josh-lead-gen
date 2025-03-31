@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -22,6 +21,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Link } from "react-router-dom";
 import { Heart, LogIn } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PropertyCardProps {
   property: Property;
@@ -49,13 +49,38 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const { user, signup, login, isLoading } = useUser();
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [checkingFavoriteStatus, setCheckingFavoriteStatus] = useState(true);
 
-  // Check if the property is already in favorites when component mounts
   useEffect(() => {
-    const savedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
-    const isAlreadySaved = savedProperties.some(p => p.id === property.id);
-    setIsFavorite(isAlreadySaved);
-  }, [property.id]);
+    const checkFavoriteStatus = async () => {
+      if (!user) {
+        setIsFavorite(false);
+        setCheckingFavoriteStatus(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('saved_properties')
+          .select('id')
+          .eq('property_id', property.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error checking favorite status:", error);
+          return;
+        }
+
+        setIsFavorite(!!data);
+      } catch (err) {
+        console.error("Exception checking favorite status:", err);
+      } finally {
+        setCheckingFavoriteStatus(false);
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [property.id, user]);
 
   const handlePropertyClick = () => {
     if (user) {
@@ -114,7 +139,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     }
   };
 
-  const toggleFavorite = (e: React.MouseEvent) => {
+  const toggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
     if (!user) {
@@ -122,32 +147,67 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       return;
     }
     
-    const savedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
-    
-    if (isFavorite) {
-      // Remove from favorites
-      const updatedProperties = savedProperties.filter(p => p.id !== property.id);
-      localStorage.setItem("savedProperties", JSON.stringify(updatedProperties));
-      setIsFavorite(false);
+    try {
+      if (isFavorite) {
+        // Find the saved property record first
+        const { data: savedProperty, error: findError } = await supabase
+          .from('saved_properties')
+          .select('id')
+          .eq('property_id', property.id)
+          .maybeSingle();
+          
+        if (findError) {
+          throw findError;
+        }
+        
+        if (savedProperty) {
+          // Remove from favorites
+          const { error: deleteError } = await supabase
+            .from('saved_properties')
+            .delete()
+            .eq('id', savedProperty.id);
+            
+          if (deleteError) {
+            throw deleteError;
+          }
+          
+          setIsFavorite(false);
+          toast({
+            title: "Removed from favorites",
+            description: "Property removed from your saved properties",
+          });
+        }
+      } else {
+        // Add to favorites
+        const propertyToSave = {
+          property_id: property.id,
+          property_data: {
+            address: `${property.address.street}, ${property.address.city}`,
+            price: property.price,
+            image: property.images[0],
+          }
+        };
+        
+        const { error: insertError } = await supabase
+          .from('saved_properties')
+          .insert(propertyToSave);
+          
+        if (insertError) {
+          throw insertError;
+        }
+        
+        setIsFavorite(true);
+        toast({
+          title: "Added to favorites",
+          description: "Property saved to your favorites",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error toggling favorite:", error);
       toast({
-        title: "Removed from favorites",
-        description: "Property removed from your saved properties",
-      });
-    } else {
-      // Add to favorites
-      const propertyToSave = {
-        id: property.id,
-        address: `${property.address.street}, ${property.address.city}`,
-        price: property.price,
-        image: property.images[0],
-        savedAt: new Date().toISOString(),
-      };
-      
-      localStorage.setItem("savedProperties", JSON.stringify([...savedProperties, propertyToSave]));
-      setIsFavorite(true);
-      toast({
-        title: "Added to favorites",
-        description: "Property saved to your favorites",
+        title: "Error",
+        description: error.message || "There was a problem updating your favorites",
+        variant: "destructive"
       });
     }
   };
@@ -180,9 +240,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             variant={isFavorite ? "default" : "outline"} 
             size="icon" 
             onClick={toggleFavorite}
+            disabled={checkingFavoriteStatus}
             className={`absolute top-2 right-2 ${isFavorite ? "bg-rose-500 hover:bg-rose-600" : "bg-white/80 hover:bg-white"} ${property.isFeatured ? "top-12" : "top-2"}`}
           >
-            <Heart className={isFavorite ? "fill-white" : ""} />
+            {checkingFavoriteStatus ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            ) : (
+              <Heart className={isFavorite ? "fill-white" : ""} />
+            )}
           </Button>
         </div>
 

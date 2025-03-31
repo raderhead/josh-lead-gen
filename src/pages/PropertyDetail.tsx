@@ -38,6 +38,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { useUser } from "@/contexts/UserContext";
 
 const Pool = ({ className }: { className?: string }) => (
   <svg
@@ -61,10 +62,8 @@ const Pool = ({ className }: { className?: string }) => (
 
 interface SavedProperty {
   id: string;
-  address: string;
-  price: number;
-  image: string;
-  savedAt: string;
+  property_id: string;
+  saved_at: string;
 }
 
 interface ShowingRequest {
@@ -82,6 +81,8 @@ const PropertyDetail: React.FC = () => {
   const property = properties.find((p) => p.id === id);
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [checkingFavoriteStatus, setCheckingFavoriteStatus] = useState(true);
+  const { user } = useUser(); // Add this line to get the user
   const [showingDate, setShowingDate] = useState("");
   const [showingTime, setShowingTime] = useState("");
   const [contactName, setContactName] = useState("");
@@ -129,64 +130,112 @@ const PropertyDetail: React.FC = () => {
   const virtualTourUrl = getVirtualTourUrl();
 
   useEffect(() => {
-    if (!property) return;
+    if (!property || !user) {
+      setCheckingFavoriteStatus(false);
+      return;
+    }
     
-    const savedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
-    const isAlreadySaved = savedProperties.some((p: SavedProperty) => p.id === property.id);
-    setIsFavorite(isAlreadySaved);
+    const checkFavoriteStatus = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('saved_properties')
+          .select('id')
+          .eq('property_id', property.id)
+          .maybeSingle();
 
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "savedProperties") {
-        const updatedProperties = JSON.parse(localStorage.getItem("savedProperties") || "[]");
-        setIsFavorite(updatedProperties.some((p: SavedProperty) => p.id === property.id));
+        if (error) {
+          console.error("Error checking favorite status:", error);
+          return;
+        }
+
+        setIsFavorite(!!data);
+      } catch (err) {
+        console.error("Exception checking favorite status:", err);
+      } finally {
+        setCheckingFavoriteStatus(false);
       }
     };
     
-    window.addEventListener("storage", handleStorageChange);
-    
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [property]);
+    checkFavoriteStatus();
+  }, [property, user]);
 
   if (!property) {
     return <div>Property not found</div>;
   }
 
-  const toggleFavorite = () => {
-    const savedProperties: SavedProperty[] = JSON.parse(
-      localStorage.getItem("savedProperties") || "[]"
-    );
-
-    if (isFavorite) {
-      const updatedProperties = savedProperties.filter(
-        (p: SavedProperty) => p.id !== property.id
-      );
-      localStorage.setItem("savedProperties", JSON.stringify(updatedProperties));
-      setIsFavorite(false);
+  const toggleFavorite = async () => {
+    if (!user) {
       toast({
-        title: "Property removed from favorites",
-        description: "You can add it back anytime.",
+        title: "Login required",
+        description: "Please log in to save properties to your favorites.",
+        variant: "destructive"
       });
-    } else {
-      const propertyToSave: SavedProperty = {
-        id: property.id,
-        address: `${property.address.street}, ${property.address.city}`,
-        price: property.price,
-        image: property.images[0],
-        savedAt: new Date().toISOString(),
-      };
-      
-      const updatedProperties = [...savedProperties, propertyToSave];
-      localStorage.setItem("savedProperties", JSON.stringify(updatedProperties));
-      setIsFavorite(true);
+      return;
+    }
+
+    try {
+      if (isFavorite) {
+        // Find the saved property record first
+        const { data: savedProperty, error: findError } = await supabase
+          .from('saved_properties')
+          .select('id')
+          .eq('property_id', property.id)
+          .maybeSingle();
+          
+        if (findError) {
+          throw findError;
+        }
+        
+        if (savedProperty) {
+          // Remove from favorites
+          const { error: deleteError } = await supabase
+            .from('saved_properties')
+            .delete()
+            .eq('id', savedProperty.id);
+            
+          if (deleteError) {
+            throw deleteError;
+          }
+          
+          setIsFavorite(false);
+          toast({
+            title: "Property removed from favorites",
+            description: "You can add it back anytime.",
+          });
+        }
+      } else {
+        // Add to favorites
+        const propertyToSave = {
+          property_id: property.id,
+          property_data: {
+            address: `${property.address.street}, ${property.address.city}`,
+            price: property.price,
+            image: property.images[0],
+          }
+        };
+        
+        const { error: insertError } = await supabase
+          .from('saved_properties')
+          .insert(propertyToSave);
+          
+        if (insertError) {
+          throw insertError;
+        }
+        
+        setIsFavorite(true);
+        toast({
+          title: "Property saved to favorites",
+          description: "You can view all your saved properties in your dashboard.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error toggling favorite:", error);
       toast({
-        title: "Property saved to favorites",
-        description: "You can view all your saved properties in your dashboard.",
+        title: "Error",
+        description: error.message || "There was a problem updating your favorites",
+        variant: "destructive"
       });
     }
-    
-    window.dispatchEvent(new Event("storage"));
   };
 
   const handleRequestShowing = () => {
@@ -264,9 +313,14 @@ const PropertyDetail: React.FC = () => {
                 variant={isFavorite ? "default" : "outline"} 
                 size="icon" 
                 onClick={toggleFavorite}
+                disabled={checkingFavoriteStatus}
                 className={isFavorite ? "bg-rose-500 hover:bg-rose-600" : ""}
               >
-                <Heart className={isFavorite ? "fill-white" : ""} />
+                {checkingFavoriteStatus ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <Heart className={isFavorite ? "fill-white" : ""} />
+                )}
               </Button>
             </div>
             <div className="mt-4 flex items-center space-x-3">
