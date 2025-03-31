@@ -10,8 +10,8 @@ const Properties = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({
     propertyType: [],
-    minPrice: "",
-    maxPrice: "",
+    minPrice: 0,
+    maxPrice: 1000000,
     beds: "",
     baths: "",
   });
