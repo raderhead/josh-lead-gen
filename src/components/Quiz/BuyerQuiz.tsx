@@ -137,7 +137,7 @@ const BuyerQuiz = () => {
   
   const sendToWebhook = async (formData: any) => {
     try {
-      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/4813340d-f86b-46d7-a82a-39db8631e043";
       
       const response = await fetch(webhookUrl, {
         method: 'POST',
@@ -399,3 +399,4 @@ const BuyerQuiz = () => {
 };
 
 export default BuyerQuiz;
+
