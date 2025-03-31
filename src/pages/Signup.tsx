@@ -67,7 +67,7 @@ const Signup = () => {
       toast({
         title: 'Verification Required',
         description: 'Please check your email for a verification link.',
-        variant: 'warning',
+        variant: 'default', // Changed from 'warning' to 'default'
       });
       
       // Clear the form

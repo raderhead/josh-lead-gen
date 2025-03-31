@@ -157,7 +157,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       toast({
         title: 'Verification Required',
         description: 'Please check your email for a verification link.',
-        variant: 'warning',
+        variant: 'default', // Changed from 'warning' to 'default'
       });
     } catch (error: any) {
       console.error("Signup error full:", error);
