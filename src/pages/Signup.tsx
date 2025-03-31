@@ -56,7 +56,9 @@ const Signup = () => {
   const onSubmit = async (values: FormValues) => {
     try {
       console.log("Signup form submitted with:", values);
-      await signup(values.email, values.name, values.phone);
+      // Make sure to remove any spaces or special characters from phone number
+      const cleanedPhone = values.phone.replace(/\D/g, '');
+      await signup(values.email, values.name, cleanedPhone);
       // No need to navigate here as useEffect will handle it
     } catch (error) {
       // Error already handled in the signup function

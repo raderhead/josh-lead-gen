@@ -63,10 +63,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, phone: string) => {
     setIsLoading(true);
     try {
-      console.log("Attempting login with:", { email, phone });
+      // Clean phone number (remove any non-digit characters)
+      const cleanedPhone = phone.replace(/\D/g, '');
+      console.log("Attempting login with:", { email, phone: cleanedPhone });
+      
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
-        password: phone // We're using phone as password
+        password: cleanedPhone // We're using phone as password
       });
       
       if (error) {
@@ -98,14 +101,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const signup = async (email: string, name: string, phone: string) => {
     setIsLoading(true);
     try {
-      console.log("Attempting signup with:", { email, name, phone });
+      // Clean phone number (remove any non-digit characters)
+      const cleanedPhone = phone.replace(/\D/g, '');
+      console.log("Attempting signup with:", { email, name, phone: cleanedPhone });
+      
       const { data, error } = await supabase.auth.signUp({
         email,
-        password: phone, // Using phone as password
+        password: cleanedPhone, // Using phone as password
         options: {
           data: {
             name,
-            phone,
+            phone: cleanedPhone,
           },
         },
       });
