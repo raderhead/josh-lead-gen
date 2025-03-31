@@ -9,20 +9,23 @@ import { useUser } from "@/contexts/UserContext";
 const Properties = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({
-    propertyType: [],
+    city: '',
+    propertyType: 'any',
     minPrice: 0,
     maxPrice: 1000000,
-    beds: "",
-    baths: "",
+    beds: 0,
+    baths: 0,
   });
   const { user } = useUser();
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
+    console.log("Search term updated:", term);
   };
 
   const handleFilterChange = (filters: any) => {
     setSelectedFilters(filters);
+    console.log("Filters updated:", filters);
   };
 
   return (

@@ -26,6 +26,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
     const fetchProperties = async () => {
       setLoading(true);
       try {
+        console.log("Fetching properties from Supabase...");
         const { data, error } = await supabase
           .from('properties')
           .select('*')
@@ -33,6 +34,15 @@ const PropertyList: React.FC<PropertyListProps> = ({
           
         if (error) {
           throw error;
+        }
+        
+        console.log("Properties from Supabase:", data);
+        
+        if (!data || data.length === 0) {
+          console.log("No properties found in database");
+          setProperties([]);
+          setLoading(false);
+          return;
         }
         
         // Transform data to match Property type
@@ -70,6 +80,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
           mls: item.mls || '',
         } as Property));
         
+        console.log("Transformed properties:", transformedProperties.length);
         setProperties(transformedProperties);
       } catch (err: any) {
         console.error('Error fetching properties:', err);
@@ -97,12 +108,17 @@ const PropertyList: React.FC<PropertyListProps> = ({
       
       // Apply search term if it exists
       if (searchTerm) {
-        query = query.or(`address.ilike.%${searchTerm}%,city.ilike.%${searchTerm}%`);
+        query = query.ilike('address', `%${searchTerm}%`);
       }
       
       // Apply property type filter (skip if "any" is selected)
       if (newFilters.propertyType && newFilters.propertyType !== 'any') {
         query = query.eq('type', newFilters.propertyType);
+      }
+      
+      // Apply city filter if it exists
+      if (newFilters.city) {
+        query = query.ilike('address', `%${newFilters.city}%`);
       }
       
       // Execute the query
@@ -119,6 +135,20 @@ const PropertyList: React.FC<PropertyListProps> = ({
         filteredProperties = data.filter(item => {
           const price = Number(item.price?.replace(/[^0-9.-]+/g, '')) || 0;
           return price >= newFilters.minPrice && price <= newFilters.maxPrice;
+        });
+      }
+      
+      // Filter by beds if specified
+      if (newFilters.beds > 0) {
+        filteredProperties = filteredProperties.filter(item => {
+          return Number(item.beds) >= newFilters.beds;
+        });
+      }
+      
+      // Filter by baths if specified
+      if (newFilters.baths > 0) {
+        filteredProperties = filteredProperties.filter(item => {
+          return Number(item.baths) >= newFilters.baths;
         });
       }
         
