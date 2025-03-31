@@ -227,7 +227,12 @@ const Contact = () => {
                       <span>Josh.Rader@McCullerProperties.com</span>
                     </div>
                   </div>
-                  <p className="mt-4 text-gray-600">With over 10 years of experience in the Abilene real estate market, Josh has helped hundreds of families find their perfect home.</p>
+                  <p className="mt-4 text-gray-600">
+                    With over 10 years of experience in the Abilene commercial real estate market, 
+                    Josh specializes in helping businesses find the perfect location for growth and success. 
+                    From retail spaces to office buildings, his expertise ensures you find the ideal 
+                    commercial property to meet your business needs.
+                  </p>
                 </div>
               </div>
             </div>
