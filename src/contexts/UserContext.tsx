@@ -32,7 +32,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return {
       id: supabaseUser.id,
       email: supabaseUser.email || '',
-      // Use the user's email name as display name if no metadata is available
+      // Use the user's metadata name or fall back to email name
       name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
       role: 'user', // Default role
     };
@@ -101,12 +101,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("Attempting signup with:", { email, name });
       
+      // Ensure we're properly sending the name in the user_metadata
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            name,
+            name: name, // Ensure the name is explicitly set from the parameter
           },
         },
       });
@@ -117,6 +118,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
       
       console.log("Signup successful:", data);
+      
       // User set by the onAuthStateChange listener
       toast({
         title: 'Account created',
