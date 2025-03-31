@@ -36,7 +36,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       email: supabaseUser.email || '',
       // First try to get name from user_metadata, then fall back to email username
       name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || '',
-      phone: supabaseUser.user_metadata?.phone || supabaseUser.user_metadata?.phone_number || '',
+      phone: supabaseUser.phone || supabaseUser.user_metadata?.phone || supabaseUser.user_metadata?.phone_number || '',
       role: 'user', // Default role
     };
   };
@@ -108,10 +108,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const origin = window.location.origin;
       console.log("Setting redirectTo to:", `${origin}/email-verified`);
       
-      // IMPORTANT: We need to pass the name in the signup options to ensure it's stored correctly
+      // IMPORTANT: Format phone number for Supabase (must include country code)
+      let formattedPhone = phone;
+      if (phone && !phone.startsWith('+')) {
+        // If US number and doesn't have country code, add +1
+        formattedPhone = `+1${phone.replace(/\D/g, '')}`;
+      }
+      
+      console.log("Formatted phone:", formattedPhone);
+      
+      // First try to register the phone number directly with Supabase
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        phone: formattedPhone,
         options: {
           data: {
             name,
@@ -138,6 +148,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         
         try {
           const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+            phone: formattedPhone,
             data: { 
               name,
               full_name: name,
@@ -161,7 +172,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       toast({
         title: 'Verification Required',
         description: 'Please check your email for a verification link.',
-        variant: 'default', // Keep as 'default' since 'warning' is not a valid variant
+        variant: 'default',
         className: 'bg-amber-50 border-amber-200 text-amber-800', // Add yellow styling
       });
     } catch (error: any) {

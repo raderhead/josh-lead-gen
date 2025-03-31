@@ -38,7 +38,7 @@ enable_confirmations = true
 
 [auth.sms]
 enable_signup = true
-enable_confirmations = false
+enable_confirmations = true
 
 [realtime]
 enabled = true
