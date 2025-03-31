@@ -22,11 +22,11 @@ import { UserPlus } from 'lucide-react';
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  confirmPhone: z.string().min(10, 'Phone number must be at least 10 digits'),
-}).refine((data) => data.phone === data.confirmPhone, {
-  message: "Phone numbers don't match",
-  path: ["confirmPhone"],
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string().min(6, 'Password must be at least 6 characters'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -48,17 +48,15 @@ const Signup = () => {
     defaultValues: {
       name: '',
       email: '',
-      phone: '',
-      confirmPhone: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
   const onSubmit = async (values: FormValues) => {
     try {
       console.log("Signup form submitted with:", values);
-      // Make sure to remove any spaces or special characters from phone number
-      const cleanedPhone = values.phone.replace(/\D/g, '');
-      await signup(values.email, values.name, cleanedPhone);
+      await signup(values.email, values.name, values.password);
       // No need to navigate here as useEffect will handle it
     } catch (error) {
       // Error already handled in the signup function
@@ -120,12 +118,12 @@ const Signup = () => {
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="(555) 555-5555" {...field} />
+                      <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -134,12 +132,12 @@ const Signup = () => {
 
               <FormField
                 control={form.control}
-                name="confirmPhone"
+                name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Phone Number</FormLabel>
+                    <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="(555) 555-5555" {...field} />
+                      <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -21,7 +21,7 @@ import { LogIn } from 'lucide-react';
 
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -42,16 +42,14 @@ const Login = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
-      phone: '',
+      password: '',
     },
   });
 
   const onSubmit = async (values: FormValues) => {
     try {
       console.log("Login form submitted with:", values);
-      // Make sure to remove any spaces or special characters from phone number
-      const cleanedPhone = values.phone.replace(/\D/g, '');
-      await login(values.email, cleanedPhone);
+      await login(values.email, values.password);
       // No need to navigate here as useEffect will handle it
     } catch (error) {
       // Error already handled in the login function
@@ -99,12 +97,12 @@ const Login = () => {
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="(555) 555-5555" {...field} />
+                      <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
