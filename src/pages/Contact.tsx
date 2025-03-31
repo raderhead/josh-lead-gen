@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -12,6 +12,7 @@ import { Mail, Phone, Calendar, MessageSquare, User, Loader2 } from 'lucide-reac
 import { toast } from "@/components/ui/use-toast";
 import BuyerQuiz from '@/components/Quiz/BuyerQuiz';
 import { supabase } from '@/integrations/supabase/client';
+import { useUser } from '@/contexts/UserContext';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -33,6 +34,7 @@ const formSchema = z.object({
 
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useUser();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,6 +46,15 @@ const Contact = () => {
       preferredContactMethod: "either"
     }
   });
+
+  // Prefill form with user data when available
+  useEffect(() => {
+    if (user) {
+      form.setValue('name', user.name || '');
+      form.setValue('email', user.email || '');
+      form.setValue('phone', user.phone || '');
+    }
+  }, [user, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -66,6 +77,13 @@ const Contact = () => {
       });
       
       form.reset();
+      
+      // If user is logged in, prefill the form again after reset
+      if (user) {
+        form.setValue('name', user.name || '');
+        form.setValue('email', user.email || '');
+        form.setValue('phone', user.phone || '');
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       toast({

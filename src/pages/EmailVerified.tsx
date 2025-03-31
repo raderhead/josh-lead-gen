@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
@@ -17,16 +16,12 @@ const EmailVerified = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Handle hash fragment if present (for Supabase auth redirects)
     const handleHashParameters = async () => {
       try {
         setVerifying(true);
         
-        // If we have a hash in the URL, it might contain auth tokens
         if (location.hash) {
           console.log("Processing auth redirect with hash:", location.hash);
-          
-          // Let Supabase auth handle the hash parameters
           const { data, error } = await supabase.auth.getSession();
           
           if (error) {
@@ -48,7 +43,6 @@ const EmailVerified = () => {
   }, [location]);
 
   useEffect(() => {
-    // Start countdown to redirect only after verification is complete
     if (!verifying && !error) {
       const timer = setInterval(() => {
         setCountdown((prev) => {
@@ -61,7 +55,6 @@ const EmailVerified = () => {
         });
       }, 1000);
 
-      // Cleanup timer on unmount
       return () => clearInterval(timer);
     }
   }, [navigate, verifying, error]);
@@ -116,6 +109,9 @@ const EmailVerified = () => {
               <li>Contacting listing agents</li>
               <li>Scheduling property viewings</li>
               <li>Accessing exclusive listings</li>
+              <li>Prefilled contact forms with your information</li>
+              <li>Making offers on properties</li>
+              <li>Receiving property alerts</li>
             </ul>
           </AlertDescription>
         </Alert>

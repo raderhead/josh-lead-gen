@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Card, 
@@ -28,6 +28,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { useUser } from "@/contexts/UserContext";
 
 type QuizStep = {
   id: number;
@@ -86,6 +87,16 @@ const BuyerQuiz = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useUser();
+  
+  // Prefill contact information when user is logged in
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+      setPhone(user.phone || '');
+    }
+  }, [user, isOpen]);
   
   const handleNext = () => {
     if (currentStep < quizSteps.length) {
