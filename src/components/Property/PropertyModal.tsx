@@ -1,15 +1,18 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { formatCurrency } from '@/lib/utils';
 import { Property } from '@/types/property';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { MapPin, ExternalLink, X } from 'lucide-react';
+import { MapPin, ExternalLink, X, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { useUser } from '@/contexts/UserContext';
+import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 
 interface PropertyModalProps {
   property: Property | null;
@@ -19,6 +22,15 @@ interface PropertyModalProps {
 
 const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose }) => {
   const [virtualTourOpen, setVirtualTourOpen] = useState(false);
+  const [showingDialogOpen, setShowingDialogOpen] = useState(false);
+  const [showingDate, setShowingDate] = useState("");
+  const [showingTime, setShowingTime] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const { user } = useUser();
+  const { toast } = useToast();
   
   const { data: propertyDetails, isLoading } = useQuery({
     queryKey: ['propertyDetails', property?.id],
@@ -40,6 +52,15 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
     },
     enabled: !!property?.id && isOpen,
   });
+
+  // Initialize form fields with user data when component mounts or user changes
+  React.useEffect(() => {
+    if (user) {
+      setContactName(user.name || '');
+      setContactEmail(user.email || '');
+      setContactPhone(user.phone || '');
+    }
+  }, [user]);
 
   if (!property) return null;
 
@@ -63,6 +84,44 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
   // Handle closing the virtual tour properly
   const handleCloseVirtualTour = () => {
     setVirtualTourOpen(false);
+  };
+
+  const handleRequestShowing = () => {
+    if (!contactName || !contactEmail || !showingDate || !showingTime) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const showingRequest = {
+      propertyId: property.id,
+      propertyAddress: `${property.address.street}, ${property.address.city}`,
+      propertyPrice: property.price,
+      date: showingDate,
+      time: showingTime,
+      name: contactName,
+      email: contactEmail,
+      phone: contactPhone,
+      message: message
+    };
+
+    const showingRequests = JSON.parse(
+      localStorage.getItem("showingRequests") || "[]"
+    );
+    localStorage.setItem("showingRequests", JSON.stringify([...showingRequests, showingRequest]));
+
+    toast({
+      title: "Showing request sent",
+      description: `An agent will contact you soon to confirm your showing on ${showingDate} at ${showingTime}.`,
+    });
+
+    setShowingDialogOpen(false);
+    setShowingDate("");
+    setShowingTime("");
+    setMessage("");
   };
 
   return (
@@ -90,14 +149,23 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                     </div>
                   </div>
 
-                  {property.mls && (
-                    <div className="mb-6 text-right">
+                  <div className="mb-6 flex justify-between items-center">
+                    <Button 
+                      onClick={() => setShowingDialogOpen(true)}
+                      variant="showing"
+                      className="gap-2"
+                    >
+                      <Calendar size={16} />
+                      Request Showing
+                    </Button>
+                    
+                    {property.mls && (
                       <div className="bg-secondary inline-block p-3 rounded">
                         <p className="text-sm text-muted-foreground">MLS</p>
                         <p className="text-lg">{property.mls}</p>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   <div className="mb-6 bg-secondary p-4 rounded-lg">
                     <div className="flex items-center justify-between mb-4">
@@ -195,7 +263,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
         </DialogContent>
       </Dialog>
 
-      {/* Virtual Tour Sheet instead of AlertDialog */}
+      {/* Virtual Tour Sheet */}
       {virtualTourUrl && (
         <Sheet open={virtualTourOpen} onOpenChange={setVirtualTourOpen}>
           <SheetContent side="bottom" className="p-0 h-[90vh] max-w-full border-t-0 rounded-t-lg">
@@ -220,6 +288,104 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
           </SheetContent>
         </Sheet>
       )}
+
+      {/* Request Showing Dialog */}
+      <Dialog open={showingDialogOpen} onOpenChange={setShowingDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Request a Showing</DialogTitle>
+            <DialogDescription>
+              Fill out the form below to schedule a showing of this property.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label htmlFor="name" className="text-sm font-medium">
+                  Full Name*
+                </label>
+                <input
+                  id="name"
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  className="w-full p-2 border rounded-md mt-1"
+                  required
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <label htmlFor="email" className="text-sm font-medium">
+                  Email*
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  className="w-full p-2 border rounded-md mt-1"
+                  required
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <label htmlFor="phone" className="text-sm font-medium">
+                  Phone
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
+                  className="w-full p-2 border rounded-md mt-1"
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <label htmlFor="date" className="text-sm font-medium">
+                  Preferred Date*
+                </label>
+                <input
+                  id="date"
+                  type="date"
+                  value={showingDate}
+                  onChange={(e) => setShowingDate(e.target.value)}
+                  className="w-full p-2 border rounded-md mt-1"
+                  min={new Date().toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <label htmlFor="time" className="text-sm font-medium">
+                  Preferred Time*
+                </label>
+                <input
+                  id="time"
+                  type="time"
+                  value={showingTime}
+                  onChange={(e) => setShowingTime(e.target.value)}
+                  className="w-full p-2 border rounded-md mt-1"
+                  required
+                />
+              </div>
+              <div className="col-span-2">
+                <label htmlFor="message" className="text-sm font-medium">
+                  Message
+                </label>
+                <Textarea
+                  id="message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full mt-1"
+                  placeholder="Add any additional information or questions..."
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit" onClick={handleRequestShowing}>
+              Submit Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
