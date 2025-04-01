@@ -51,6 +51,42 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_submissions: {
+        Row: {
+          airtable_record_id: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string
+          preferred_contact_method: string
+          sync_status: string | null
+        }
+        Insert: {
+          airtable_record_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone: string
+          preferred_contact_method: string
+          sync_status?: string | null
+        }
+        Update: {
+          airtable_record_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+          preferred_contact_method?: string
+          sync_status?: string | null
+        }
+        Relationships: []
+      }
       properties: {
         Row: {
           address: string | null
