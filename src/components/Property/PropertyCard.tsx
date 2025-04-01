@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -375,17 +374,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             <p className="text-muted-foreground">
               {property.address.city} {property.address.state}, {property.address.zipCode} USA
             </p>
-          </div>
-          
-          <div className="mt-4">
-            <Button 
-              variant="showing" 
-              className="w-full" 
-              onClick={handleShowingRequest}
-            >
-              <Calendar className="h-4 w-4" />
-              Request Showing
-            </Button>
           </div>
         </div>
       </div>
