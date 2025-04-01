@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -138,9 +139,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   const showingRequestForm = useForm<ShowingRequestFormValues>({
     resolver: zodResolver(showingRequestSchema),
     defaultValues: {
-      name: user?.user_metadata?.name || '',
+      name: user?.name || '',
       email: user?.email || '',
-      phone: user?.user_metadata?.phone || '',
+      phone: user?.phone || '',
       date: '',
       time: '',
       message: '',
@@ -280,9 +281,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       });
       
       showingRequestForm.reset({
-        name: user?.user_metadata?.name || '',
+        name: user?.name || '',
         email: user?.email || '',
-        phone: user?.user_metadata?.phone || '',
+        phone: user?.phone || '',
         date: '',
         time: '',
         message: '',
@@ -306,9 +307,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     }
     
     showingRequestForm.reset({
-      name: user?.user_metadata?.name || '',
-      email: user?.email || '',
-      phone: user?.user_metadata?.phone || '',
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
       date: '',
       time: '',
       message: '',
