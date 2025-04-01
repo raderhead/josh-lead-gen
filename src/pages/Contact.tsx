@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,7 +12,6 @@ import { Mail, Phone, Calendar, MessageSquare, User, Loader2 } from 'lucide-reac
 import { toast } from "@/components/ui/use-toast";
 import BuyerQuiz from '@/components/Quiz/BuyerQuiz';
 import { useUser } from '@/contexts/UserContext';
-import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -55,22 +55,45 @@ const Contact = () => {
     }
   }, [user, form]);
 
+  async function sendToWebhook(formData: any) {
+    try {
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/cb6baca4-a6ea-46a4-bee4-4dd126b631b8";
+      
+      const queryParams = new URLSearchParams();
+      queryParams.append('data', JSON.stringify(formData));
+      
+      const response = await fetch(`${webhookUrl}?${queryParams.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Webhook error: ${response.status}`);
+      }
+      
+      console.log('Webhook response:', await response.text());
+      return true;
+    } catch (error) {
+      console.error('Error sending data to webhook:', error);
+      throw error;
+    }
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true);
       
-      console.log('Submitting contact form data:', values);
+      const formData = {
+        ...values,
+        formType: "Contact Form",
+        timestamp: new Date().toISOString()
+      };
       
-      // Call the Supabase Edge Function to store in the database and send to Airtable
-      const { data, error } = await supabase.functions.invoke('send-contact-to-airtable', {
-        body: values,
-      });
+      console.log('Submitting contact form data:', formData);
       
-      if (error) {
-        throw new Error(error.message || 'Something went wrong while sending your message');
-      }
-      
-      console.log('Form submission response:', data);
+      await sendToWebhook(formData);
       
       toast({
         title: "Message Sent",
