@@ -14,12 +14,14 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Link } from "react-router-dom";
-import { Heart, LogIn, Phone, AlertTriangle } from "lucide-react";
+import { Heart, LogIn, Phone, AlertTriangle, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -47,7 +49,19 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+const showingRequestSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  phone: z.string().optional(),
+  date: z.string().min(1, 'Please select a date'),
+  time: z.string().min(1, 'Please select a time'),
+  message: z.string().optional(),
+});
+
+type ShowingRequestFormValues = z.infer<typeof showingRequestSchema>;
+
 const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
+  const [isShowingDialogOpen, setIsShowingDialogOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
@@ -121,24 +135,31 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     },
   });
 
+  const showingRequestForm = useForm<ShowingRequestFormValues>({
+    resolver: zodResolver(showingRequestSchema),
+    defaultValues: {
+      name: user?.user_metadata?.name || '',
+      email: user?.email || '',
+      phone: user?.user_metadata?.phone || '',
+      date: '',
+      time: '',
+      message: '',
+    },
+  });
+
   const onSignup = async (values: SignupFormValues) => {
     try {
       console.log("Signup form submitted with:", values);
 
-      // Log the phone number specifically to ensure it's passed correctly
       console.log("Phone number from form:", values.phone);
       console.log("Phone number type:", typeof values.phone);
 
-      // Pass the phone number as-is - the formatting will be handled in UserContext
       await signup(values.email, values.name, values.password, values.phone);
       
-      // Show verification warning instead of property details immediately
       setShowVerificationWarning(true);
       
-      // Clear the form
       signupForm.reset();
     } catch (error) {
-      // Error already handled in the signup function
       console.error('Signup error:', error);
     }
   };
@@ -167,7 +188,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     
     try {
       if (isFavorite) {
-        // Find the saved property record first
         const { data: savedProperty, error: findError } = await supabase
           .from('saved_properties')
           .select('id')
@@ -180,7 +200,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         }
         
         if (savedProperty) {
-          // Remove from favorites
           const { error: deleteError } = await supabase
             .from('saved_properties')
             .delete()
@@ -198,7 +217,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           });
         }
       } else {
-        // Add to favorites
         const propertyToSave = {
           property_id: property.id,
           property_data: {
@@ -232,6 +250,71 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         variant: "destructive"
       });
     }
+  };
+
+  const onShowingRequest = (values: ShowingRequestFormValues) => {
+    try {
+      console.log("Showing request submitted with:", values);
+      
+      const showingRequest = {
+        propertyId: property.id,
+        propertyAddress: `${property.address.street}, ${property.address.city}`,
+        propertyPrice: property.price,
+        date: values.date,
+        time: values.time,
+        name: values.name,
+        email: values.email,
+        phone: values.phone || '',
+        message: values.message || ''
+      };
+      
+      const showingRequests = JSON.parse(
+        localStorage.getItem("showingRequests") || "[]"
+      );
+      localStorage.setItem("showingRequests", JSON.stringify([...showingRequests, showingRequest]));
+
+      setIsShowingDialogOpen(false);
+      toast({
+        title: "Showing request sent",
+        description: `An agent will contact you soon to confirm your showing on ${values.date} at ${values.time}.`,
+      });
+      
+      showingRequestForm.reset({
+        name: user?.user_metadata?.name || '',
+        email: user?.email || '',
+        phone: user?.user_metadata?.phone || '',
+        date: '',
+        time: '',
+        message: '',
+      });
+    } catch (error) {
+      console.error("Error submitting showing request:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem submitting your showing request. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleShowingRequest = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      setIsAuthDialogOpen(true);
+      return;
+    }
+    
+    showingRequestForm.reset({
+      name: user?.user_metadata?.name || '',
+      email: user?.email || '',
+      phone: user?.user_metadata?.phone || '',
+      date: '',
+      time: '',
+      message: '',
+    });
+    
+    setIsShowingDialogOpen(true);
   };
 
   return (
@@ -273,23 +356,36 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
           </Button>
         </div>
 
-        <div className="p-4" onClick={handlePropertyClick}>
-          <div className="flex justify-between items-center mb-1">
-            <h3 className="text-3xl font-bold text-primary dark:text-estate-dark-blue">
-              {formatCurrency(property.price)}
-            </h3>
-            {property.mls && (
-              <div className="text-right">
-                <span className="text-xs text-muted-foreground">MLS</span>
-                <p className="text-sm">{property.mls}</p>
-              </div>
-            )}
+        <div className="p-4">
+          <div onClick={handlePropertyClick}>
+            <div className="flex justify-between items-center mb-1">
+              <h3 className="text-3xl font-bold text-primary dark:text-estate-dark-blue">
+                {formatCurrency(property.price)}
+              </h3>
+              {property.mls && (
+                <div className="text-right">
+                  <span className="text-xs text-muted-foreground">MLS</span>
+                  <p className="text-sm">{property.mls}</p>
+                </div>
+              )}
+            </div>
+            
+            <p className="text-lg text-foreground">{property.address.street}</p>
+            <p className="text-muted-foreground">
+              {property.address.city} {property.address.state}, {property.address.zipCode} USA
+            </p>
           </div>
           
-          <p className="text-lg text-foreground">{property.address.street}</p>
-          <p className="text-muted-foreground">
-            {property.address.city} {property.address.state}, {property.address.zipCode} USA
-          </p>
+          <div className="mt-4">
+            <Button 
+              variant="showing" 
+              className="w-full" 
+              onClick={handleShowingRequest}
+            >
+              <Calendar className="h-4 w-4" />
+              Request Showing
+            </Button>
+          </div>
         </div>
       </div>
       
@@ -298,6 +394,122 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         isOpen={isModalOpen} 
         onClose={closeModal}
       />
+
+      <Dialog open={isShowingDialogOpen} onOpenChange={setIsShowingDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Request a Showing</DialogTitle>
+            <DialogDescription>
+              Fill out the form below to schedule a showing of this property.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...showingRequestForm}>
+            <form onSubmit={showingRequestForm.handleSubmit(onShowingRequest)} className="space-y-4 mt-4">
+              <FormField
+                control={showingRequestForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name*</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={showingRequestForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email*</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="you@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={showingRequestForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone</FormLabel>
+                      <FormControl>
+                        <Input type="tel" placeholder="(555) 123-4567" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={showingRequestForm.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preferred Date*</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="date" 
+                          {...field} 
+                          min={new Date().toISOString().split('T')[0]}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={showingRequestForm.control}
+                  name="time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preferred Time*</FormLabel>
+                      <FormControl>
+                        <Input type="time" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={showingRequestForm.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Message</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Any additional information or questions..." 
+                        className="resize-none" 
+                        {...field}
+                        rows={3}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button type="submit">Submit Request</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen}>
         <DialogContent className="sm:max-w-md">
