@@ -50,4 +50,4 @@ import_map = "./import_map.json"
 
 [functions.send-contact-to-airtable]
 verify_jwt = false
-import_map = "./import_map.json"
+import_map = "./functions/send-contact-to-airtable/import_map.json"
