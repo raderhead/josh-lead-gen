@@ -506,7 +506,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     return (
       <div className="fixed inset-0 bg-gradient-to-r from-slate-900 to-estate-dark-blue z-50 overflow-y-auto">
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
-          <div className="w-full max-w-4xl mb-4 bg-white/10 rounded-full h-2 overflow-hidden">
+          <div className="w-full max-w-4xl mb-4 bg-white/20 rounded-full h-2 overflow-hidden">
             <div 
               className="bg-estate-blue h-full transition-all duration-300 ease-in-out" 
               style={{ width: `${progress}%` }}
@@ -643,11 +643,19 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
           </Button>
         )}
         
-        {isLastQuestion && (
+        {!isLastQuestion ? (
+          <Button
+            onClick={handleNext}
+            disabled={!canProceed()}
+            className="ml-auto bg-estate-blue hover:bg-estate-dark-blue text-white"
+          >
+            Next
+          </Button>
+        ) : (
           <Button 
             onClick={handleSubmit}
             disabled={isSubmitting || !canProceed()}
-            className="bg-estate-blue hover:bg-estate-dark-blue"
+            className="ml-auto bg-estate-blue hover:bg-estate-dark-blue text-white"
           >
             {isSubmitting ? (
               <>
