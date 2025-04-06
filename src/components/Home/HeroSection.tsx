@@ -15,7 +15,7 @@ const HeroSection = () => {
   return <>
       <div className="relative bg-gradient-to-r from-slate-900 to-slate-800 h-[600px] flex items-center">
         <div className="absolute inset-0 overflow-hidden">
-          <img src="/lovable-uploads/9478e2e8-6d1a-48e4-b7c3-2e60e9022800.png" alt="Abilene skyline" className="w-full h-full object-cover opacity-30" />
+          <img src="/lovable-uploads/9478e2e8-6d1a-48e4-b7c3-2e60e9022800.png" alt="Abilene skyline" className="w-full h-full opacity-30 object-cover" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6"> Commercial Property in Abilene</h1>
