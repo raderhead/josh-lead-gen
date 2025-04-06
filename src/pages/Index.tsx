@@ -1,3 +1,4 @@
+
 import Layout from '@/components/Layout/Layout';
 import HeroSection from '@/components/Home/HeroSection';
 import FeaturedListings from '@/components/Home/FeaturedListings';
@@ -6,12 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Phone, BarChart2, Building, MessageSquare } from 'lucide-react';
 import PropertyQuiz from '@/components/Quiz/PropertyQuiz';
+
 const Index = () => {
   return <Layout>
       <HeroSection />
-      
-      {/* Interactive Quiz Section - Prominent placement */}
-      
       
       <FeaturedListings />
       <HomeFeatures />
@@ -51,4 +50,5 @@ const Index = () => {
       </section>
     </Layout>;
 };
+
 export default Index;
