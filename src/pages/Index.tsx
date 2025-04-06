@@ -1,4 +1,3 @@
-
 import Layout from '@/components/Layout/Layout';
 import HeroSection from '@/components/Home/HeroSection';
 import FeaturedListings from '@/components/Home/FeaturedListings';
@@ -7,30 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Phone, BarChart2, Building, MessageSquare } from 'lucide-react';
 import PropertyQuiz from '@/components/Quiz/PropertyQuiz';
-
 const Index = () => {
   return <Layout>
       <HeroSection />
       
       {/* Interactive Quiz Section - Prominent placement */}
-      <section className="py-16 bg-gradient-to-r from-slate-100 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 mb-3 bg-estate-light-blue px-4 py-2 rounded-full">
-              <MessageSquare size={20} className="text-estate-blue" />
-              <span className="font-medium text-estate-blue">Interactive Questionnaire</span>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Find Your Perfect Commercial Property Match</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Tell us what you're looking for and our experts will help you find the perfect property
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <PropertyQuiz className="shadow-xl border border-gray-200" />
-          </div>
-        </div>
-      </section>
+      
       
       <FeaturedListings />
       <HomeFeatures />
@@ -70,5 +51,4 @@ const Index = () => {
       </section>
     </Layout>;
 };
-
 export default Index;
