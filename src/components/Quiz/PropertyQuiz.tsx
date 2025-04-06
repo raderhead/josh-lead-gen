@@ -184,6 +184,14 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       
       console.log('Submitting quiz data:', formData);
       
+      const webhookResult = await sendToWebhook(formData);
+      
+      if (webhookResult && typeof webhookResult === 'object' && 'error' in webhookResult) {
+        console.error('Webhook submission failed:', webhookResult.message);
+      } else {
+        console.log('Webhook submission successful');
+      }
+      
       if (user) {
         try {
           const { data, error } = await supabase
@@ -196,39 +204,11 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
           
           if (error) {
             console.error('Supabase submission error:', error);
-            const webhookResult = await sendToWebhook(formData);
-            
-            if (webhookResult && typeof webhookResult === 'object' && 'error' in webhookResult) {
-              console.error('Webhook submission failed:', webhookResult.message);
-              
-              if (!user) {
-                throw new Error(webhookResult.message || 'Failed to submit form');
-              }
-            }
           } else {
             console.log('Saved to Supabase:', data);
           }
         } catch (supabaseError) {
           console.error('Supabase submission exception:', supabaseError);
-          const webhookResult = await sendToWebhook(formData);
-          
-          if (webhookResult && typeof webhookResult === 'object' && 'error' in webhookResult) {
-            console.error('Webhook submission failed:', webhookResult.message);
-            
-            if (!user) {
-              throw new Error(webhookResult.message || 'Failed to submit form');
-            }
-          }
-        }
-      } else {
-        const webhookResult = await sendToWebhook(formData);
-        
-        if (webhookResult && typeof webhookResult === 'object' && 'error' in webhookResult) {
-          console.error('Webhook submission failed:', webhookResult.message);
-          
-          if (!user) {
-            throw new Error(webhookResult.message || 'Failed to submit form');
-          }
         }
       }
       
