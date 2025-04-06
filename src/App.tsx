@@ -21,37 +21,40 @@ import SignupDialog from "./components/Auth/SignupDialog";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <UserProvider>
-      <ThemeProvider>
-        <AuthDialogProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/properties" element={<Properties />} />
-                <Route path="/property/:id" element={<PropertyDetail />} />
-                <Route path="/valuation" element={<HomeValuation />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/saved-properties" element={<SavedProperties />} />
-                <Route path="/email-verified" element={<EmailVerified />} />
-                <Route path="/property-quiz" element={<PropertyQuizPage />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <AuthDialogs />
-            </BrowserRouter>
-          </TooltipProvider>
-        </AuthDialogProvider>
-      </ThemeProvider>
-    </UserProvider>
-  </QueryClientProvider>
-);
+// Move AuthDialogs component inside the App component to use it correctly within the provider
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
+        <ThemeProvider>
+          <AuthDialogProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/properties" element={<Properties />} />
+                  <Route path="/property/:id" element={<PropertyDetail />} />
+                  <Route path="/valuation" element={<HomeValuation />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/saved-properties" element={<SavedProperties />} />
+                  <Route path="/email-verified" element={<EmailVerified />} />
+                  <Route path="/property-quiz" element={<PropertyQuizPage />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <AuthDialogs />
+              </BrowserRouter>
+            </TooltipProvider>
+          </AuthDialogProvider>
+        </ThemeProvider>
+      </UserProvider>
+    </QueryClientProvider>
+  );
+};
 
-// Component to handle auth dialogs globally
+// Component to handle auth dialogs globally - now it's defined after the main App component
 const AuthDialogs = () => {
   const { isLoginOpen, isSignupOpen, closeLogin, closeSignup, switchToSignup, switchToLogin } = useAuthDialog();
   
