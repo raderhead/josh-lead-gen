@@ -18,6 +18,7 @@ import { QuizMode, UserType } from './types';
 import { getFilteredQuestions, sendToWebhook } from './quizUtils';
 import QuizContent from './QuizContent';
 import AuthDialog from './AuthDialog';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PropertyQuizProps {
   mode?: QuizMode;
@@ -191,6 +192,30 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       
       console.log('Submitting quiz data:', formData);
       
+      // First try to store in Supabase if user is authenticated
+      if (user) {
+        try {
+          const { data, error } = await supabase
+            .from('quiz_submissions')
+            .insert({
+              user_id: user.id,
+              user_type: formData.userType.toLowerCase(),
+              quiz_data: formData
+            });
+          
+          if (error) {
+            console.error('Supabase submission error:', error);
+            // Continue with webhook as fallback
+          } else {
+            console.log('Saved to Supabase:', data);
+          }
+        } catch (supabaseError) {
+          console.error('Supabase submission exception:', supabaseError);
+          // Continue with webhook as fallback
+        }
+      }
+      
+      // Always send to webhook as well (as a backup or if not authenticated)
       await sendToWebhook(formData);
       
       setCurrentQuestionIndex(0);
