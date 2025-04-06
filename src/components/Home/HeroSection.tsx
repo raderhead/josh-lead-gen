@@ -58,7 +58,7 @@ const HeroSection = () => {
                   onClick={() => navigate('/properties')}
                   variant="outline"
                   size="lg"
-                  className="border-white/30 text-white hover:bg-white/10 rounded-full px-6 py-6 flex-1"
+                  className="border-white/30 bg-white/10 text-white hover:bg-white/20 rounded-full px-6 py-6 flex-1"
                 >
                   Browse Properties
                 </Button>
