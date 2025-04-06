@@ -21,7 +21,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-import { Loader2, MessageSquare, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 type QuizQuestionType = 'text' | 'select' | 'checkbox' | 'radio' | 'range';
@@ -230,6 +230,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     }
   };
   
+  // Modified to automatically advance to next question after checkbox selection
   const handleCheckboxChange = (questionId: number, option: string) => {
     setAnswers(prev => {
       const currentAnswers = prev[questionId] || [];
@@ -246,6 +247,21 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         };
       }
     });
+    // No auto-advance for checkboxes as users may want to select multiple options
+  };
+  
+  // New handler for radio changes to automatically advance
+  const handleRadioChange = (questionId: number, value: string) => {
+    setAnswers({ ...answers, [questionId]: value });
+    // Auto-advance to next question after selection
+    setTimeout(() => handleNext(), 300); // Small delay for better UX
+  };
+  
+  // New handler for select changes to automatically advance
+  const handleSelectChange = (questionId: number, value: string) => {
+    setAnswers({ ...answers, [questionId]: value });
+    // Auto-advance to next question after selection
+    setTimeout(() => handleNext(), 300); // Small delay for better UX
   };
   
   const isCheckboxSelected = (option: string) => {
@@ -404,6 +420,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             value={answers[currentQuestion.id] || ''}
             onChange={(e) => setAnswers({ ...answers, [currentQuestion.id]: e.target.value })}
             className="text-lg py-6 px-5"
+            onBlur={() => handleNext()} // Auto-advance when user tabs out or clicks away
           />
         );
       
@@ -411,7 +428,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         return (
           <Select
             value={answers[currentQuestion.id] || ''}
-            onValueChange={(value) => setAnswers({ ...answers, [currentQuestion.id]: value })}
+            onValueChange={(value) => handleSelectChange(currentQuestion.id, value)}
           >
             <SelectTrigger className="text-lg py-6">
               <SelectValue placeholder="Select an option" />
@@ -430,7 +447,10 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         return (
           <div className="grid grid-cols-1 gap-3">
             {currentQuestion.options?.map((option) => (
-              <div key={option} className="flex items-center space-x-3 bg-white/5 p-4 rounded-md hover:bg-white/10 transition-colors">
+              <div 
+                key={option} 
+                className="flex items-center space-x-3 bg-white/5 p-4 rounded-md hover:bg-white/10 transition-colors"
+              >
                 <Checkbox
                   id={`checkbox-${currentQuestion.id}-${option}`}
                   checked={isCheckboxSelected(option)}
@@ -452,11 +472,15 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         return (
           <RadioGroup
             value={answers[currentQuestion.id] || ''}
-            onValueChange={(value) => setAnswers({ ...answers, [currentQuestion.id]: value })}
+            onValueChange={(value) => handleRadioChange(currentQuestion.id, value)}
           >
             <div className="grid grid-cols-1 gap-3">
               {currentQuestion.options?.map((option) => (
-                <div key={option} className="flex items-center space-x-3 bg-white/5 p-4 rounded-md hover:bg-white/10 transition-colors">
+                <div 
+                  key={option} 
+                  className="flex items-center space-x-3 bg-white/5 p-4 rounded-md hover:bg-white/10 transition-colors cursor-pointer"
+                  onClick={() => handleRadioChange(currentQuestion.id, option)}
+                >
                   <RadioGroupItem value={option} id={`radio-${currentQuestion.id}-${option}`} className="h-5 w-5" />
                   <label
                     htmlFor={`radio-${currentQuestion.id}-${option}`}
@@ -561,7 +585,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                 Back
               </Button>
               
-              {isLastQuestion ? (
+              {isLastQuestion && (
                 <Button 
                   onClick={handleSubmit}
                   disabled={isSubmitting || !canProceed()}
@@ -575,15 +599,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                   ) : (
                     "Submit"
                   )}
-                </Button>
-              ) : (
-                <Button 
-                  onClick={handleNext}
-                  disabled={!canProceed()}
-                  className="bg-estate-blue hover:bg-estate-dark-blue"
-                >
-                  Next
-                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               )}
             </CardFooter>
@@ -645,7 +660,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
           Back
         </Button>
         
-        {isLastQuestion ? (
+        {isLastQuestion && (
           <Button 
             onClick={handleSubmit}
             disabled={isSubmitting || !canProceed()}
@@ -659,15 +674,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             ) : (
               "Submit"
             )}
-          </Button>
-        ) : (
-          <Button 
-            onClick={handleNext}
-            disabled={!canProceed()}
-            className="bg-estate-blue hover:bg-estate-dark-blue"
-          >
-            Next
-            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         )}
       </CardFooter>
