@@ -179,12 +179,20 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const { user } = useUser();
   const navigate = useNavigate();
   
-  // Pre-fill user information if available
+  // Enhanced pre-fill user information
   useEffect(() => {
     if (user) {
+      // Set name from user context
       setName(user.name || '');
+      
+      // Set email from user context
       setEmail(user.email || '');
-      setPhone(user.phone || '');
+      
+      // Set phone from user context, trying different metadata possible locations
+      if (user.phone) {
+        setPhone(user.phone);
+        console.log("Found phone in user.phone:", user.phone);
+      }
     }
   }, [user]);
   
