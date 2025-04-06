@@ -24,6 +24,16 @@ import { useUser } from "@/contexts/UserContext";
 import { Loader2, MessageSquare, ArrowLeft, LogIn } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useNavigate } from 'react-router-dom';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 type QuizQuestionType = 'text' | 'select' | 'checkbox' | 'radio' | 'range';
 
@@ -165,22 +175,18 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { user } = useUser();
   const navigate = useNavigate();
   
-  // Redirect to login if not authenticated
+  // Pre-fill user information if available
   useEffect(() => {
-    if (!user) {
-      if (mode === 'fullscreen') {
-        navigate('/login', { state: { returnTo: '/property-quiz' } });
-      }
-    } else {
-      // Pre-fill user information if available
+    if (user) {
       setName(user.name || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
     }
-  }, [user, navigate, mode]);
+  }, [user]);
   
   useEffect(() => {
     if (answers[0] === 'Buy') {
@@ -217,6 +223,12 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   };
   
   const handleNext = () => {
+    // If user is not authenticated and trying to proceed, show auth dialog
+    if (!user) {
+      setShowAuthDialog(true);
+      return;
+    }
+    
     const filteredQuestions = getFilteredQuestions();
     if (currentQuestionIndex < filteredQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -232,6 +244,11 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   };
   
   const handleCheckboxChange = (questionId: number, option: string) => {
+    if (!user) {
+      setShowAuthDialog(true);
+      return;
+    }
+    
     setAnswers(prev => {
       const currentAnswers = prev[questionId] || [];
       
@@ -250,11 +267,21 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   };
   
   const handleRadioChange = (questionId: number, value: string) => {
+    if (!user) {
+      setShowAuthDialog(true);
+      return;
+    }
+    
     setAnswers({ ...answers, [questionId]: value });
     setTimeout(() => handleNext(), 300);
   };
   
   const handleSelectChange = (questionId: number, value: string) => {
+    if (!user) {
+      setShowAuthDialog(true);
+      return;
+    }
+    
     setAnswers({ ...answers, [questionId]: value });
     setTimeout(() => handleNext(), 300);
   };
@@ -415,6 +442,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             onChange={(e) => setAnswers({ ...answers, [currentQuestion.id]: e.target.value })}
             className="text-lg py-6 px-5"
             onBlur={() => handleNext()}
+            onClick={() => !user && setShowAuthDialog(true)}
           />
         );
       
@@ -423,6 +451,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
           <Select
             value={answers[currentQuestion.id] || ''}
             onValueChange={(value) => handleSelectChange(currentQuestion.id, value)}
+            onOpenChange={() => !user && setShowAuthDialog(true)}
           >
             <SelectTrigger 
               className={cn(
@@ -455,7 +484,8 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             {currentQuestion.options?.map((option) => (
               <div 
                 key={option} 
-                className="flex items-center space-x-3 bg-white/5 p-4 rounded-md hover:bg-white/10 transition-colors"
+                className="flex items-center space-x-3 bg-white/5 p-4 rounded-md hover:bg-white/10 transition-colors cursor-pointer"
+                onClick={() => handleCheckboxChange(currentQuestion.id, option)}
               >
                 <Checkbox
                   id={`checkbox-${currentQuestion.id}-${option}`}
@@ -517,32 +547,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     
     return !!answers[currentQuestion.id];
   };
-  
-  // Show authentication required message if not logged in
-  if (!user && mode === 'inline') {
-    return (
-      <Card className={cn("w-full bg-white border shadow-md", className)}>
-        <CardHeader>
-          <CardTitle>Authentication Required</CardTitle>
-          <CardDescription>
-            Please sign in to access the property questionnaire.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center py-8">
-          <LogIn className="h-12 w-12 text-estate-blue mb-4" />
-          <p className="mb-6 text-center text-muted-foreground">
-            You need to be logged in to use this feature.
-          </p>
-          <Button
-            onClick={() => navigate('/login', { state: { returnTo: window.location.pathname } })}
-            className="bg-estate-blue hover:bg-estate-dark-blue"
-          >
-            Sign In
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
   
   const filteredQuestions = getFilteredQuestions();
   const isLastQuestion = currentQuestionIndex === filteredQuestions.length;
@@ -715,6 +719,48 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
           </Button>
         )}
       </CardFooter>
+      
+      {/* Authentication Dialog */}
+      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sign in required</DialogTitle>
+            <DialogDescription>
+              You need to be signed in to use the property questionnaire. 
+              Please sign in or create an account to continue.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <Button
+              className="w-full bg-estate-blue hover:bg-estate-dark-blue"
+              onClick={() => {
+                setShowAuthDialog(false);
+                navigate('/login', { state: { returnTo: window.location.pathname } });
+              }}
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign in
+            </Button>
+            <Button
+              variant="outline" 
+              className="w-full"
+              onClick={() => {
+                setShowAuthDialog(false);
+                navigate('/signup', { state: { returnTo: window.location.pathname } });
+              }}
+            >
+              Create an account
+            </Button>
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary" onClick={() => setShowAuthDialog(false)}>
+                Cancel
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
