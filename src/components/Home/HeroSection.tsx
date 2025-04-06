@@ -4,10 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, ArrowRight, Building } from 'lucide-react';
 import PropertySearchInput from '@/components/Property/PropertySearchInput';
+import PropertyQuiz from '@/components/Quiz/PropertyQuiz';
+import { useUser } from '@/contexts/UserContext';
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const [addressData, setAddressData] = useState<any>(null);
+  const { user } = useUser();
   
   const handleAddressSelected = (data: any) => {
     setAddressData(data);
@@ -27,6 +30,10 @@ const HeroSection = () => {
       <div className="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">Commercial Property in Abilene</h1>
+        </div>
+
+        <div className="w-full">
+          <PropertyQuiz mode="inline" className="bg-white/10 border-white/20 backdrop-blur-md text-white shadow-xl" />
         </div>
       </div>
     </div>

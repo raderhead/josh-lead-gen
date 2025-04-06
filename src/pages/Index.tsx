@@ -6,7 +6,6 @@ import HomeFeatures from '@/components/Home/HomeFeatures';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Phone, BarChart2, Building, MessageSquare } from 'lucide-react';
-import PropertyQuiz from '@/components/Quiz/PropertyQuiz';
 
 const Index = () => {
   return <Layout>
