@@ -18,8 +18,8 @@ const HeroSection = () => {
     <div className="relative bg-gradient-to-r from-slate-900 to-slate-800 h-[600px] flex items-center">
       <div className="absolute inset-0 overflow-hidden">
         <img 
-          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1470" 
-          alt="Modern commercial property" 
+          src="/lovable-uploads/9478e2e8-6d1a-48e4-b7c3-2e60e9022800.png" 
+          alt="Abilene skyline" 
           className="w-full h-full object-cover opacity-30"
         />
       </div>
