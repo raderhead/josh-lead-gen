@@ -32,6 +32,7 @@ const PropertyQuizPage = () => {
     <PropertyQuiz 
       mode="fullscreen"
       onClose={() => navigate(-1)}
+      className="animate-slide-in-right"
     />
   );
 };

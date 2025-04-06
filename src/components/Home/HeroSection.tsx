@@ -56,19 +56,19 @@ const HeroSection = () => {
           <div className="flex flex-col md:flex-row gap-4 justify-center">
             <Button 
               size="xl" 
-              className="bg-blue-600 hover:bg-blue-700 text-white text-lg flex items-center justify-center"
-              onClick={handleQuestionnaireClick}
-            >
-              Start Questionnaire
-              <ArrowRight className="ml-2" />
-            </Button>
-            <Button 
-              size="xl" 
               variant="outline" 
               className="border-white/30 bg-white/10 text-white hover:bg-white/20 text-lg"
               onClick={() => navigate('/properties')}
             >
               Browse All Properties
+            </Button>
+            <Button 
+              size="xl" 
+              className="bg-blue-600 hover:bg-blue-700 text-white text-lg flex items-center justify-center group"
+              onClick={handleQuestionnaireClick}
+            >
+              Take The Quiz
+              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </div>
         </div>
