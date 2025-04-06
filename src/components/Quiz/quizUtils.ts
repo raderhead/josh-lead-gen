@@ -12,7 +12,12 @@ export const getFilteredQuestions = (userType: UserType): QuizQuestion[] => {
   );
 };
 
-export const sendToWebhook = async (formData: any) => {
+export interface WebhookError {
+  error: true;
+  message: string;
+}
+
+export const sendToWebhook = async (formData: any): Promise<boolean | WebhookError> => {
   try {
     const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/4813340d-f86b-46d7-a82a-39db8631e043";
     

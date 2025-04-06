@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
@@ -14,7 +13,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
-import { QuizMode, UserType } from './types';
+import { QuizMode, UserType, QuizSubmission } from './types';
 import { getFilteredQuestions, sendToWebhook } from './quizUtils';
 import QuizContent from './QuizContent';
 import AuthDialog from './AuthDialog';
@@ -39,16 +38,10 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const { user } = useUser();
   const navigate = useNavigate();
   
-  // Enhanced pre-fill user information
   useEffect(() => {
     if (user) {
-      // Set name from user context
       setName(user.name || '');
-      
-      // Set email from user context
       setEmail(user.email || '');
-      
-      // Set phone from user context, trying different metadata possible locations
       if (user.phone) {
         setPhone(user.phone);
         console.log("Found phone in user.phone:", user.phone);
@@ -81,7 +74,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   };
   
   const handleNext = () => {
-    // If user is not authenticated and trying to proceed, show auth dialog
     if (!user) {
       setShowAuthDialog(true);
       return;
@@ -192,7 +184,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       
       console.log('Submitting quiz data:', formData);
       
-      // First try to store in Supabase if user is authenticated
       if (user) {
         try {
           const { data, error } = await supabase
@@ -201,22 +192,45 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
               user_id: user.id,
               user_type: formData.userType.toLowerCase(),
               quiz_data: formData
-            });
+            } as QuizSubmission);
           
           if (error) {
             console.error('Supabase submission error:', error);
-            // Continue with webhook as fallback
+            const webhookResult = await sendToWebhook(formData);
+            
+            if (webhookResult && typeof webhookResult === 'object' && 'error' in webhookResult) {
+              console.error('Webhook submission failed:', webhookResult.message);
+              
+              if (!user) {
+                throw new Error(webhookResult.message || 'Failed to submit form');
+              }
+            }
           } else {
             console.log('Saved to Supabase:', data);
           }
         } catch (supabaseError) {
           console.error('Supabase submission exception:', supabaseError);
-          // Continue with webhook as fallback
+          const webhookResult = await sendToWebhook(formData);
+          
+          if (webhookResult && typeof webhookResult === 'object' && 'error' in webhookResult) {
+            console.error('Webhook submission failed:', webhookResult.message);
+            
+            if (!user) {
+              throw new Error(webhookResult.message || 'Failed to submit form');
+            }
+          }
+        }
+      } else {
+        const webhookResult = await sendToWebhook(formData);
+        
+        if (webhookResult && typeof webhookResult === 'object' && 'error' in webhookResult) {
+          console.error('Webhook submission failed:', webhookResult.message);
+          
+          if (!user) {
+            throw new Error(webhookResult.message || 'Failed to submit form');
+          }
         }
       }
-      
-      // Always send to webhook as well (as a backup or if not authenticated)
-      await sendToWebhook(formData);
       
       setCurrentQuestionIndex(0);
       setAnswers({});
