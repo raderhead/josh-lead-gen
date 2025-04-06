@@ -415,12 +415,24 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             value={answers[currentQuestion.id] || ''}
             onValueChange={(value) => handleSelectChange(currentQuestion.id, value)}
           >
-            <SelectTrigger className="text-lg py-6">
+            <SelectTrigger 
+              className={cn(
+                "text-lg py-6",
+                mode === 'fullscreen' ? "bg-white/20 border-white/30 text-white" : ""
+              )}
+            >
               <SelectValue placeholder="Select an option" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={mode === 'fullscreen' ? "bg-slate-800 text-white border-white/20" : ""}>
               {currentQuestion.options?.map((option) => (
-                <SelectItem key={option} value={option} className="text-lg py-3">
+                <SelectItem 
+                  key={option} 
+                  value={option} 
+                  className={cn(
+                    "text-lg py-3",
+                    mode === 'fullscreen' ? "text-white hover:bg-slate-700 focus:bg-slate-700" : ""
+                  )}
+                >
                   {option}
                 </SelectItem>
               ))}
