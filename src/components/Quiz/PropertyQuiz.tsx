@@ -1,5 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { cn } from "@/lib/utils";
 import { Button } from '@/components/ui/button';
 import { 
   Card, 
@@ -9,156 +11,13 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-import { Loader2, MessageSquare, ArrowLeft, LogIn } from 'lucide-react';
-import { cn } from "@/lib/utils";
-import { useNavigate } from 'react-router-dom';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-
-type QuizQuestionType = 'text' | 'select' | 'checkbox' | 'radio' | 'range';
-
-type QuizQuestion = {
-  id: number;
-  question: string;
-  description?: string;
-  type: QuizQuestionType;
-  options?: string[];
-  placeholder?: string;
-  forUserType: 'buyer' | 'seller' | 'both';
-};
-
-const initialQuestions: QuizQuestion[] = [
-  {
-    id: 0,
-    question: "Are you looking to buy or sell commercial property?",
-    type: 'radio',
-    options: ['Buy', 'Sell'],
-    forUserType: 'both'
-  },
-  {
-    id: 1,
-    question: "What type of commercial property are you looking for?",
-    description: "Select the property type that best fits your needs",
-    type: 'radio',
-    options: ['Office Space', 'Retail/Storefront', 'Industrial/Warehouse', 'Multi-family', 'Restaurant', 'Mixed-use', 'Land/Development', 'Other'],
-    forUserType: 'buyer'
-  },
-  {
-    id: 2,
-    question: "What other areas are you considering besides Abilene?",
-    description: "Select all that apply",
-    type: 'checkbox',
-    options: ['Buffalo Gap', 'Eastland', 'Tuscola', 'Not considering other areas', 'Other'],
-    forUserType: 'buyer'
-  },
-  {
-    id: 3,
-    question: "What is your approximate budget?",
-    type: 'select',
-    options: ['Under $200,000', '$200,000 - $500,000', '$500,000 - $1,000,000', '$1,000,000 - $2,000,000', '$2,000,000 - $5,000,000', 'Over $5,000,000'],
-    forUserType: 'buyer'
-  },
-  {
-    id: 4,
-    question: "What is your preferred square footage?",
-    type: 'select',
-    options: ['Under 1,000 sq ft', '1,000 - 2,500 sq ft', '2,500 - 5,000 sq ft', '5,000 - 10,000 sq ft', '10,000 - 25,000 sq ft', 'Over 25,000 sq ft'],
-    forUserType: 'buyer'
-  },
-  {
-    id: 5,
-    question: "What features are most important to you?",
-    description: "Select all that apply",
-    type: 'checkbox',
-    options: ['High visibility location', 'Ample parking', 'Loading dock', 'Open floor plan', 'Multiple offices', 'Reception area', 'Kitchen/break room', 'Conference rooms', 'Storage space', 'Energy efficient'],
-    forUserType: 'buyer'
-  },
-  {
-    id: 6,
-    question: "When are you looking to make your investment?",
-    type: 'radio',
-    options: ['Immediately (0-3 months)', 'Soon (3-6 months)', 'This year (6-12 months)', 'Just exploring (>12 months)'],
-    forUserType: 'buyer'
-  },
-  {
-    id: 7,
-    question: "Are you a first-time investor, experienced buyer, or business owner?",
-    type: 'radio',
-    options: ['First-time investor', 'Experienced buyer', 'Business owner', 'Other'],
-    forUserType: 'buyer'
-  },
-  {
-    id: 8,
-    question: "What type of commercial property are you selling?",
-    type: 'radio',
-    options: ['Office Space', 'Retail/Storefront', 'Industrial/Warehouse', 'Multi-family', 'Restaurant', 'Mixed-use', 'Land/Development', 'Other'],
-    forUserType: 'seller'
-  },
-  {
-    id: 9,
-    question: "What is the approximate square footage of your property?",
-    type: 'select',
-    options: ['Under 1,000 sq ft', '1,000 - 2,500 sq ft', '2,500 - 5,000 sq ft', '5,000 - 10,000 sq ft', '10,000 - 25,000 sq ft', 'Over 25,000 sq ft'],
-    forUserType: 'seller'
-  },
-  {
-    id: 10,
-    question: "How long have you owned the property?",
-    type: 'radio',
-    options: ['Less than 1 year', '1-5 years', '5-10 years', '10+ years'],
-    forUserType: 'seller'
-  },
-  {
-    id: 11,
-    question: "What is your reason for selling?",
-    type: 'radio',
-    options: ['Upgrading to larger space', 'Downsizing', 'Relocating', 'Investment strategy', 'Retirement', 'Financial reasons', 'Other'],
-    forUserType: 'seller'
-  },
-  {
-    id: 12,
-    question: "Is the property currently occupied?",
-    type: 'radio',
-    options: ['Yes, owner-occupied', 'Yes, tenant-occupied', 'No, vacant', 'Partially occupied'],
-    forUserType: 'seller'
-  },
-  {
-    id: 13,
-    question: "Have you had the property appraised recently?",
-    type: 'radio',
-    options: ['Yes, within the last 6 months', 'Yes, within the last year', 'Yes, more than a year ago', 'No'],
-    forUserType: 'seller'
-  },
-  {
-    id: 14,
-    question: "How soon are you looking to sell?",
-    type: 'radio',
-    options: ['Immediately', 'Within 3 months', 'Within 6 months', 'Within a year', 'Just exploring options'],
-    forUserType: 'seller'
-  },
-];
-
-type QuizMode = 'inline' | 'fullscreen';
+import { Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
+import { QuizMode, UserType } from './types';
+import { getFilteredQuestions, sendToWebhook } from './quizUtils';
+import QuizContent from './QuizContent';
+import AuthDialog from './AuthDialog';
 
 interface PropertyQuizProps {
   mode?: QuizMode;
@@ -169,7 +28,7 @@ interface PropertyQuizProps {
 const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, className }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, any>>({});
-  const [userType, setUserType] = useState<'buyer' | 'seller' | null>(null);
+  const [userType, setUserType] = useState<UserType>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -208,25 +67,15 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     if (userType === null) {
       setProgress(0);
     } else {
-      const filteredQuestions = getFilteredQuestions();
+      const filteredQuestions = getFilteredQuestions(userType);
       const totalQuestions = filteredQuestions.length;
       const answeredCount = currentQuestionIndex;
       setProgress((answeredCount / totalQuestions) * 100);
     }
   }, [currentQuestionIndex, userType]);
 
-  const getFilteredQuestions = () => {
-    if (userType === null) {
-      return [initialQuestions[0]];
-    }
-    
-    return initialQuestions.filter(q => 
-      q.forUserType === userType || q.forUserType === 'both'
-    );
-  };
-
   const getCurrentQuestion = () => {
-    const filteredQuestions = getFilteredQuestions();
+    const filteredQuestions = getFilteredQuestions(userType);
     return filteredQuestions[currentQuestionIndex];
   };
   
@@ -237,7 +86,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       return;
     }
     
-    const filteredQuestions = getFilteredQuestions();
+    const filteredQuestions = getFilteredQuestions(userType);
     if (currentQuestionIndex < filteredQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
@@ -301,32 +150,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     return currentAnswers.includes(option);
   };
   
-  const sendToWebhook = async (formData: any) => {
-    try {
-      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/4813340d-f86b-46d7-a82a-39db8631e043";
-      
-      const queryParams = new URLSearchParams();
-      queryParams.append('data', JSON.stringify(formData));
-      
-      const response = await fetch(`${webhookUrl}?${queryParams.toString()}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Webhook error: ${response.status}`);
-      }
-      
-      console.log('Webhook response:', await response.text());
-      return true;
-    } catch (error) {
-      console.error('Error sending data to webhook:', error);
-      throw error;
-    }
-  };
-  
   const handleSubmit = async () => {
     if (!name || !email || !phone) {
       toast({
@@ -340,12 +163,12 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     setIsSubmitting(true);
     
     try {
-      const filteredQuestions = getFilteredQuestions();
+      const filteredQuestions = getFilteredQuestions(userType);
       
       const formattedAnswers = Object.entries(answers)
         .map(([questionIdStr, answer]) => {
           const questionId = Number(questionIdStr);
-          const question = initialQuestions.find(q => q.id === questionId);
+          const question = filteredQuestions.find(q => q.id === questionId);
           
           if (!question) return null;
           
@@ -399,149 +222,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       setIsSubmitting(false);
     }
   };
-  
-  const renderQuestionContent = () => {
-    const currentQuestion = getCurrentQuestion();
-    
-    if (!currentQuestion) {
-      return (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="block text-lg font-medium">Your Name</label>
-            <Input 
-              id="name" 
-              placeholder="John Doe" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-              className="text-lg py-6 px-5"
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="email" className="block text-lg font-medium">Email Address</label>
-            <Input 
-              id="email" 
-              type="email" 
-              placeholder="you@example.com" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              className="text-lg py-6 px-5"
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="phone" className="block text-lg font-medium">Phone Number</label>
-            <Input 
-              id="phone" 
-              placeholder="(555) 123-4567" 
-              value={phone} 
-              onChange={(e) => setPhone(e.target.value)} 
-              className="text-lg py-6 px-5"
-            />
-          </div>
-        </div>
-      );
-    }
-    
-    switch (currentQuestion.type) {
-      case 'text':
-        return (
-          <Input
-            placeholder={currentQuestion.placeholder}
-            value={answers[currentQuestion.id] || ''}
-            onChange={(e) => setAnswers({ ...answers, [currentQuestion.id]: e.target.value })}
-            className="text-lg py-6 px-5"
-            onBlur={() => handleNext()}
-            onClick={() => !user && setShowAuthDialog(true)}
-          />
-        );
-      
-      case 'select':
-        return (
-          <Select
-            value={answers[currentQuestion.id] || ''}
-            onValueChange={(value) => handleSelectChange(currentQuestion.id, value)}
-            onOpenChange={() => !user && setShowAuthDialog(true)}
-          >
-            <SelectTrigger 
-              className={cn(
-                "text-lg py-6",
-                mode === 'fullscreen' ? "bg-white/20 border-white/30 text-white" : ""
-              )}
-            >
-              <SelectValue placeholder="Select an option" />
-            </SelectTrigger>
-            <SelectContent className={mode === 'fullscreen' ? "bg-slate-800 text-white border-white/20" : ""}>
-              {currentQuestion.options?.map((option) => (
-                <SelectItem 
-                  key={option} 
-                  value={option} 
-                  className={cn(
-                    "text-lg py-3",
-                    mode === 'fullscreen' ? "text-white hover:bg-slate-700 focus:bg-slate-700" : ""
-                  )}
-                >
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-      
-      case 'checkbox':
-        return (
-          <div className="grid grid-cols-1 gap-3">
-            {currentQuestion.options?.map((option) => (
-              <div 
-                key={option} 
-                className="flex items-center space-x-3 bg-white/5 p-4 rounded-md hover:bg-white/10 transition-colors cursor-pointer"
-                onClick={() => handleCheckboxChange(currentQuestion.id, option)}
-              >
-                <Checkbox
-                  id={`checkbox-${currentQuestion.id}-${option}`}
-                  checked={isCheckboxSelected(option)}
-                  onCheckedChange={() => handleCheckboxChange(currentQuestion.id, option)}
-                  className="h-5 w-5"
-                />
-                <label
-                  htmlFor={`checkbox-${currentQuestion.id}-${option}`}
-                  className="text-lg leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer w-full"
-                >
-                  {option}
-                </label>
-              </div>
-            ))}
-          </div>
-        );
-      
-      case 'radio':
-        return (
-          <RadioGroup
-            value={answers[currentQuestion.id] || ''}
-            onValueChange={(value) => handleRadioChange(currentQuestion.id, value)}
-          >
-            <div className="grid grid-cols-1 gap-3">
-              {currentQuestion.options?.map((option) => (
-                <div 
-                  key={option} 
-                  className="flex items-center space-x-3 bg-white/5 p-4 rounded-md hover:bg-white/10 transition-colors cursor-pointer"
-                  onClick={() => handleRadioChange(currentQuestion.id, option)}
-                >
-                  <RadioGroupItem value={option} id={`radio-${currentQuestion.id}-${option}`} className="h-5 w-5" />
-                  <label
-                    htmlFor={`radio-${currentQuestion.id}-${option}`}
-                    className="text-lg font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer w-full"
-                  >
-                    {option}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </RadioGroup>
-        );
-      
-      default:
-        return null;
-    }
-  };
 
   const canProceed = () => {
     const currentQuestion = getCurrentQuestion();
@@ -556,7 +236,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     return !!answers[currentQuestion.id];
   };
   
-  const filteredQuestions = getFilteredQuestions();
+  const filteredQuestions = getFilteredQuestions(userType);
   const isLastQuestion = currentQuestionIndex === filteredQuestions.length;
   const isContactInfoScreen = currentQuestionIndex >= filteredQuestions.length;
   const isFirstQuestion = currentQuestionIndex === 0;
@@ -611,7 +291,25 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                     ? "Your Contact Information" 
                     : getCurrentQuestion()?.question}
                 </h3>
-                {renderQuestionContent()}
+                <QuizContent
+                  currentQuestion={getCurrentQuestion()}
+                  answers={answers}
+                  setAnswers={setAnswers}
+                  name={name}
+                  setName={setName}
+                  email={email}
+                  setEmail={setEmail}
+                  phone={phone}
+                  setPhone={setPhone}
+                  handleNext={handleNext}
+                  handleCheckboxChange={handleCheckboxChange}
+                  handleRadioChange={handleRadioChange}
+                  handleSelectChange={handleSelectChange}
+                  isCheckboxSelected={isCheckboxSelected}
+                  mode={mode}
+                  isAuthenticated={!!user}
+                  showAuthDialog={() => setShowAuthDialog(true)}
+                />
               </div>
             </CardContent>
             
@@ -646,6 +344,11 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             </CardFooter>
           </Card>
         </div>
+        
+        <AuthDialog 
+          open={showAuthDialog} 
+          onOpenChange={setShowAuthDialog} 
+        />
       </div>
     );
   }
@@ -679,7 +382,25 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
               ? "Your Contact Information" 
               : getCurrentQuestion()?.question}
           </h3>
-          {renderQuestionContent()}
+          <QuizContent
+            currentQuestion={getCurrentQuestion()}
+            answers={answers}
+            setAnswers={setAnswers}
+            name={name}
+            setName={setName}
+            email={email}
+            setEmail={setEmail}
+            phone={phone}
+            setPhone={setPhone}
+            handleNext={handleNext}
+            handleCheckboxChange={handleCheckboxChange}
+            handleRadioChange={handleRadioChange}
+            handleSelectChange={handleSelectChange}
+            isCheckboxSelected={isCheckboxSelected}
+            mode={mode}
+            isAuthenticated={!!user}
+            showAuthDialog={() => setShowAuthDialog(true)}
+          />
         </div>
         
         <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
@@ -728,47 +449,10 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         )}
       </CardFooter>
       
-      {/* Authentication Dialog */}
-      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Sign in required</DialogTitle>
-            <DialogDescription>
-              You need to be signed in to use the property questionnaire. 
-              Please sign in or create an account to continue.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-4 py-4">
-            <Button
-              className="w-full bg-estate-blue hover:bg-estate-dark-blue"
-              onClick={() => {
-                setShowAuthDialog(false);
-                navigate('/login', { state: { returnTo: window.location.pathname } });
-              }}
-            >
-              <LogIn className="mr-2 h-4 w-4" />
-              Sign in
-            </Button>
-            <Button
-              variant="outline" 
-              className="w-full"
-              onClick={() => {
-                setShowAuthDialog(false);
-                navigate('/signup', { state: { returnTo: window.location.pathname } });
-              }}
-            >
-              Create an account
-            </Button>
-          </div>
-          <DialogFooter className="sm:justify-start">
-            <DialogClose asChild>
-              <Button type="button" variant="secondary" onClick={() => setShowAuthDialog(false)}>
-                Cancel
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AuthDialog 
+        open={showAuthDialog} 
+        onOpenChange={setShowAuthDialog} 
+      />
     </Card>
   );
 };
