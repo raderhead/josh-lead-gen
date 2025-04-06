@@ -38,16 +38,23 @@ const HeroSection = () => {
         />
       </div>
       
-      <div className="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full">
+      {/* Large heading at the top */}
+      <div className="absolute top-32 w-full text-center">
+        <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 px-4">
+          Commercial Property in Abilene
+        </h1>
+      </div>
+      
+      <div className="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full mt-24">
         <div className="bg-slate-900/70 backdrop-blur-sm p-12 rounded-2xl border border-slate-700 w-full max-w-3xl">
           <div className="flex items-start mb-8">
             <div className="flex-shrink-0 bg-blue-900/80 rounded-full p-5 mr-6">
               <Building className="h-10 w-10 text-blue-400" />
             </div>
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
                 Find Your Perfect Commercial Space
-              </h1>
+              </h2>
               <p className="text-xl text-gray-300">
                 Tell us your needs and preferences, and we'll help you find the ideal 
                 property for your business.
