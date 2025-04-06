@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
+import { useAuthDialog } from '@/contexts/AuthDialogContext';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -14,18 +15,18 @@ import { Heart, LogOut, Settings, User } from 'lucide-react';
 
 const UserMenu = () => {
   const { user, logout } = useUser();
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const { openLogin, openSignup } = useAuthDialog();
+  const [isOpen, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   if (!user) {
     return (
       <div className="flex items-center space-x-2">
-        <Button variant="outline" size="sm" asChild>
-          <Link to="/login">Sign in</Link>
+        <Button variant="outline" size="sm" onClick={openLogin}>
+          Sign in
         </Button>
-        <Button size="sm" asChild>
-          <Link to="/signup">Sign up</Link>
+        <Button size="sm" onClick={openSignup}>
+          Sign up
         </Button>
       </div>
     );
@@ -36,14 +37,13 @@ const UserMenu = () => {
     try {
       await logout();
       setOpen(false);
-      navigate('/');
     } finally {
       setIsLoggingOut(false);
     }
   };
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <DropdownMenu open={isOpen} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="relative rounded-full">
           <User className="h-5 w-5" />

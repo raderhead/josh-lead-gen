@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import { useAuthDialog } from '@/contexts/AuthDialogContext';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import { LogIn } from 'lucide-react';
 const HeroSection = () => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const { openLogin, openSignup } = useAuthDialog();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   
   const handleQuestionnaireClick = () => {
@@ -89,7 +91,7 @@ const HeroSection = () => {
               className="w-full bg-estate-blue hover:bg-estate-dark-blue"
               onClick={() => {
                 setShowAuthDialog(false);
-                navigate('/login', { state: { returnTo: '/property-quiz' } });
+                openLogin();
               }}
             >
               <LogIn className="mr-2 h-4 w-4" />
@@ -100,7 +102,7 @@ const HeroSection = () => {
               className="w-full"
               onClick={() => {
                 setShowAuthDialog(false);
-                navigate('/signup', { state: { returnTo: '/property-quiz' } });
+                openSignup();
               }}
             >
               Create an account

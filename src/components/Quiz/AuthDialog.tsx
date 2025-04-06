@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useAuthDialog } from "@/contexts/AuthDialogContext";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ interface AuthDialogProps {
 }
 
 const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
-  const navigate = useNavigate();
+  const { openLogin, openSignup } = useAuthDialog();
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -36,7 +36,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
             className="w-full bg-estate-blue hover:bg-estate-dark-blue"
             onClick={() => {
               onOpenChange(false);
-              navigate('/login', { state: { returnTo: window.location.pathname } });
+              openLogin();
             }}
           >
             <LogIn className="mr-2 h-4 w-4" />
@@ -47,7 +47,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
             className="w-full"
             onClick={() => {
               onOpenChange(false);
-              navigate('/signup', { state: { returnTo: window.location.pathname } });
+              openSignup();
             }}
           >
             Create an account
