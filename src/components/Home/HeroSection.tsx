@@ -43,18 +43,9 @@ const HeroSection = () => {
           </div>
           
           <div className="flex flex-wrap justify-center gap-4 mt-8">
-            <Button variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20 flex items-center gap-2 text-lg py-6 px-8" onClick={() => navigate('/properties')}>
-              <Building size={20} />
-              Browse Properties
-            </Button>
-            <Button variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20 flex items-center gap-2 text-lg py-6 px-8" onClick={() => navigate('/valuation')}>
-              <DollarSign size={20} />
-              Property Valuation
-            </Button>
-            <Button variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20 flex items-center gap-2 text-lg py-6 px-8" onClick={() => navigate('/contact')}>
-              <MapPin size={20} />
-              Contact Agent
-            </Button>
+            
+            
+            
           </div>
         </div>
       </div>
