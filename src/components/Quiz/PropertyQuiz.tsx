@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { toast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-import { Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Loader2, MessageSquare, ArrowLeft, CheckCircle } from 'lucide-react';
 import { QuizMode, UserType, QuizSubmission } from './types';
 import { getFilteredQuestions, sendToWebhook } from './quizUtils';
 import QuizContent from './QuizContent';
@@ -35,6 +35,8 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState(3);
   const { user } = useUser();
   const navigate = useNavigate();
   
@@ -67,6 +69,22 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       setProgress((answeredCount / totalQuestions) * 100);
     }
   }, [currentQuestionIndex, userType]);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    
+    if (isSubmitted && redirectCountdown > 0) {
+      timer = setTimeout(() => {
+        setRedirectCountdown(redirectCountdown - 1);
+      }, 1000);
+    } else if (isSubmitted && redirectCountdown === 0) {
+      navigate('/');
+    }
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isSubmitted, redirectCountdown, navigate]);
 
   const getCurrentQuestion = () => {
     const filteredQuestions = getFilteredQuestions(userType);
@@ -219,24 +237,8 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         }
       }
       
-      setCurrentQuestionIndex(0);
-      setAnswers({});
-      setUserType(null);
+      setIsSubmitted(true);
       
-      if (!user) {
-        setName('');
-        setEmail('');
-        setPhone('');
-      }
-      
-      toast({
-        title: "Thank You!",
-        description: "Your preferences have been submitted. Our agent will contact you soon."
-      });
-      
-      if (onClose) {
-        onClose();
-      }
     } catch (error) {
       console.error('Submission error:', error);
       toast({
@@ -266,6 +268,43 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const isLastQuestion = currentQuestionIndex === filteredQuestions.length;
   const isContactInfoScreen = currentQuestionIndex >= filteredQuestions.length;
   const isFirstQuestion = currentQuestionIndex === 0;
+
+  if (isSubmitted) {
+    return (
+      <div className={mode === 'fullscreen' ? "fixed inset-0 bg-gradient-to-r from-slate-900 to-estate-dark-blue z-50 overflow-y-auto" : ""}>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <Card className={cn(
+            "w-full max-w-lg text-center bg-white", 
+            mode === 'fullscreen' ? "bg-white/10 border-white/20 text-white" : "",
+            className
+          )}>
+            <CardHeader>
+              <div className="flex justify-center mb-4">
+                <CheckCircle size={64} className="text-green-500" />
+              </div>
+              <CardTitle className={cn("text-3xl", mode === 'fullscreen' ? "text-white" : "")}>
+                Thank You, {name}!
+              </CardTitle>
+              <CardDescription className={cn("text-lg mt-2", mode === 'fullscreen' ? "text-white/80" : "")}>
+                Your preferences have been submitted. Our agent will contact you soon.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className={cn("mb-6", mode === 'fullscreen' ? "text-white/80" : "")}>
+                Redirecting to homepage in {redirectCountdown} seconds...
+              </p>
+              <Button 
+                onClick={() => navigate('/')}
+                className="bg-estate-blue hover:bg-estate-dark-blue text-white"
+              >
+                Return Home Now
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (mode === 'fullscreen') {
     return (
