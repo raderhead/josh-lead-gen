@@ -21,6 +21,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         estate: "bg-estate-blue text-white hover:bg-estate-dark-blue",
         showing: "bg-blue-600 hover:bg-blue-700 text-white",
+        glow: "bg-estate-blue text-white relative overflow-hidden shadow-md hover:bg-estate-blue/90 hover:scale-[1.02] transition-all duration-300 before:absolute before:inset-0 before:bg-white before:opacity-0 before:blur-xl hover:before:opacity-20 hover:shadow-glow",
       },
       size: {
         default: "h-10 px-4 py-2",
