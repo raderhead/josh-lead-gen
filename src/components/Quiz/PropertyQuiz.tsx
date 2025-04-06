@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
@@ -18,6 +17,18 @@ import { QuizMode, UserType } from './types';
 import { getFilteredQuestions, sendToWebhook } from './quizUtils';
 import QuizContent from './QuizContent';
 import AuthDialog from './AuthDialog';
+import QuizCompletionPage from './QuizCompletionPage';
+import QuizRetakeDialog from './QuizRetakeDialog';
+import { supabase } from '@/integrations/supabase/client';
+
+// Define an interface for quiz submissions
+interface QuizSubmission {
+  id: string;
+  user_id: string;
+  submitted_at: Date;
+  user_type: string;
+  quiz_data: any;
+}
 
 interface PropertyQuizProps {
   mode?: QuizMode;
@@ -29,31 +40,15 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [userType, setUserType] = useState<UserType>(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showCompletion, setShowCompletion] = useState(false);
+  const [showRetakeDialog, setShowRetakeDialog] = useState(false);
+  const [previousSubmission, setPreviousSubmission] = useState<QuizSubmission | null>(null);
+  const [isRetake, setIsRetake] = useState(false);
   const { user } = useUser();
   const navigate = useNavigate();
-  
-  // Enhanced pre-fill user information
-  useEffect(() => {
-    if (user) {
-      // Set name from user context
-      setName(user.name || '');
-      
-      // Set email from user context
-      setEmail(user.email || '');
-      
-      // Set phone from user context, trying different metadata possible locations
-      if (user.phone) {
-        setPhone(user.phone);
-        console.log("Found phone in user.phone:", user.phone);
-      }
-    }
-  }, [user]);
   
   useEffect(() => {
     if (answers[0] === 'Buy') {
@@ -62,6 +57,13 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       setUserType('seller');
     }
   }, [answers[0]]);
+  
+  useEffect(() => {
+    if (user) {
+      // Check if user has already submitted a quiz
+      checkPreviousSubmission();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (userType === null) {
@@ -73,6 +75,34 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       setProgress((answeredCount / totalQuestions) * 100);
     }
   }, [currentQuestionIndex, userType]);
+  
+  // Function to check for previous quiz submissions
+  const checkPreviousSubmission = async () => {
+    try {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('quiz_submissions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('submitted_at', { ascending: false })
+        .limit(1);
+      
+      if (error) {
+        console.error('Error fetching previous submissions:', error);
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        setPreviousSubmission({
+          ...data[0],
+          submitted_at: new Date(data[0].submitted_at)
+        });
+      }
+    } catch (error) {
+      console.error('Error in checkPreviousSubmission:', error);
+    }
+  };
 
   const getCurrentQuestion = () => {
     const filteredQuestions = getFilteredQuestions(userType);
@@ -91,6 +121,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       setCurrentQuestionIndex(filteredQuestions.length);
+      handleSubmit();
     }
   };
   
@@ -150,13 +181,32 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     return currentAnswers.includes(option);
   };
   
+  const handleStartQuiz = () => {
+    // If there's a previous submission, show the retake dialog
+    if (previousSubmission && !isRetake) {
+      setShowRetakeDialog(true);
+      return;
+    }
+    
+    // Otherwise, start the quiz as normal
+    setCurrentQuestionIndex(0);
+    setAnswers({});
+    setUserType(null);
+    setIsRetake(false);
+    setShowCompletion(false);
+  };
+  
+  const handleRetakeQuiz = () => {
+    setIsRetake(true);
+    setCurrentQuestionIndex(0);
+    setAnswers({});
+    setUserType(null);
+    setShowCompletion(false);
+  };
+  
   const handleSubmit = async () => {
-    if (!name || !email || !phone) {
-      toast({
-        title: "Missing Information",
-        description: "Please provide your name, email, and phone number.",
-        variant: "destructive"
-      });
+    if (!user) {
+      setShowAuthDialog(true);
       return;
     }
     
@@ -180,9 +230,9 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         .filter(Boolean);
       
       const formData = {
-        name,
-        email,
-        phone,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "",
         userType: answers[0] === 'Buy' ? 'Buyer' : 'Seller',
         formType: answers[0] === 'Buy' ? "Commercial Property Buyer Questionnaire" : "Commercial Property Seller Questionnaire",
         answers: formattedAnswers,
@@ -191,26 +241,32 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       
       console.log('Submitting quiz data:', formData);
       
+      // Only save to database if this is not a retake
+      if (!isRetake) {
+        // Save to quiz_submissions table
+        await supabase
+          .from('quiz_submissions')
+          .insert({
+            user_id: user.id,
+            submitted_at: new Date().toISOString(),
+            user_type: answers[0] === 'Buy' ? 'buyer' : 'seller',
+            quiz_data: formData
+          });
+          
+        // Update previousSubmission
+        await checkPreviousSubmission();
+      }
+      
+      // Always send to webhook for notification purposes
       await sendToWebhook(formData);
       
-      setCurrentQuestionIndex(0);
-      setAnswers({});
-      setUserType(null);
-      
-      if (!user) {
-        setName('');
-        setEmail('');
-        setPhone('');
-      }
+      // Show completion page
+      setShowCompletion(true);
       
       toast({
         title: "Thank You!",
         description: "Your preferences have been submitted. Our agent will contact you soon."
       });
-      
-      if (onClose) {
-        onClose();
-      }
     } catch (error) {
       console.error('Submission error:', error);
       toast({
@@ -226,7 +282,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const canProceed = () => {
     const currentQuestion = getCurrentQuestion();
     if (!currentQuestion) {
-      return !!name && !!email && !!phone;
+      return true; // No more questions, can proceed
     }
     
     if (currentQuestion.type === 'checkbox') {
@@ -237,9 +293,20 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   };
   
   const filteredQuestions = getFilteredQuestions(userType);
-  const isLastQuestion = currentQuestionIndex === filteredQuestions.length;
-  const isContactInfoScreen = currentQuestionIndex >= filteredQuestions.length;
+  const isLastQuestion = currentQuestionIndex === filteredQuestions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
+
+  // If showing completion page
+  if (showCompletion) {
+    return (
+      <QuizCompletionPage
+        userName={user?.name || ""}
+        className={className}
+        onClose={onClose}
+        mode={mode}
+      />
+    );
+  }
 
   if (mode === 'fullscreen') {
     return (
@@ -268,39 +335,27 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
               <div className="flex items-center gap-3 mb-2">
                 <MessageSquare size={28} className="text-estate-blue" />
                 <CardTitle className="text-3xl">
-                  {isContactInfoScreen 
-                    ? "Almost Done!" 
-                    : userType === null 
-                      ? "Commercial Property Questionnaire" 
-                      : userType === 'buyer' 
-                        ? "Buyer Questionnaire" 
-                        : "Seller Questionnaire"}
+                  {userType === null 
+                    ? "Commercial Property Questionnaire" 
+                    : userType === 'buyer' 
+                      ? "Buyer Questionnaire" 
+                      : "Seller Questionnaire"}
                 </CardTitle>
               </div>
               <CardDescription className="text-white/80 text-lg">
-                {isContactInfoScreen 
-                  ? "Please provide your contact information so our agent can get in touch with you." 
-                  : getCurrentQuestion()?.description || "Please help us understand your needs better."}
+                {getCurrentQuestion()?.description || "Please help us understand your needs better."}
               </CardDescription>
             </CardHeader>
             
             <CardContent className="pt-6">
               <div className="mb-8">
                 <h3 className="text-2xl font-semibold mb-6">
-                  {isContactInfoScreen 
-                    ? "Your Contact Information" 
-                    : getCurrentQuestion()?.question}
+                  {getCurrentQuestion()?.question}
                 </h3>
                 <QuizContent
                   currentQuestion={getCurrentQuestion()}
                   answers={answers}
                   setAnswers={setAnswers}
-                  name={name}
-                  setName={setName}
-                  email={email}
-                  setEmail={setEmail}
-                  phone={phone}
-                  setPhone={setPhone}
                   handleNext={handleNext}
                   handleCheckboxChange={handleCheckboxChange}
                   handleRadioChange={handleRadioChange}
@@ -325,11 +380,11 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                 </Button>
               )}
               
-              {isLastQuestion && (
+              {isLastQuestion ? (
                 <Button 
                   onClick={handleSubmit}
                   disabled={isSubmitting || !canProceed()}
-                  className="bg-estate-blue hover:bg-estate-dark-blue"
+                  className="bg-estate-blue hover:bg-estate-dark-blue ml-auto"
                 >
                   {isSubmitting ? (
                     <>
@@ -340,6 +395,14 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                     "Submit"
                   )}
                 </Button>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  disabled={!canProceed()}
+                  className="ml-auto bg-estate-blue hover:bg-estate-dark-blue text-white"
+                >
+                  Next
+                </Button>
               )}
             </CardFooter>
           </Card>
@@ -348,6 +411,14 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         <AuthDialog 
           open={showAuthDialog} 
           onOpenChange={setShowAuthDialog} 
+        />
+        
+        <QuizRetakeDialog
+          open={showRetakeDialog}
+          onOpenChange={setShowRetakeDialog}
+          userName={user?.name || ""}
+          lastSubmissionDate={previousSubmission?.submitted_at || new Date()}
+          onRetake={handleRetakeQuiz}
         />
       </div>
     );
@@ -359,39 +430,27 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         <div className="flex items-center gap-3 mb-2">
           <MessageSquare size={24} className="text-estate-blue" />
           <CardTitle>
-            {isContactInfoScreen 
-              ? "Almost Done!" 
-              : userType === null 
-                ? "Commercial Property Questionnaire" 
-                : userType === 'buyer' 
-                  ? "Buyer Questionnaire" 
-                  : "Seller Questionnaire"}
+            {userType === null 
+              ? "Commercial Property Questionnaire" 
+              : userType === 'buyer' 
+                ? "Buyer Questionnaire" 
+                : "Seller Questionnaire"}
           </CardTitle>
         </div>
         <CardDescription className="text-base">
-          {isContactInfoScreen 
-            ? "Please provide your contact information so our agent can get in touch with you." 
-            : getCurrentQuestion()?.description || "Please help us understand your needs better."}
+          {getCurrentQuestion()?.description || "Please help us understand your needs better."}
         </CardDescription>
       </CardHeader>
       
       <CardContent>
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-4">
-            {isContactInfoScreen 
-              ? "Your Contact Information" 
-              : getCurrentQuestion()?.question}
+            {getCurrentQuestion()?.question}
           </h3>
           <QuizContent
             currentQuestion={getCurrentQuestion()}
             answers={answers}
             setAnswers={setAnswers}
-            name={name}
-            setName={setName}
-            email={email}
-            setEmail={setEmail}
-            phone={phone}
-            setPhone={setPhone}
             handleNext={handleNext}
             handleCheckboxChange={handleCheckboxChange}
             handleRadioChange={handleRadioChange}
@@ -452,6 +511,14 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       <AuthDialog 
         open={showAuthDialog} 
         onOpenChange={setShowAuthDialog} 
+      />
+      
+      <QuizRetakeDialog
+        open={showRetakeDialog}
+        onOpenChange={setShowRetakeDialog}
+        userName={user?.name || ""}
+        lastSubmissionDate={previousSubmission?.submitted_at || new Date()}
+        onRetake={handleRetakeQuiz}
       />
     </Card>
   );
