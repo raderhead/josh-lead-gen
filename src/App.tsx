@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { AuthDialogProvider } from "./contexts/AuthDialogContext";
+import { AuthDialogProvider, useAuthDialog } from "./contexts/AuthDialogContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Properties from "./pages/Properties";
