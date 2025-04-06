@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -177,7 +176,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   }, [user]);
   
   useEffect(() => {
-    // Set user type based on first question answer
     if (answers[0] === 'Buy') {
       setUserType('buyer');
     } else if (answers[0] === 'Sell') {
@@ -186,7 +184,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   }, [answers[0]]);
 
   useEffect(() => {
-    // Calculate progress percentage
     if (userType === null) {
       setProgress(0);
     } else {
@@ -198,12 +195,10 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   }, [currentQuestionIndex, userType]);
 
   const getFilteredQuestions = () => {
-    // First question is always shown
     if (userType === null) {
       return [initialQuestions[0]];
     }
     
-    // Filter questions based on user type
     return initialQuestions.filter(q => 
       q.forUserType === userType || q.forUserType === 'both'
     );
@@ -219,7 +214,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     if (currentQuestionIndex < filteredQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // Move to contact info
       setCurrentQuestionIndex(filteredQuestions.length);
     }
   };
@@ -230,7 +224,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     }
   };
   
-  // Modified to automatically advance to next question after checkbox selection
   const handleCheckboxChange = (questionId: number, option: string) => {
     setAnswers(prev => {
       const currentAnswers = prev[questionId] || [];
@@ -247,21 +240,16 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         };
       }
     });
-    // No auto-advance for checkboxes as users may want to select multiple options
   };
   
-  // New handler for radio changes to automatically advance
   const handleRadioChange = (questionId: number, value: string) => {
     setAnswers({ ...answers, [questionId]: value });
-    // Auto-advance to next question after selection
-    setTimeout(() => handleNext(), 300); // Small delay for better UX
+    setTimeout(() => handleNext(), 300);
   };
   
-  // New handler for select changes to automatically advance
   const handleSelectChange = (questionId: number, value: string) => {
     setAnswers({ ...answers, [questionId]: value });
-    // Auto-advance to next question after selection
-    setTimeout(() => handleNext(), 300); // Small delay for better UX
+    setTimeout(() => handleNext(), 300);
   };
   
   const isCheckboxSelected = (option: string) => {
@@ -374,7 +362,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     const currentQuestion = getCurrentQuestion();
     
     if (!currentQuestion) {
-      // Render contact information form
       return (
         <div className="space-y-4">
           <div className="space-y-2">
@@ -420,7 +407,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             value={answers[currentQuestion.id] || ''}
             onChange={(e) => setAnswers({ ...answers, [currentQuestion.id]: e.target.value })}
             className="text-lg py-6 px-5"
-            onBlur={() => handleNext()} // Auto-advance when user tabs out or clicks away
+            onBlur={() => handleNext()}
           />
         );
       
@@ -502,12 +489,10 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const canProceed = () => {
     const currentQuestion = getCurrentQuestion();
     if (!currentQuestion) {
-      // On contact info screen
       return !!name && !!email && !!phone;
     }
     
     if (currentQuestion.type === 'checkbox') {
-      // For checkbox questions, allow proceeding if at least one option is selected
       return Array.isArray(answers[currentQuestion.id]) && answers[currentQuestion.id].length > 0;
     }
     
@@ -517,13 +502,12 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const filteredQuestions = getFilteredQuestions();
   const isLastQuestion = currentQuestionIndex === filteredQuestions.length;
   const isContactInfoScreen = currentQuestionIndex >= filteredQuestions.length;
+  const isFirstQuestion = currentQuestionIndex === 0;
 
-  // Full screen mode styling
   if (mode === 'fullscreen') {
     return (
       <div className="fixed inset-0 bg-gradient-to-r from-slate-900 to-estate-dark-blue z-50 overflow-y-auto">
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
-          {/* Progress bar */}
           <div className="w-full max-w-4xl mb-4 bg-white/10 rounded-full h-2 overflow-hidden">
             <div 
               className="bg-estate-blue h-full transition-all duration-300 ease-in-out" 
@@ -575,15 +559,16 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             </CardContent>
             
             <CardFooter className="flex justify-between pt-4 border-t border-white/10">
-              <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={currentQuestionIndex === 0}
-                className="border-white/20 text-white hover:bg-white/10"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
+              {!isFirstQuestion && (
+                <Button
+                  variant="outline"
+                  onClick={handlePrevious}
+                  className="border-white/30 bg-white/10 text-white hover:bg-white/20"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+              )}
               
               {isLastQuestion && (
                 <Button 
@@ -608,7 +593,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     );
   }
 
-  // Inline mode
   return (
     <Card className={cn("w-full bg-white border shadow-md", className)}>
       <CardHeader>
@@ -641,7 +625,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
           {renderQuestionContent()}
         </div>
         
-        {/* Progress bar */}
         <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
           <div 
             className="bg-estate-blue h-full rounded-full transition-all duration-300 ease-in-out" 
@@ -651,14 +634,16 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       </CardContent>
       
       <CardFooter className="flex justify-between border-t pt-4">
-        <Button
-          variant="outline"
-          onClick={handlePrevious}
-          disabled={currentQuestionIndex === 0}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
+        {!isFirstQuestion && (
+          <Button
+            variant="outline"
+            onClick={handlePrevious}
+            className="border-gray-200 bg-gray-100 hover:bg-gray-200"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        )}
         
         {isLastQuestion && (
           <Button 
