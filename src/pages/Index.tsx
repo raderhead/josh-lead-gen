@@ -2,7 +2,6 @@
 import Layout from '@/components/Layout/Layout';
 import HeroSection from '@/components/Home/HeroSection';
 import FeaturedListings from '@/components/Home/FeaturedListings';
-import HomeFeatures from '@/components/Home/HomeFeatures';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Phone, BarChart2, Building, MessageSquare } from 'lucide-react';
@@ -12,7 +11,6 @@ const Index = () => {
       <HeroSection />
       
       <FeaturedListings />
-      <HomeFeatures />
       
       {/* Testimonials Section */}
       <section className="py-16 bg-white">
