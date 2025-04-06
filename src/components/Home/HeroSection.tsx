@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Building } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import {
   Dialog,
@@ -47,22 +47,13 @@ const HeroSection = () => {
       
       <div className="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full mt-24">
         <div className="bg-slate-900/70 backdrop-blur-sm p-12 rounded-2xl border border-slate-700 w-full max-w-3xl">
-          <div className="flex items-start mb-8">
-            <div className="flex-shrink-0 bg-blue-900/80 rounded-full p-5 mr-6">
-              <Building className="h-10 w-10 text-blue-400" />
-            </div>
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                Find Your Perfect Commercial Space
-              </h2>
-              <p className="text-xl text-gray-300">
-                Tell us your needs and preferences, and we'll help you find the ideal 
-                property for your business.
-              </p>
-            </div>
+          <div className="mb-8 text-center">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 whitespace-nowrap">
+              Find Your Perfect Commercial Space
+            </h2>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 mt-8">
+          <div className="flex flex-col md:flex-row gap-4 mt-8 justify-center">
             <Button 
               size="xl" 
               className="bg-blue-600 hover:bg-blue-700 text-white text-lg flex items-center justify-center"
