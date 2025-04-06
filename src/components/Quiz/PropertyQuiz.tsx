@@ -21,6 +21,7 @@ import AuthDialog from './AuthDialog';
 import QuizCompletionPage from './QuizCompletionPage';
 import QuizRetakeDialog from './QuizRetakeDialog';
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
 
 // Define an interface for quiz submissions
 interface QuizSubmission {
