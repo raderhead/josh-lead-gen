@@ -48,7 +48,7 @@ const HeroSection = () => {
       <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full mt-60">
         <div className="bg-slate-900/70 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 w-full">
           <div className="mb-6 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white">
+            <h2 className="text-3xl md:text-4xl font-bold text-white">
               What's Your Commercial Real Estate Game Plan?
             </h2>
           </div>
