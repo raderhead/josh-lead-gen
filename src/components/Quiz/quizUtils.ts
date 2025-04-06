@@ -19,7 +19,7 @@ export interface WebhookError {
 
 export const sendToWebhook = async (formData: any): Promise<boolean | WebhookError> => {
   try {
-    const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/4813340d-f86b-46d7-a82a-39db8631e043";
+    const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/d8f5b13a-ac80-4ae5-8247-27c574036746";
     
     // Use fetch with a timeout to prevent hanging requests
     const controller = new AbortController();
@@ -27,14 +27,34 @@ export const sendToWebhook = async (formData: any): Promise<boolean | WebhookErr
       controller.abort();
     }, 10000); // 10 second timeout
     
-    // Instead of using URL parameters which can be problematic with large data,
-    // let's send data in the request body as JSON
-    const response = await fetch(webhookUrl, {
-      method: 'POST',
+    // Since this is a GET request, we need to encode the data as URL parameters
+    const params = new URLSearchParams();
+    
+    // Flatten the form data object for URL parameters
+    const flattenObject = (obj: any, prefix = '') => {
+      for (const key in obj) {
+        const value = obj[key];
+        const newKey = prefix ? `${prefix}.${key}` : key;
+        
+        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+          flattenObject(value, newKey);
+        } else {
+          params.append(newKey, JSON.stringify(value));
+        }
+      }
+    };
+    
+    flattenObject(formData);
+    
+    // Create the URL with parameters
+    const urlWithParams = `${webhookUrl}?${params.toString()}`;
+    console.log('Sending GET request to:', urlWithParams);
+    
+    const response = await fetch(urlWithParams, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
-      body: JSON.stringify(formData),
       signal: controller.signal
     });
     
