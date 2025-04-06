@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Building, Search, BarChart2, Phone, MessageSquare } from 'lucide-react';
+import { Menu, X, Building, Search, BarChart2, Phone } from 'lucide-react';
 import UserMenu from './UserMenu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useUser } from '@/contexts/UserContext';
@@ -28,7 +28,6 @@ const Navbar = () => {
               <Link to="/properties" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Properties</Link>
               <Link to="/valuation" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Valuation</Link>
               <Link to="/contact" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Contact</Link>
-              <Link to="/property-quiz" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Questionnaire</Link>
             </div>
             <div className="ml-4 flex items-center gap-2">
               <ThemeToggle />
@@ -71,12 +70,6 @@ const Navbar = () => {
               <div className="flex items-center">
                 <Phone className="h-5 w-5 mr-3" />
                 Contact
-              </div>
-            </Link>
-            <Link to="/property-quiz" className="block px-3 py-2 text-base font-medium text-foreground hover:text-estate-blue hover:bg-secondary" onClick={() => setIsOpen(false)}>
-              <div className="flex items-center">
-                <MessageSquare className="h-5 w-5 mr-3" />
-                Questionnaire
               </div>
             </Link>
           </div>
