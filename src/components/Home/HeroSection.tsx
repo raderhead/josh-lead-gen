@@ -27,8 +27,8 @@ const HeroSection = () => {
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">Commercial Property in Abilene</h1>
       </div>
       
-      {/* Quiz CTA - Positioned at the bottom of the hero section */}
-      <div className="relative z-10 w-full transform translate-y-1/2">
+      {/* Quiz CTA - Positioned at the bottom of the screen */}
+      <div className="relative z-10 w-full mb-8">
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 max-w-2xl mx-auto border border-white/20 shadow-xl">
           <div className="flex items-center gap-3 mb-3 justify-center">
             <MessageSquare size={24} className="text-estate-blue" />
