@@ -27,24 +27,23 @@ export const sendToWebhook = async (formData: any): Promise<boolean | WebhookErr
       controller.abort();
     }, 10000); // 10 second timeout
     
-    // Since this is a GET request, we need to encode the data as URL parameters
+    // Create URL parameters for each field individually
     const params = new URLSearchParams();
     
-    // Flatten the form data object for URL parameters
-    const flattenObject = (obj: any, prefix = '') => {
-      for (const key in obj) {
-        const value = obj[key];
-        const newKey = prefix ? `${prefix}.${key}` : key;
-        
-        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
-          flattenObject(value, newKey);
-        } else {
-          params.append(newKey, JSON.stringify(value));
-        }
-      }
-    };
+    // Add basic user info
+    params.append('name', formData.name);
+    params.append('email', formData.email);
+    params.append('phone', formData.phone);
+    params.append('userType', formData.userType);
+    params.append('timestamp', formData.timestamp);
     
-    flattenObject(formData);
+    // Add each answer as a separate parameter
+    if (Array.isArray(formData.answers)) {
+      formData.answers.forEach((answer: any, index: number) => {
+        params.append(`question_${index}`, answer.question);
+        params.append(`answer_${index}`, answer.answer);
+      });
+    }
     
     // Create the URL with parameters
     const urlWithParams = `${webhookUrl}?${params.toString()}`;

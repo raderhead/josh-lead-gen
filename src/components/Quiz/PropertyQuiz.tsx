@@ -188,6 +188,13 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       
       if (webhookResult && typeof webhookResult === 'object' && 'error' in webhookResult) {
         console.error('Webhook submission failed:', webhookResult.message);
+        toast({
+          title: "Submission Error",
+          description: "There was a problem submitting your information. Please try again.",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
       } else {
         console.log('Webhook submission successful');
       }
