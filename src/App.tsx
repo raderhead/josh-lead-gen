@@ -16,6 +16,7 @@ import SavedProperties from "./pages/SavedProperties";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import EmailVerified from "./pages/EmailVerified";
+import PropertyQuizPage from "./pages/PropertyQuiz";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/email-verified" element={<EmailVerified />} />
+              <Route path="/property-quiz" element={<PropertyQuizPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
