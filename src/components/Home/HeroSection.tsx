@@ -45,10 +45,10 @@ const HeroSection = () => {
         </h1>
       </div>
       
-      <div className="relative w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full mt-24">
-        <div className="bg-slate-900/70 backdrop-blur-sm p-12 rounded-2xl border border-slate-700 w-full max-w-3xl">
+      <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full mt-24">
+        <div className="bg-slate-900/70 backdrop-blur-sm p-12 rounded-2xl border border-slate-700 w-full">
           <div className="mb-8 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 whitespace-nowrap">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Find Your Perfect Commercial Space
             </h2>
           </div>
