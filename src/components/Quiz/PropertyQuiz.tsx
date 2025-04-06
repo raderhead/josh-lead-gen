@@ -43,7 +43,6 @@ const initialQuestions: QuizQuestion[] = [
     options: ['Buy', 'Sell'],
     forUserType: 'both'
   },
-  // Buyer questions
   {
     id: 1,
     question: "What type of commercial property are you looking for?",
@@ -57,7 +56,7 @@ const initialQuestions: QuizQuestion[] = [
     question: "What other areas are you considering besides Abilene?",
     description: "Select all that apply",
     type: 'checkbox',
-    options: ['San Angelo', 'Lubbock', 'San Antonio', 'Dallas/Fort Worth', 'Austin', 'Midland/Odessa', 'Not considering other areas', 'Other'],
+    options: ['Buffalo Gap', 'Eastland', 'Tuscola', 'Not considering other areas', 'Other'],
     forUserType: 'buyer'
   },
   {
@@ -96,7 +95,6 @@ const initialQuestions: QuizQuestion[] = [
     options: ['First-time investor', 'Experienced buyer', 'Business owner', 'Other'],
     forUserType: 'buyer'
   },
-  // Seller questions
   {
     id: 8,
     question: "What type of commercial property are you selling?",
