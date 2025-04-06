@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -20,8 +21,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-import { Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
+import { Loader2, MessageSquare, ArrowLeft, LogIn } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { useNavigate } from 'react-router-dom';
 
 type QuizQuestionType = 'text' | 'select' | 'checkbox' | 'radio' | 'range';
 
@@ -164,14 +166,21 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
   const { user } = useUser();
+  const navigate = useNavigate();
   
+  // Redirect to login if not authenticated
   useEffect(() => {
-    if (user) {
+    if (!user) {
+      if (mode === 'fullscreen') {
+        navigate('/login', { state: { returnTo: '/property-quiz' } });
+      }
+    } else {
+      // Pre-fill user information if available
       setName(user.name || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
     }
-  }, [user]);
+  }, [user, navigate, mode]);
   
   useEffect(() => {
     if (answers[0] === 'Buy') {
@@ -509,6 +518,32 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     return !!answers[currentQuestion.id];
   };
   
+  // Show authentication required message if not logged in
+  if (!user && mode === 'inline') {
+    return (
+      <Card className={cn("w-full bg-white border shadow-md", className)}>
+        <CardHeader>
+          <CardTitle>Authentication Required</CardTitle>
+          <CardDescription>
+            Please sign in to access the property questionnaire.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center py-8">
+          <LogIn className="h-12 w-12 text-estate-blue mb-4" />
+          <p className="mb-6 text-center text-muted-foreground">
+            You need to be logged in to use this feature.
+          </p>
+          <Button
+            onClick={() => navigate('/login', { state: { returnTo: window.location.pathname } })}
+            className="bg-estate-blue hover:bg-estate-dark-blue"
+          >
+            Sign In
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   const filteredQuestions = getFilteredQuestions();
   const isLastQuestion = currentQuestionIndex === filteredQuestions.length;
   const isContactInfoScreen = currentQuestionIndex >= filteredQuestions.length;
@@ -518,7 +553,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     return (
       <div className="fixed inset-0 bg-gradient-to-r from-slate-900 to-estate-dark-blue z-50 overflow-y-auto">
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
-          <div className="w-full max-w-4xl mb-4 bg-white/20 rounded-full h-2 overflow-hidden">
+          <div className="w-full max-w-4xl mb-4 bg-slate-600 rounded-full h-2 overflow-hidden">
             <div 
               className="bg-estate-blue h-full transition-all duration-300 ease-in-out" 
               style={{ width: `${progress}%` }}

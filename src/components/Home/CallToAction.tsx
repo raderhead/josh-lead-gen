@@ -36,26 +36,6 @@ const CallToAction: React.FC = () => {
               Our team of experienced agents is here to help you navigate the Abilene commercial real estate market. 
               Whether you're buying, selling, or leasing, we've got you covered.
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button asChild className="bg-estate-blue hover:bg-estate-blue/90">
-                <Link to="/contact" className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  Contact an Agent
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="border-estate-blue text-estate-blue hover:bg-estate-light-blue/50">
-                <Link to="/properties" className="flex items-center gap-2">
-                  <Building className="h-4 w-4" />
-                  Browse Properties
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="border-estate-blue text-estate-blue hover:bg-estate-light-blue/50">
-                <Link to="/valuation" className="flex items-center gap-2">
-                  <BarChart2 className="h-4 w-4" />
-                  Get Free Valuation
-                </Link>
-              </Button>
-            </div>
           </div>
           <div className="hidden md:block bg-white rounded-lg shadow-md p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Why Choose Abilene Commercial</h3>
