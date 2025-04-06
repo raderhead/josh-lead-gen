@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -10,7 +9,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Mail, Phone, Calendar, MessageSquare, User, Loader2 } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
-import BuyerQuiz from '@/components/Quiz/BuyerQuiz';
 import { useUser } from '@/contexts/UserContext';
 
 const formSchema = z.object({
@@ -46,7 +44,6 @@ const Contact = () => {
     }
   });
 
-  // Prefill form with user data when available
   useEffect(() => {
     if (user) {
       form.setValue('name', user.name || '');
@@ -102,7 +99,6 @@ const Contact = () => {
       
       form.reset();
       
-      // If user is logged in, prefill the form again after reset
       if (user) {
         form.setValue('name', user.name || '');
         form.setValue('email', user.email || '');
@@ -259,19 +255,6 @@ const Contact = () => {
                   </p>
                 </div>
               </div>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <MessageSquare className="h-5 w-5 text-estate-blue mr-2" />
-                Find Your Perfect Home
-              </h2>
-              
-              <p className="text-gray-600 mb-4">
-                Help us understand your needs better. Take our quick questionnaire to give our agent insights into what you're looking for.
-              </p>
-              
-              <BuyerQuiz />
             </div>
             
             <div className="bg-white p-6 rounded-lg shadow-md">
