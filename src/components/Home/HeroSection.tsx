@@ -31,7 +31,7 @@ const HeroSection = () => {
   };
   
   return (
-    <div className="relative bg-gradient-to-r from-slate-900 to-slate-800 h-screen flex items-center justify-center">
+    <div className="relative bg-gradient-to-r from-slate-900 to-slate-800 min-h-[90vh] md:h-screen flex items-center justify-center">
       <div className="absolute inset-0 overflow-hidden">
         <img 
           src="/lovable-uploads/9478e2e8-6d1a-48e4-b7c3-2e60e9022800.png" 
@@ -41,32 +41,32 @@ const HeroSection = () => {
       </div>
       
       {/* Large heading at the top */}
-      <div className="absolute top-32 w-full text-center">
-        <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 px-4">
+      <div className="absolute top-20 md:top-32 w-full text-center">
+        <h1 className="text-4xl md:text-7xl font-bold text-white mb-4 px-4">
           Commercial Property in Abilene
         </h1>
       </div>
       
-      <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full mt-60">
-        <div className="bg-slate-900/70 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 w-full">
+      <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full mt-40 md:mt-60">
+        <div className="bg-slate-900/70 backdrop-blur-sm p-6 md:p-8 rounded-2xl border border-slate-700 w-full">
           <div className="mb-6 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
+            <h2 className="text-2xl md:text-4xl font-bold text-white">
               What's Your Commercial Real Estate Game Plan?
             </h2>
           </div>
 
           <div className="flex flex-col md:flex-row gap-4 justify-center">
             <Button 
-              size="xl" 
+              size="lg" 
               variant="outline" 
-              className="border-white/30 bg-white/10 text-white hover:bg-white/20 text-lg"
+              className="border-white/30 bg-white/10 text-white hover:bg-white/20 text-base md:text-lg"
               onClick={() => navigate('/properties')}
             >
               Browse All Properties
             </Button>
             <Button 
-              size="xl" 
-              className="bg-blue-600 hover:bg-blue-700 text-white text-lg flex items-center justify-center group"
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700 text-white text-base md:text-lg flex items-center justify-center group"
               onClick={handleQuestionnaireClick}
             >
               Take The Quiz

@@ -7,22 +7,23 @@ import { Link } from 'react-router-dom';
 import { Phone, BarChart2, Building, MessageSquare } from 'lucide-react';
 
 const Index = () => {
-  return <Layout>
+  return (
+    <Layout>
       <HeroSection />
       
       <FeaturedListings />
       
       {/* Testimonials Section */}
-      <section className="py-16 bg-white">
+      <section className="py-12 md:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">What Our Clients Say</h2>
-            <p className="mt-4 text-xl text-gray-600">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">What Our Clients Say</h2>
+            <p className="mt-3 md:mt-4 text-lg md:text-xl text-gray-600">
               Hear from our satisfied clients about their experience working with Abilene Commercial
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {[{
             quote: "Working with Abilene Commercial was a fantastic experience! They helped us find the perfect retail space in less than a month.",
             name: "Jennifer Smith",
@@ -35,17 +36,20 @@ const Index = () => {
             quote: "Their knowledge of the Abilene commercial market is unmatched. The property search tools made finding our new office simple.",
             name: "David Williams",
             title: "CEO"
-          }].map((testimonial, index) => <div key={index} className="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-100">
+          }].map((testimonial, index) => (
+              <div key={index} className="bg-gray-50 p-5 md:p-6 rounded-lg shadow-sm border border-gray-100">
                 <p className="text-gray-600 italic mb-4">"{testimonial.quote}"</p>
                 <div>
                   <p className="font-semibold text-gray-900">{testimonial.name}</p>
                   <p className="text-gray-500 text-sm">{testimonial.title}</p>
                 </div>
-              </div>)}
+              </div>
+            ))}
           </div>
         </div>
       </section>
-    </Layout>;
+    </Layout>
+  );
 };
 
 export default Index;
