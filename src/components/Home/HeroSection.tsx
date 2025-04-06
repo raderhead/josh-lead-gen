@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, ArrowRight, Buildings } from 'lucide-react';
+import { MessageSquare, ArrowRight, Building } from 'lucide-react';
 import PropertySearchInput from '@/components/Property/PropertySearchInput';
 import PropertyQuiz from '@/components/Quiz/PropertyQuiz';
 
@@ -35,7 +35,7 @@ const HeroSection = () => {
         <div className="w-full max-w-3xl backdrop-blur-md p-8 rounded-2xl border border-white/20 bg-gradient-to-br from-black/70 to-slate-800/80 shadow-xl transform hover:scale-[1.01] transition-all duration-300">
           <div className="flex flex-col lg:flex-row items-center gap-6">
             <div className="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 bg-estate-blue/20 rounded-full flex items-center justify-center">
-              <Buildings size={40} className="text-estate-blue" />
+              <Building size={40} className="text-estate-blue" />
             </div>
             
             <div className="flex-1">
