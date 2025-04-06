@@ -196,30 +196,6 @@ export type Database = {
           },
         ]
       }
-      quiz_submissions: {
-        Row: {
-          id: string
-          quiz_data: Json
-          submitted_at: string
-          user_id: string
-          user_type: string
-        }
-        Insert: {
-          id?: string
-          quiz_data: Json
-          submitted_at?: string
-          user_id: string
-          user_type: string
-        }
-        Update: {
-          id?: string
-          quiz_data?: Json
-          submitted_at?: string
-          user_id?: string
-          user_type?: string
-        }
-        Relationships: []
-      }
       saved_properties: {
         Row: {
           id: string
