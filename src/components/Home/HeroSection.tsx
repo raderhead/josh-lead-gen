@@ -17,7 +17,7 @@ const HeroSection = () => {
   };
   
   return (
-    <div className="relative bg-gradient-to-r from-slate-900 to-slate-800 h-[600px] flex flex-col justify-between">
+    <div className="relative bg-gradient-to-r from-slate-900 to-slate-800 h-screen flex flex-col justify-between">
       <div className="absolute inset-0 overflow-hidden">
         <img src="/lovable-uploads/9478e2e8-6d1a-48e4-b7c3-2e60e9022800.png" alt="Abilene skyline" className="w-full h-full opacity-30 object-cover" />
       </div>
