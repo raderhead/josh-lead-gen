@@ -46,14 +46,14 @@ const HeroSection = () => {
       </div>
       
       <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center h-full mt-24">
-        <div className="bg-slate-900/70 backdrop-blur-sm p-12 rounded-2xl border border-slate-700 w-full">
-          <div className="mb-8 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <div className="bg-slate-900/70 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 w-full">
+          <div className="mb-6 text-center">
+            <h2 className="text-4xl md:text-5xl font-bold text-white">
               Find Your Perfect Commercial Space
             </h2>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 mt-8 justify-center">
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
             <Button 
               size="xl" 
               className="bg-blue-600 hover:bg-blue-700 text-white text-lg flex items-center justify-center"
