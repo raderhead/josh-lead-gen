@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
@@ -244,7 +245,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
       // Only save to database if this is not a retake
       if (!isRetake) {
         // Save to quiz_submissions table
-        await supabase
+        const { error } = await supabase
           .from('quiz_submissions')
           .insert({
             user_id: user.id,
@@ -252,6 +253,11 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             user_type: answers[0] === 'Buy' ? 'buyer' : 'seller',
             quiz_data: formData
           });
+          
+        if (error) {
+          console.error('Error saving submission to database:', error);
+          throw error;
+        }
           
         // Update previousSubmission
         await checkPreviousSubmission();
