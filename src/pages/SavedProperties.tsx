@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { Heart, Trash2 } from "lucide-react";
+import { Heart, Trash2, Trash } from "lucide-react";
 import Layout from "@/components/Layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
@@ -10,6 +10,17 @@ import { Button } from "@/components/ui/button";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useUser } from "@/contexts/UserContext";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface SavedProperty {
   id: string;
@@ -23,6 +34,7 @@ interface SavedProperty {
 const SavedProperties: React.FC = () => {
   const [savedProperties, setSavedProperties] = useState<SavedProperty[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
   const { toast } = useToast();
   const { user } = useUser();
 
@@ -138,6 +150,45 @@ const SavedProperties: React.FC = () => {
     }
   };
 
+  const removeAllProperties = async () => {
+    if (!user) return;
+    
+    try {
+      setIsDeletingAll(true);
+      
+      const { error } = await supabase
+        .from('saved_properties')
+        .delete()
+        .returns<any>();
+      
+      if (error) {
+        console.error("Error removing all properties:", error);
+        toast({
+          title: "Error removing properties",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      setSavedProperties([]);
+      
+      toast({
+        title: "Properties removed",
+        description: "All properties have been removed from your saved list."
+      });
+    } catch (err) {
+      console.error("Error in removeAllProperties:", err);
+      toast({
+        title: "Error removing properties",
+        description: "There was a problem removing your saved properties.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="container mx-auto py-10">
@@ -148,6 +199,43 @@ const SavedProperties: React.FC = () => {
               View and manage your favorite listings
             </p>
           </div>
+          
+          {savedProperties.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="flex items-center gap-2">
+                  <Trash className="h-4 w-4" />
+                  Delete All
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete all saved properties?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently remove all properties
+                    from your saved list.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={removeAllProperties}
+                    disabled={isDeletingAll}
+                    className="bg-red-500 hover:bg-red-600"
+                  >
+                    {isDeletingAll ? (
+                      <>
+                        <span className="mr-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        </span>
+                        Deleting...
+                      </>
+                    ) : "Delete All"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
 
         {isLoading ? (
