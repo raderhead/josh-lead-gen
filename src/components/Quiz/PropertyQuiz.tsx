@@ -30,9 +30,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [userType, setUserType] = useState<UserType>(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -41,17 +38,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const { user } = useUser();
   const navigate = useNavigate();
   
-  useEffect(() => {
-    if (user) {
-      setName(user.name || '');
-      setEmail(user.email || '');
-      if (user.phone) {
-        setPhone(user.phone);
-        console.log("Found phone in user.phone:", user.phone);
-      }
-    }
-  }, [user]);
-  
+  // Set user type based on first question answer
   useEffect(() => {
     if (answers[0] === 'Buy') {
       setUserType('buyer');
@@ -60,6 +47,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     }
   }, [answers[0]]);
 
+  // Calculate progress
   useEffect(() => {
     if (userType === null) {
       setProgress(0);
@@ -71,6 +59,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     }
   }, [currentQuestionIndex, userType]);
 
+  // Handle countdown and redirect after submission
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
     
@@ -164,7 +153,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   };
   
   const handleSubmit = async () => {
-    if (!user || !name || !email) {
+    if (!user) {
       toast({
         title: "Authentication Required",
         description: "Please login to submit your quiz.",
@@ -194,9 +183,9 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         .filter(Boolean);
       
       const formData = {
-        name,
-        email,
-        phone: phone || "",
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
         userType: answers[0] === 'Buy' ? 'Buyer' : 'Seller',
         formType: answers[0] === 'Buy' ? "Commercial Property Buyer Questionnaire" : "Commercial Property Seller Questionnaire",
         answers: formattedAnswers,
@@ -257,7 +246,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const canProceed = () => {
     const currentQuestion = getCurrentQuestion();
     if (!currentQuestion) {
-      return true; // We've removed the contact info screen, so this shouldn't happen
+      return false; 
     }
     
     if (currentQuestion.type === 'checkbox') {
@@ -285,7 +274,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                 <CheckCircle size={64} className="text-green-500" />
               </div>
               <CardTitle className={cn("text-3xl", mode === 'fullscreen' ? "text-white" : "")}>
-                Thank You, {name}!
+                Thank You, {user?.name || ""}!
               </CardTitle>
               <CardDescription className={cn("text-lg mt-2", mode === 'fullscreen' ? "text-white/80" : "")}>
                 Your preferences have been submitted. Our agent will contact you soon.
@@ -356,12 +345,12 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                   currentQuestion={getCurrentQuestion()}
                   answers={answers}
                   setAnswers={setAnswers}
-                  name={name}
-                  setName={setName}
-                  email={email}
-                  setEmail={setEmail}
-                  phone={phone}
-                  setPhone={setPhone}
+                  name={user?.name || ''}
+                  setName={() => {}}
+                  email={user?.email || ''}
+                  setEmail={() => {}}
+                  phone={user?.phone || ''}
+                  setPhone={() => {}}
                   handleNext={handleNext}
                   handleCheckboxChange={handleCheckboxChange}
                   handleRadioChange={handleRadioChange}
@@ -451,12 +440,12 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             currentQuestion={getCurrentQuestion()}
             answers={answers}
             setAnswers={setAnswers}
-            name={name}
-            setName={setName}
-            email={email}
-            setEmail={setEmail}
-            phone={phone}
-            setPhone={setPhone}
+            name={user?.name || ''}
+            setName={() => {}}
+            email={user?.email || ''}
+            setEmail={() => {}}
+            phone={user?.phone || ''}
+            setPhone={() => {}}
             handleNext={handleNext}
             handleCheckboxChange={handleCheckboxChange}
             handleRadioChange={handleRadioChange}
