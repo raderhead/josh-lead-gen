@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Mail, Phone, MapPin, Clock, BriefcaseBusiness } from 'lucide-react';
 import Layout from '@/components/Layout/Layout';
@@ -7,29 +6,30 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-
 const Contact: React.FC = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [message, setMessage] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     try {
       const response = await fetch('https://hooks.zapier.com/hooks/catch/123456/abcdef/', {
         method: 'POST',
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({
+          name,
+          email,
+          message
+        })
       });
-
       if (response.ok) {
         toast({
           title: "Message sent",
-          description: "We've received your message and will get back to you soon.",
+          description: "We've received your message and will get back to you soon."
         });
         setName('');
         setEmail('');
@@ -38,22 +38,20 @@ const Contact: React.FC = () => {
         toast({
           title: "Error",
           description: "There was a problem sending your message. Please try again.",
-          variant: "destructive",
+          variant: "destructive"
         });
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "There was a problem sending your message. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <Layout>
+  return <Layout>
       <div className="container mx-auto py-12 px-4 md:px-6">
         <h1 className="text-4xl font-bold text-center mb-12">Contact Us</h1>
         
@@ -65,39 +63,19 @@ const Contact: React.FC = () => {
                 <label htmlFor="name" className="block text-sm font-medium mb-1">
                   Name
                 </label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your name"
-                  required
-                />
+                <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" required />
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-1">
                   Email
                 </label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
-                  required
-                />
+                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Your email" required />
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium mb-1">
                   Message
                 </label>
-                <Textarea
-                  id="message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="How can we help you?"
-                  rows={5}
-                  required
-                />
+                <Textarea id="message" value={message} onChange={e => setMessage(e.target.value)} placeholder="How can we help you?" rows={5} required />
               </div>
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? 'Sending...' : 'Send Message'}
@@ -108,16 +86,6 @@ const Contact: React.FC = () => {
           <div>
             <h2 className="text-2xl font-semibold mb-6">Contact Information</h2>
             <div className="space-y-6">
-              <div className="flex items-center">
-                <Avatar className="h-16 w-16 mr-4">
-                  <AvatarImage src="/lovable-uploads/55deabfb-d38d-4cf3-ad88-d5e416c3ae39.png" alt="Josh Peterson" />
-                  <AvatarFallback>JP</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="text-lg font-medium">Josh Peterson</h3>
-                  <p className="text-gray-600">Principal Broker</p>
-                </div>
-              </div>
               <div className="flex items-start">
                 <Phone className="h-5 w-5 mr-3 mt-0.5" />
                 <div>
@@ -176,8 +144,6 @@ const Contact: React.FC = () => {
           </div>
         </div>
       </div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Contact;
