@@ -34,6 +34,7 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
   const [contactEmail, setContactEmail] = React.useState("");
   const [contactPhone, setContactPhone] = React.useState("");
   const [message, setMessage] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { user } = useUser();
   const { toast } = useToast();
 
@@ -46,7 +47,7 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
     }
   }, [user]);
 
-  const handleRequestShowing = () => {
+  const handleRequestShowing = async () => {
     if (!contactName || !contactEmail || !showingDate || !showingTime) {
       toast({
         title: "Missing information",
@@ -55,6 +56,8 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
       });
       return;
     }
+
+    setIsSubmitting(true);
 
     const showingRequest = {
       propertyId,
@@ -68,20 +71,59 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
       message: message
     };
 
-    const showingRequests = JSON.parse(
-      localStorage.getItem("showingRequests") || "[]"
-    );
-    localStorage.setItem("showingRequests", JSON.stringify([...showingRequests, showingRequest]));
+    try {
+      // Call the webhook with showing request data
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/42172b32-2eaf-48e9-a912-9229f59e21be";
+      
+      // Since it's a GET request, we'll encode the data in the URL
+      const queryParams = new URLSearchParams({
+        propertyId: showingRequest.propertyId,
+        propertyAddress: showingRequest.propertyAddress,
+        propertyPrice: showingRequest.propertyPrice.toString(),
+        date: showingRequest.date,
+        time: showingRequest.time,
+        name: showingRequest.name,
+        email: showingRequest.email,
+        phone: showingRequest.phone || '',
+        message: showingRequest.message || ''
+      }).toString();
+      
+      const response = await fetch(`${webhookUrl}?${queryParams}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      
+      // Store in local storage for backwards compatibility
+      const showingRequests = JSON.parse(
+        localStorage.getItem("showingRequests") || "[]"
+      );
+      localStorage.setItem("showingRequests", JSON.stringify([...showingRequests, showingRequest]));
 
-    toast({
-      title: "Showing request sent",
-      description: `An agent will contact you soon to confirm your showing on ${showingDate} at ${showingTime}.`,
-    });
+      toast({
+        title: "Showing request sent",
+        description: `An agent will contact you soon to confirm your showing on ${showingDate} at ${showingTime}.`,
+      });
 
-    onClose();
-    setShowingDate("");
-    setShowingTime("");
-    setMessage("");
+      onClose();
+      setShowingDate("");
+      setShowingTime("");
+      setMessage("");
+    } catch (error) {
+      console.error("Error sending showing request to webhook:", error);
+      toast({
+        title: "Error sending request",
+        description: "There was a problem submitting your showing request. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -175,8 +217,21 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleRequestShowing}>
-            Submit Request
+          <Button 
+            type="submit" 
+            onClick={handleRequestShowing}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="mr-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                </span>
+                Submitting...
+              </>
+            ) : (
+              "Submit Request"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

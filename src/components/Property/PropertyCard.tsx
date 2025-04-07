@@ -252,7 +252,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     }
   };
 
-  const onShowingRequest = (values: ShowingRequestFormValues) => {
+  const onShowingRequest = async (values: ShowingRequestFormValues) => {
     try {
       console.log("Showing request submitted with:", values);
       
@@ -267,6 +267,31 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         phone: values.phone || '',
         message: values.message || ''
       };
+
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/42172b32-2eaf-48e9-a912-9229f59e21be";
+      
+      const queryParams = new URLSearchParams({
+        propertyId: showingRequest.propertyId,
+        propertyAddress: showingRequest.propertyAddress,
+        propertyPrice: showingRequest.propertyPrice.toString(),
+        date: showingRequest.date,
+        time: showingRequest.time,
+        name: showingRequest.name,
+        email: showingRequest.email,
+        phone: showingRequest.phone || '',
+        message: showingRequest.message || ''
+      }).toString();
+      
+      const response = await fetch(`${webhookUrl}?${queryParams}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
       
       const showingRequests = JSON.parse(
         localStorage.getItem("showingRequests") || "[]"
@@ -431,7 +456,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                     <FormItem>
                       <FormLabel>Phone</FormLabel>
                       <FormControl>
-                        <Input type="tel" placeholder="(555) 123-4567" {...field} />
+                        <Input type="tel" placeholder="(555) 555-5555" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -493,7 +518,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
               />
               
               <DialogFooter>
-                <Button type="submit">Submit Request</Button>
+                <Button 
+                  type="submit"
+                  disabled={showingRequestForm.formState.isSubmitting}
+                >
+                  {showingRequestForm.formState.isSubmitting ? (
+                    <>
+                      <span className="mr-2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      </span>
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit Request"
+                  )}
+                </Button>
               </DialogFooter>
             </form>
           </Form>
