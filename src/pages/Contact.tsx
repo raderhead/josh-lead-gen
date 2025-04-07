@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const Contact: React.FC = () => {
   const { toast } = useToast();
@@ -107,6 +108,16 @@ const Contact: React.FC = () => {
           <div>
             <h2 className="text-2xl font-semibold mb-6">Contact Information</h2>
             <div className="space-y-6">
+              <div className="flex items-center">
+                <Avatar className="h-16 w-16 mr-4">
+                  <AvatarImage src="/lovable-uploads/55deabfb-d38d-4cf3-ad88-d5e416c3ae39.png" alt="Josh Peterson" />
+                  <AvatarFallback>JP</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-medium">Josh Peterson</h3>
+                  <p className="text-gray-600">Principal Broker</p>
+                </div>
+              </div>
               <div className="flex items-start">
                 <Phone className="h-5 w-5 mr-3 mt-0.5" />
                 <div>
