@@ -7,6 +7,7 @@ import TextQuestion from './QuestionTypes/TextQuestion';
 import SelectQuestion from './QuestionTypes/SelectQuestion';
 import CheckboxQuestion from './QuestionTypes/CheckboxQuestion';
 import RadioQuestion from './QuestionTypes/RadioQuestion';
+import ContactInfoForm from './ContactInfoForm';
 
 interface QuizContentProps {
   currentQuestion: QuizQuestion | undefined;
@@ -47,9 +48,18 @@ const QuizContent: React.FC<QuizContentProps> = ({
   isAuthenticated,
   showAuthDialog
 }) => {
-  // If there's no current question, show nothing (this shouldn't happen now)
+  // If there's no current question, show contact info form
   if (!currentQuestion) {
-    return null;
+    return (
+      <ContactInfoForm 
+        name={name}
+        setName={setName}
+        email={email}
+        setEmail={setEmail}
+        phone={phone}
+        setPhone={setPhone}
+      />
+    );
   }
 
   // Render appropriate input based on question type
