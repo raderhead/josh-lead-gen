@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
@@ -29,9 +30,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [userType, setUserType] = useState<UserType>(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -39,17 +37,6 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const [redirectCountdown, setRedirectCountdown] = useState(3);
   const { user } = useUser();
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (user) {
-      setName(user.name || '');
-      setEmail(user.email || '');
-      if (user.phone) {
-        setPhone(user.phone);
-        console.log("Found phone in user.phone:", user.phone);
-      }
-    }
-  }, [user]);
   
   useEffect(() => {
     if (answers[0] === 'Buy') {
@@ -101,7 +88,8 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
     if (currentQuestionIndex < filteredQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      setCurrentQuestionIndex(filteredQuestions.length);
+      // No more questions, move to submit directly
+      handleSubmit();
     }
   };
   
@@ -162,12 +150,8 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   };
   
   const handleSubmit = async () => {
-    if (!name || !email || !phone) {
-      toast({
-        title: "Missing Information",
-        description: "Please provide your name, email, and phone number.",
-        variant: "destructive"
-      });
+    if (!user) {
+      setShowAuthDialog(true);
       return;
     }
     
@@ -191,9 +175,9 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         .filter(Boolean);
       
       const formData = {
-        name,
-        email,
-        phone,
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
         userType: answers[0] === 'Buy' ? 'Buyer' : 'Seller',
         formType: answers[0] === 'Buy' ? "Commercial Property Buyer Questionnaire" : "Commercial Property Seller Questionnaire",
         answers: formattedAnswers,
@@ -254,7 +238,8 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   const canProceed = () => {
     const currentQuestion = getCurrentQuestion();
     if (!currentQuestion) {
-      return !!name && !!email && !!phone;
+      // We always have user information from the auth system, so we can proceed
+      return true;
     }
     
     if (currentQuestion.type === 'checkbox') {
@@ -265,8 +250,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
   };
   
   const filteredQuestions = getFilteredQuestions(userType);
-  const isLastQuestion = currentQuestionIndex === filteredQuestions.length;
-  const isContactInfoScreen = currentQuestionIndex >= filteredQuestions.length;
+  const isLastQuestion = currentQuestionIndex === filteredQuestions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
 
   if (isSubmitted) {
@@ -283,7 +267,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                 <CheckCircle size={64} className="text-green-500" />
               </div>
               <CardTitle className={cn("text-3xl", mode === 'fullscreen' ? "text-white" : "")}>
-                Thank You, {name}!
+                Thank You, {user?.name}!
               </CardTitle>
               <CardDescription className={cn("text-lg mt-2", mode === 'fullscreen' ? "text-white/80" : "")}>
                 Your preferences have been submitted. Our agent will contact you soon.
@@ -333,39 +317,27 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
               <div className="flex items-center gap-3 mb-2">
                 <MessageSquare size={28} className="text-estate-blue" />
                 <CardTitle className="text-3xl">
-                  {isContactInfoScreen 
-                    ? "Almost Done!" 
-                    : userType === null 
-                      ? "Commercial Property Questionnaire" 
-                      : userType === 'buyer' 
-                        ? "Buyer Questionnaire" 
-                        : "Seller Questionnaire"}
+                  {userType === null 
+                    ? "Commercial Property Questionnaire" 
+                    : userType === 'buyer' 
+                      ? "Buyer Questionnaire" 
+                      : "Seller Questionnaire"}
                 </CardTitle>
               </div>
               <CardDescription className="text-white/80 text-lg">
-                {isContactInfoScreen 
-                  ? "Please provide your contact information so our agent can get in touch with you." 
-                  : getCurrentQuestion()?.description || "Please help us understand your needs better."}
+                {getCurrentQuestion()?.description || "Please help us understand your needs better."}
               </CardDescription>
             </CardHeader>
             
             <CardContent className="pt-6">
               <div className="mb-8">
                 <h3 className="text-2xl font-semibold mb-6">
-                  {isContactInfoScreen 
-                    ? "Your Contact Information" 
-                    : getCurrentQuestion()?.question}
+                  {getCurrentQuestion()?.question}
                 </h3>
                 <QuizContent
                   currentQuestion={getCurrentQuestion()}
                   answers={answers}
                   setAnswers={setAnswers}
-                  name={name}
-                  setName={setName}
-                  email={email}
-                  setEmail={setEmail}
-                  phone={phone}
-                  setPhone={setPhone}
                   handleNext={handleNext}
                   handleCheckboxChange={handleCheckboxChange}
                   handleRadioChange={handleRadioChange}
@@ -390,7 +362,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                 </Button>
               )}
               
-              {isLastQuestion && (
+              {isLastQuestion ? (
                 <Button 
                   onClick={handleSubmit}
                   disabled={isSubmitting || !canProceed()}
@@ -404,6 +376,14 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                   ) : (
                     "Submit"
                   )}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  disabled={!canProceed()}
+                  className="bg-estate-blue hover:bg-estate-dark-blue"
+                >
+                  Next
                 </Button>
               )}
             </CardFooter>
@@ -424,39 +404,27 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         <div className="flex items-center gap-3 mb-2">
           <MessageSquare size={24} className="text-estate-blue" />
           <CardTitle>
-            {isContactInfoScreen 
-              ? "Almost Done!" 
-              : userType === null 
-                ? "Commercial Property Questionnaire" 
-                : userType === 'buyer' 
-                  ? "Buyer Questionnaire" 
-                  : "Seller Questionnaire"}
+            {userType === null 
+              ? "Commercial Property Questionnaire" 
+              : userType === 'buyer' 
+                ? "Buyer Questionnaire" 
+                : "Seller Questionnaire"}
           </CardTitle>
         </div>
         <CardDescription className="text-base">
-          {isContactInfoScreen 
-            ? "Please provide your contact information so our agent can get in touch with you." 
-            : getCurrentQuestion()?.description || "Please help us understand your needs better."}
+          {getCurrentQuestion()?.description || "Please help us understand your needs better."}
         </CardDescription>
       </CardHeader>
       
       <CardContent>
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-4">
-            {isContactInfoScreen 
-              ? "Your Contact Information" 
-              : getCurrentQuestion()?.question}
+            {getCurrentQuestion()?.question}
           </h3>
           <QuizContent
             currentQuestion={getCurrentQuestion()}
             answers={answers}
             setAnswers={setAnswers}
-            name={name}
-            setName={setName}
-            email={email}
-            setEmail={setEmail}
-            phone={phone}
-            setPhone={setPhone}
             handleNext={handleNext}
             handleCheckboxChange={handleCheckboxChange}
             handleRadioChange={handleRadioChange}

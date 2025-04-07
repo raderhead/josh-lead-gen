@@ -7,18 +7,11 @@ import TextQuestion from './QuestionTypes/TextQuestion';
 import SelectQuestion from './QuestionTypes/SelectQuestion';
 import CheckboxQuestion from './QuestionTypes/CheckboxQuestion';
 import RadioQuestion from './QuestionTypes/RadioQuestion';
-import ContactInfoForm from './ContactInfoForm';
 
 interface QuizContentProps {
   currentQuestion: QuizQuestion | undefined;
   answers: Record<number, any>;
   setAnswers: React.Dispatch<React.SetStateAction<Record<number, any>>>;
-  name: string;
-  setName: (name: string) => void;
-  email: string;
-  setEmail: (email: string) => void;
-  phone: string;
-  setPhone: (phone: string) => void;
   handleNext: () => void;
   handleCheckboxChange: (questionId: number, option: string) => void;
   handleRadioChange: (questionId: number, value: string) => void;
@@ -33,12 +26,6 @@ const QuizContent: React.FC<QuizContentProps> = ({
   currentQuestion,
   answers,
   setAnswers,
-  name,
-  setName,
-  email,
-  setEmail,
-  phone,
-  setPhone,
   handleNext,
   handleCheckboxChange,
   handleRadioChange,
@@ -48,18 +35,9 @@ const QuizContent: React.FC<QuizContentProps> = ({
   isAuthenticated,
   showAuthDialog
 }) => {
-  // If there's no current question, show contact info form
+  // If there's no current question, return null since we don't need the contact form anymore
   if (!currentQuestion) {
-    return (
-      <ContactInfoForm 
-        name={name}
-        setName={setName}
-        email={email}
-        setEmail={setEmail}
-        phone={phone}
-        setPhone={setPhone}
-      />
-    );
+    return null;
   }
 
   // Render appropriate input based on question type
