@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Mail, Phone, MapPin, Clock, BriefcaseBusiness } from 'lucide-react';
 import Layout from '@/components/Layout/Layout';
@@ -6,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 const Contact: React.FC = () => {
   const {
     toast
@@ -85,6 +88,16 @@ const Contact: React.FC = () => {
           
           <div>
             <h2 className="text-2xl font-semibold mb-6">Contact Information</h2>
+            <div className="flex items-center gap-4 mb-6">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src="/lovable-uploads/d576698c-3813-431e-a730-0ed88afff988.png" alt="Josh Wilson" />
+                <AvatarFallback>JW</AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="font-medium text-lg">Josh Wilson</h3>
+                <p className="text-gray-600">Lead Commercial Agent</p>
+              </div>
+            </div>
             <div className="space-y-6">
               <div className="flex items-start">
                 <Phone className="h-5 w-5 mr-3 mt-0.5" />
