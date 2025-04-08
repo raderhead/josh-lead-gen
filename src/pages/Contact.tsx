@@ -70,8 +70,15 @@ const Contact: React.FC = () => {
     try {
       const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/51f17603-ea6a-4b27-abfb-b0106d76b5db";
       
+      // Create query parameters with each field as a separate parameter
       const queryParams = new URLSearchParams();
-      queryParams.append('data', JSON.stringify(formData));
+      queryParams.append('name', formData.name);
+      queryParams.append('email', formData.email);
+      queryParams.append('phone', formData.phone);
+      queryParams.append('message', formData.message);
+      queryParams.append('preferredContactMethod', formData.preferredContactMethod);
+      queryParams.append('formType', formData.formType);
+      queryParams.append('timestamp', formData.timestamp);
       
       const response = await fetch(`${webhookUrl}?${queryParams.toString()}`, {
         method: 'GET',
@@ -145,17 +152,17 @@ const Contact: React.FC = () => {
     try {
       const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/42172b32-2eaf-48e9-a912-9229f59e21be";
       
-      const queryParams = new URLSearchParams({
-        propertyId: "general-showing",
-        propertyAddress: "Office Visit",
-        propertyPrice: "0",
-        date: showingDate,
-        time: showingTime,
-        name: user?.name || '',
-        email: user?.email || '',
-        phone: user?.phone || '',
-        message: showingMessage || ''
-      }).toString();
+      // Update to send parameters separately
+      const queryParams = new URLSearchParams();
+      queryParams.append('propertyId', "general-showing");
+      queryParams.append('propertyAddress', "Office Visit");
+      queryParams.append('propertyPrice', "0");
+      queryParams.append('date', showingDate);
+      queryParams.append('time', showingTime);
+      queryParams.append('name', user?.name || '');
+      queryParams.append('email', user?.email || '');
+      queryParams.append('phone', user?.phone || '');
+      queryParams.append('message', showingMessage || '');
       
       const response = await fetch(`${webhookUrl}?${queryParams}`, {
         method: 'GET',
