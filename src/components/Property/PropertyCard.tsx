@@ -490,7 +490,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                     <FormItem>
                       <FormLabel>Preferred Time*</FormLabel>
                       <FormControl>
-                        <Input type="time" {...field} />
+                        <Input 
+                          type="time" 
+                          {...field} 
+                          step="1800"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

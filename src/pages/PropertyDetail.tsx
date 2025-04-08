@@ -491,6 +491,7 @@ const PropertyDetail: React.FC = () => {
                           value={showingTime}
                           onChange={(e) => setShowingTime(e.target.value)}
                           className="w-full p-2 border rounded-md mt-1"
+                          step="1800"
                           required
                         />
                       </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -143,10 +142,8 @@ const Contact = () => {
     setIsShowingSubmitting(true);
     
     try {
-      // Call the webhook with showing request data
       const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/42172b32-2eaf-48e9-a912-9229f59e21be";
       
-      // Since it's a GET request, we'll encode the data in the URL
       const queryParams = new URLSearchParams({
         propertyId: "general-showing",
         propertyAddress: "Office Visit",
@@ -175,7 +172,6 @@ const Contact = () => {
         description: `An agent will contact you soon to confirm your showing on ${showingDate} at ${showingTime}.`,
       });
       
-      // Reset form and close sheet
       setShowingDate("");
       setShowingTime("");
       setShowingMessage("");
@@ -383,6 +379,7 @@ const Contact = () => {
                           value={showingTime}
                           onChange={(e) => setShowingTime(e.target.value)}
                           className="w-full p-2 border rounded-md mt-1"
+                          step="1800"
                           required
                         />
                       </div>
