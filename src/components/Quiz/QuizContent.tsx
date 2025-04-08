@@ -27,6 +27,7 @@ interface QuizContentProps {
   mode: QuizMode;
   isAuthenticated: boolean;
   showAuthDialog: () => void;
+  canProceed: () => boolean;
 }
 
 const QuizContent: React.FC<QuizContentProps> = ({
@@ -46,7 +47,8 @@ const QuizContent: React.FC<QuizContentProps> = ({
   isCheckboxSelected,
   mode,
   isAuthenticated,
-  showAuthDialog
+  showAuthDialog,
+  canProceed
 }) => {
   // If there's no current question, show contact info form
   if (!currentQuestion) {
@@ -95,6 +97,8 @@ const QuizContent: React.FC<QuizContentProps> = ({
           value={answers[currentQuestion.id] || []}
           onChange={(option) => handleCheckboxChange(currentQuestion.id, option)}
           isOptionSelected={isCheckboxSelected}
+          onNext={handleNext}
+          canProceed={canProceed()}
         />
       );
     

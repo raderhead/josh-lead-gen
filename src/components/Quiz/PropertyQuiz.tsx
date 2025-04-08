@@ -374,6 +374,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
                   mode={mode}
                   isAuthenticated={!!user}
                   showAuthDialog={() => setShowAuthDialog(true)}
+                  canProceed={canProceed}
                 />
               </div>
             </CardContent>
@@ -465,6 +466,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
             mode={mode}
             isAuthenticated={!!user}
             showAuthDialog={() => setShowAuthDialog(true)}
+            canProceed={canProceed}
           />
         </div>
         
