@@ -37,7 +37,7 @@ const formSchema = z.object({
   })
 });
 
-const Contact = () => {
+const Contact: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isShowingSubmitting, setIsShowingSubmitting] = useState(false);
   const [showingDate, setShowingDate] = useState("");
@@ -369,7 +369,7 @@ const Contact = () => {
                           required
                         />
                       </div>
-                      <div>
+                      <div className="col-span-2 md:col-span-1">
                         <label htmlFor="time" className="text-sm font-medium">
                           Preferred Time*
                         </label>
@@ -379,7 +379,6 @@ const Contact = () => {
                           value={showingTime}
                           onChange={(e) => setShowingTime(e.target.value)}
                           className="w-full p-2 border rounded-md mt-1"
-                          step="1800"
                           required
                         />
                       </div>

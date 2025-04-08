@@ -493,7 +493,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
                         <Input 
                           type="time" 
                           {...field} 
-                          step="1800"
                         />
                       </FormControl>
                       <FormMessage />
