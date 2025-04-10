@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Property } from '@/types/property';
 import PropertyCard from '../Property/PropertyCard';
@@ -221,11 +222,13 @@ const FeaturedListings = () => {
             <h2 className="text-3xl font-bold text-gray-900">Featured Listings</h2>
             <p className="mt-2 text-gray-600">Discover our handpicked properties in Abilene</p>
           </div>
-          <Link to="/properties" className="inline-block">
-            <Button variant="outline" className="flex items-center gap-1">
-              View All <ChevronRight size={16} />
-            </Button>
-          </Link>
+          <div>
+            <Link to="/properties">
+              <Button variant="outline" className="flex items-center gap-1">
+                View All <ChevronRight size={16} />
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {loading ? (
