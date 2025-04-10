@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -253,13 +252,23 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
     }
   };
 
+  const parseAddress = (property: Property) => {
+    const street = property.address.street || '';
+    const city = property.address.city || '';
+    
+    return { street, city };
+  };
+
   const onShowingRequest = async (values: ShowingRequestFormValues) => {
     try {
       console.log("Showing request submitted with:", values);
       
+      const { street, city } = parseAddress(property);
+
       const showingRequest = {
         propertyId: property.id,
-        propertyAddress: `${property.address.street}, ${property.address.city}`,
+        propertyStreet: street,
+        propertyCity: city,
         propertyPrice: property.price,
         date: values.date,
         time: values.time,
@@ -273,7 +282,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
       
       const queryParams = new URLSearchParams({
         propertyId: showingRequest.propertyId,
-        propertyAddress: showingRequest.propertyAddress,
+        propertyStreet: showingRequest.propertyStreet,
+        propertyCity: showingRequest.propertyCity,
         propertyPrice: showingRequest.propertyPrice.toString(),
         date: showingRequest.date,
         time: showingRequest.time,

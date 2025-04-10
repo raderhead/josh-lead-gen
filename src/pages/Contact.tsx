@@ -152,7 +152,8 @@ const Contact: React.FC = () => {
       
       const queryParams = new URLSearchParams();
       queryParams.append('propertyId', "general-showing");
-      queryParams.append('propertyAddress', "Office Visit");
+      queryParams.append('propertyStreet', "Office Visit");
+      queryParams.append('propertyCity', "Abilene");
       queryParams.append('propertyPrice', "0");
       queryParams.append('date', showingDate);
       queryParams.append('time', showingTime);

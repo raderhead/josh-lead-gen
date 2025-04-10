@@ -47,6 +47,19 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
     }
   }, [user]);
 
+  // Parse address into components
+  const parseAddress = (fullAddress: string) => {
+    // This is a simple parser - for a production app, consider a more robust solution
+    const parts = fullAddress.split(',');
+    const street = parts[0]?.trim() || '';
+    const cityParts = parts[1]?.trim().split(' ') || [];
+    
+    // Extract city name (everything before state)
+    const city = cityParts.length > 1 ? cityParts.slice(0, -1).join(' ') : cityParts[0] || '';
+    
+    return { street, city };
+  };
+
   const handleRequestShowing = async () => {
     if (!contactName || !contactEmail || !showingDate || !showingTime) {
       toast({
@@ -59,9 +72,13 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
 
     setIsSubmitting(true);
 
+    // Parse the address into street and city
+    const { street, city } = parseAddress(propertyAddress);
+
     const showingRequest = {
       propertyId,
-      propertyAddress,
+      propertyStreet: street,
+      propertyCity: city,
       propertyPrice,
       date: showingDate,
       time: showingTime,
@@ -78,7 +95,8 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
       // Since it's a GET request, we'll encode the data in the URL
       const queryParams = new URLSearchParams({
         propertyId: showingRequest.propertyId,
-        propertyAddress: showingRequest.propertyAddress,
+        propertyStreet: showingRequest.propertyStreet,
+        propertyCity: showingRequest.propertyCity,
         propertyPrice: showingRequest.propertyPrice.toString(),
         date: showingRequest.date,
         time: showingRequest.time,
