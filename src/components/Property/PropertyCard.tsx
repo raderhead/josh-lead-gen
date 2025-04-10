@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -371,12 +372,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             size="icon" 
             onClick={toggleFavorite}
             disabled={checkingFavoriteStatus}
-            className={`absolute top-2 right-2 ${isFavorite ? "bg-rose-500 hover:bg-rose-600" : "bg-white/80 hover:bg-white"} ${property.isFeatured ? "top-12" : "top-2"}`}
+            className={`absolute top-2 right-2 ${isFavorite ? "bg-rose-500 hover:bg-rose-600" : "bg-white/80 hover:bg-white dark:bg-slate-700 dark:hover:bg-slate-600"} ${property.isFeatured ? "top-12" : "top-2"}`}
           >
             {checkingFavoriteStatus ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             ) : (
-              <Heart className={isFavorite ? "fill-white" : ""} />
+              <Heart className={isFavorite ? "fill-white" : "dark:text-white"} />
             )}
           </Button>
         </div>
