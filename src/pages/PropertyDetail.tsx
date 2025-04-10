@@ -239,10 +239,11 @@ const PropertyDetail: React.FC = () => {
   };
 
   const parseAddress = (property: any) => {
-    const street = property.address.street || '';
+    // Extract address directly from property object
+    const address = property.address.street || '';
     const city = property.address.city || '';
     
-    return { street, city };
+    return { address, city };
   };
 
   const handleRequestShowing = async () => {
@@ -257,7 +258,7 @@ const PropertyDetail: React.FC = () => {
 
     setIsSubmitting(true);
 
-    const { street, city } = parseAddress(property!);
+    const { address, city } = parseAddress(property!);
 
     const showingRequest: ShowingRequest = {
       propertyId: property!.id,
@@ -274,7 +275,7 @@ const PropertyDetail: React.FC = () => {
       
       const queryParams = new URLSearchParams({
         propertyId: showingRequest.propertyId,
-        propertyStreet: street,
+        propertyStreet: address,
         propertyCity: city,
         propertyPrice: property!.price.toString(),
         date: showingRequest.date,

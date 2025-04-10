@@ -253,21 +253,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
   };
 
   const parseAddress = (property: Property) => {
-    const street = property.address.street || '';
+    const address = property.address.street || '';
     const city = property.address.city || '';
     
-    return { street, city };
+    return { address, city };
   };
 
   const onShowingRequest = async (values: ShowingRequestFormValues) => {
     try {
       console.log("Showing request submitted with:", values);
       
-      const { street, city } = parseAddress(property);
+      const { address, city } = parseAddress(property);
 
       const showingRequest = {
         propertyId: property.id,
-        propertyStreet: street,
+        propertyStreet: address,
         propertyCity: city,
         propertyPrice: property.price,
         date: values.date,

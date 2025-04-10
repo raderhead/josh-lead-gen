@@ -49,15 +49,40 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
 
   // Parse address into components
   const parseAddress = (fullAddress: string) => {
-    // This is a simple parser - for a production app, consider a more robust solution
-    const parts = fullAddress.split(',');
-    const street = parts[0]?.trim() || '';
-    const cityParts = parts[1]?.trim().split(' ') || [];
+    // More robust parsing to separate address from city
+    const commaIndex = fullAddress.indexOf(',');
     
-    // Extract city name (everything before state)
-    const city = cityParts.length > 1 ? cityParts.slice(0, -1).join(' ') : cityParts[0] || '';
+    // If there's no comma, assume the whole string is the address
+    if (commaIndex === -1) {
+      return { 
+        address: fullAddress.trim(), 
+        city: '' 
+      };
+    }
     
-    return { street, city };
+    // Extract address (everything before first comma)
+    const address = fullAddress.substring(0, commaIndex).trim();
+    
+    // Extract city (everything after the first comma)
+    const cityAndState = fullAddress.substring(commaIndex + 1).trim();
+    
+    // Extract just the city name (before any additional commas or the state)
+    const cityEndIndex = cityAndState.indexOf(',');
+    const spaceBeforeStateIndex = cityAndState.lastIndexOf(' ');
+    
+    let city;
+    if (cityEndIndex !== -1) {
+      // If there's another comma, take everything before it
+      city = cityAndState.substring(0, cityEndIndex).trim();
+    } else if (spaceBeforeStateIndex !== -1) {
+      // If there's no second comma but there's a space (likely before state)
+      city = cityAndState.substring(0, spaceBeforeStateIndex).trim();
+    } else {
+      // If there's no clear delimiter, use the whole string
+      city = cityAndState;
+    }
+    
+    return { address, city };
   };
 
   const handleRequestShowing = async () => {
@@ -72,12 +97,12 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
 
     setIsSubmitting(true);
 
-    // Parse the address into street and city
-    const { street, city } = parseAddress(propertyAddress);
+    // Parse the address into address and city
+    const { address, city } = parseAddress(propertyAddress);
 
     const showingRequest = {
       propertyId,
-      propertyStreet: street,
+      propertyStreet: address,
       propertyCity: city,
       propertyPrice,
       date: showingDate,

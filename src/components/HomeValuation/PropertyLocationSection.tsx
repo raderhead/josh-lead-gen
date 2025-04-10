@@ -28,7 +28,7 @@ const PropertyLocationSection = ({ control, onAddressSelect }: PropertyLocationS
         name="address"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Street Address</FormLabel>
+            <FormLabel>Address</FormLabel>
             <FormControl>
               <AddressAutocomplete 
                 onAddressSelect={onAddressSelect}
