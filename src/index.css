@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -27,7 +26,7 @@
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
@@ -128,6 +127,23 @@
   }
 }
 
+/* Animation for showing request buttons */
+@keyframes pulse-showing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 10px 5px rgba(37, 99, 235, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+.animate-pulse-showing {
+  animation: pulse-showing 2s infinite;
+}
+
 /* Slide in animation for the quiz */
 @keyframes slide-in-right {
   0% {
@@ -181,4 +197,17 @@
 
 .dark .text-estate-dark-blue {
   color: #7295c3 !important; /* Muted blue-gray for dark mode */
+}
+
+/* Hearts in dark mode */
+.dark .heart-icon {
+  color: white;
+}
+
+.dark .heart-container {
+  background-color: rgba(51, 65, 85, 0.9);  /* slate-700 with opacity */
+}
+
+.dark .heart-container:hover {
+  background-color: rgba(71, 85, 105, 0.95);  /* slate-600 with opacity */
 }

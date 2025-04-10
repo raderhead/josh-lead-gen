@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -70,7 +69,6 @@ const Contact: React.FC = () => {
     try {
       const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/51f17603-ea6a-4b27-abfb-b0106d76b5db";
       
-      // Create query parameters with each field as a separate parameter
       const queryParams = new URLSearchParams();
       queryParams.append('name', formData.name);
       queryParams.append('email', formData.email);
@@ -152,7 +150,6 @@ const Contact: React.FC = () => {
     try {
       const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/42172b32-2eaf-48e9-a912-9229f59e21be";
       
-      // Update to send parameters separately
       const queryParams = new URLSearchParams();
       queryParams.append('propertyId', "general-showing");
       queryParams.append('propertyAddress', "Office Visit");
@@ -350,7 +347,11 @@ const Contact: React.FC = () => {
               
               <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
-                  <Button className="w-full bg-estate-blue hover:bg-estate-dark-blue">
+                  <Button 
+                    className="w-full"
+                    variant="pulse"
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
                     Request Showing
                   </Button>
                 </SheetTrigger>

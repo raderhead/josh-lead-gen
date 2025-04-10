@@ -3,10 +3,11 @@ import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building } from 'lucide-react';
+import { Building, Calendar } from 'lucide-react';
 import { Control } from 'react-hook-form';
 import { z } from 'zod';
 import { formSchema } from './formSchema';
+import { Button } from '@/components/ui/button';
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -135,6 +136,18 @@ const PropertyDetailsSection = ({
           )}
         />
       )}
+      
+      <div className="mt-4 flex justify-end">
+        <Button
+          type="button"
+          variant="pulse"
+          className="gap-2"
+          onClick={() => window.location.href = "/contact"}
+        >
+          <Calendar className="h-4 w-4" />
+          Request Showing
+        </Button>
+      </div>
     </div>
   );
 };
