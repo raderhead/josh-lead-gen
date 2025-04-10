@@ -233,7 +233,7 @@ const FeaturedListings = () => {
             <p className="mt-2 text-gray-600">Discover our handpicked properties in Abilene</p>
           </div>
           <Link to="/properties">
-            <Button variant="outline" className="flex items-center gap-1">
+            <Button variant="outline" className="flex items-center gap-1 w-full">
               View All <ChevronRight size={16} />
             </Button>
           </Link>
