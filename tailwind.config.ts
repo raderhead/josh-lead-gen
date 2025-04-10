@@ -80,7 +80,7 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			boxShadow: {
-				'glow': '0 0 10px rgba(59, 130, 246, 0.5)',
+				'glow': '0 0 15px rgba(59, 130, 246, 0.5)',
 			},
 			keyframes: {
 				'accordion-down': {
@@ -114,13 +114,25 @@ export default {
 					'100%': {
 						opacity: '0'
 					}
+				},
+				'pulse-showing': {
+					'0%': {
+						boxShadow: '0 0 0 0 rgba(37, 99, 235, 0.7)'
+					},
+					'70%': {
+						boxShadow: '0 0 10px 5px rgba(37, 99, 235, 0.4)'
+					},
+					'100%': {
+						boxShadow: '0 0 0 0 rgba(37, 99, 235, 0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-				'fade-out': 'fade-out 0.3s ease-out'
+				'fade-out': 'fade-out 0.3s ease-out',
+				'pulse-showing': 'pulse-showing 2s infinite'
 			}
 		}
 	},

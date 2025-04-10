@@ -421,6 +421,15 @@ const PropertyDetail: React.FC = () => {
               )}
               
               <Dialog open={showingDialogOpen} onOpenChange={setShowingDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="pulse"
+                    className="gap-2"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Request Showing
+                  </Button>
+                </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>Request a Showing</DialogTitle>

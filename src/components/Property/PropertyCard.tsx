@@ -399,6 +399,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
             <p className="text-muted-foreground">
               {property.address.city} {property.address.state}, {property.address.zipCode} USA
             </p>
+
+            <div className="mt-4 flex justify-end">
+              <Button 
+                variant="pulse"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShowingRequest(e);
+                }}
+                className="gap-2"
+              >
+                <Calendar className="h-4 w-4" />
+                Request Showing
+              </Button>
+            </div>
           </div>
         </div>
       </div>

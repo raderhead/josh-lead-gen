@@ -128,6 +128,23 @@
   }
 }
 
+/* Animation for showing request buttons */
+@keyframes pulse-showing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 10px 5px rgba(37, 99, 235, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+.animate-pulse-showing {
+  animation: pulse-showing 2s infinite;
+}
+
 /* Slide in animation for the quiz */
 @keyframes slide-in-right {
   0% {
