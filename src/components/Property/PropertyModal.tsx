@@ -97,7 +97,7 @@ const PropertyModal: React.FC<PropertyModalProps> = ({ property, isOpen, onClose
                   <div className="mb-6 flex justify-between items-center">
                     <Button 
                       onClick={() => setShowingDialogOpen(true)}
-                      variant="pulse"
+                      variant="showing"
                       className="gap-2"
                     >
                       <Calendar size={16} />

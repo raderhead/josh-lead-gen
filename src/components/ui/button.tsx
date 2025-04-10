@@ -22,7 +22,6 @@ const buttonVariants = cva(
         estate: "bg-estate-blue text-white hover:bg-estate-dark-blue",
         showing: "bg-blue-600 hover:bg-blue-700 text-white",
         glow: "bg-estate-blue text-white relative overflow-hidden shadow-md hover:bg-estate-blue/90 hover:scale-[1.02] transition-all duration-300 before:absolute before:inset-0 before:bg-white before:opacity-0 before:blur-xl hover:before:opacity-20 hover:shadow-glow",
-        pulse: "bg-blue-600 text-white relative animate-pulse-showing shadow-glow hover:bg-blue-700 transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",

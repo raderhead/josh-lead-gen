@@ -30,6 +30,7 @@ const FeaturedListings = () => {
         setIsUpdating(true);
       }
       
+      // Fetch directly from Supabase properties table
       const { data, error: fetchError } = await supabase
         .from('properties')
         .select('*')
@@ -43,6 +44,7 @@ const FeaturedListings = () => {
       console.log('Properties from Supabase:', data);
       
       if (Array.isArray(data) && data.length > 0) {
+        // Transform the data to match our Property type
         const properties = data.map((item: any) => ({
           id: item.id || String(Math.random()),
           address: {
@@ -80,6 +82,7 @@ const FeaturedListings = () => {
         setFeaturedProperties(properties);
         setError(null);
       } else {
+        // If no data, try the webhook as a fallback
         const response = await fetch('https://xfmguaamogzirnnqktwz.supabase.co/functions/v1/receive-webhook');
         
         if (!response.ok) {
@@ -90,6 +93,7 @@ const FeaturedListings = () => {
         console.log('Webhook response:', webhookData);
         
         if (Array.isArray(webhookData) && webhookData.length > 0) {
+          // Process webhook data
           const properties = webhookData.map((item: any) => ({
             id: item.id || String(Math.random()),
             address: {
@@ -126,6 +130,7 @@ const FeaturedListings = () => {
           setFeaturedProperties(properties);
           setError(null);
         } else if (webhookData && webhookData.success) {
+          // If webhook returns success but no data
           setFeaturedProperties([]);
           setError('No properties found');
         } else {
@@ -136,6 +141,7 @@ const FeaturedListings = () => {
       console.error('Error fetching featured properties:', err);
       setError(err.message);
       
+      // Notify the user about the error only when initially loading
       if (showLoadingState) {
         toast({
           title: 'Error fetching properties',
@@ -153,6 +159,7 @@ const FeaturedListings = () => {
     try {
       setTestingWebhook(true);
       
+      // Test sample data to post to the webhook
       const testData = {
         id: "test-" + Date.now(),
         address: "123 Test Street",
@@ -170,6 +177,7 @@ const FeaturedListings = () => {
         listedDate: new Date().toISOString(),
       };
       
+      // Send test data to the webhook
       const response = await fetch('https://xfmguaamogzirnnqktwz.supabase.co/functions/v1/receive-webhook', {
         method: 'POST',
         headers: {
@@ -187,6 +195,7 @@ const FeaturedListings = () => {
         description: 'A test property has been sent to the webhook. Refreshing properties list...',
       });
       
+      // Fetch properties after successful test
       await fetchProperties();
       
     } catch (err: any) {
@@ -205,12 +214,13 @@ const FeaturedListings = () => {
   useEffect(() => {
     fetchProperties();
     
+    // Set up a polling interval to fetch new data periodically - increase to 5 minutes to reduce flickering
     const intervalId = setInterval(() => {
-      fetchProperties(false);
-    }, 300000);
+      fetchProperties(false); // Don't show loading state for periodic updates
+    }, 300000); // Poll every 5 minutes instead of 30 seconds
     
     return () => {
-      clearInterval(intervalId);
+      clearInterval(intervalId); // Clean up on component unmount
     };
   }, []);
 
@@ -222,13 +232,11 @@ const FeaturedListings = () => {
             <h2 className="text-3xl font-bold text-gray-900">Featured Listings</h2>
             <p className="mt-2 text-gray-600">Discover our handpicked properties in Abilene</p>
           </div>
-          <div>
-            <Link to="/properties">
-              <Button variant="outline" className="flex items-center gap-1">
-                View All <ChevronRight size={16} />
-              </Button>
-            </Link>
-          </div>
+          <Link to="/properties">
+            <Button variant="outline" className="flex items-center gap-1">
+              View All <ChevronRight size={16} />
+            </Button>
+          </Link>
         </div>
 
         {loading ? (
