@@ -1,19 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Mail, Phone, MapPin } from 'lucide-react';
-
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white pt-12 pb-8">
+  return <footer className="bg-gray-900 text-white pt-12 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Link to="/" className="flex items-center">
-              <img 
-                src="https://abilenecommercial.com/lovable-uploads/8e0f7a87-fcde-45bb-840a-20ba1452adde.png" 
-                alt="Abilene Commercial logo" 
-                className="h-8" 
-              />
-              <span className="ml-2 text-xl font-bold text-white">Abilene Commercial</span>
+              <img src="https://abilenecommercial.com/lovable-uploads/8e0f7a87-fcde-45bb-840a-20ba1452adde.png" alt="Abilene Commercial logo" className="h-8" />
+              <span className="ml-2 text-xl font-bold text-white">Texas Commercial</span>
             </Link>
             <p className="mt-4 text-gray-400">
               Your trusted partner in finding the perfect commercial property in Abilene and surrounding areas.
@@ -82,8 +76,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
