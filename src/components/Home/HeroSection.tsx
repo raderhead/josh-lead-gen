@@ -43,7 +43,7 @@ const HeroSection = () => {
       {/* Large heading at the top */}
       <div className="absolute top-32 w-full text-center">
         <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 px-4">
-          Commercial Property in Abilene
+          Your Gateway to Commercial Real Estate Success in Abilene
         </h1>
       </div>
       
