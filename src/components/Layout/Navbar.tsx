@@ -32,7 +32,7 @@ const Navbar = () => {
               <img 
                 src="https://s-static.cinccdn.com/images/header/UP65AA75D65FB844.png" 
                 alt="McCullar Properties logo" 
-                className="h-8" 
+                className="h-12" 
               />
             </a>
           </div>
