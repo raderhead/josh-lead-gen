@@ -344,7 +344,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
               </div>
               <CardDescription className="text-white/80 text-lg">
                 {isContactInfoScreen 
-                  ? "Please provide your contact information so our agent can get in touch with you." 
+                  ? "If your contact information is correct please click submit" 
                   : getCurrentQuestion()?.description || "Please help us understand your needs better."}
               </CardDescription>
             </CardHeader>
@@ -436,7 +436,7 @@ const PropertyQuiz: React.FC<PropertyQuizProps> = ({ mode = 'inline', onClose, c
         </div>
         <CardDescription className="text-base">
           {isContactInfoScreen 
-            ? "Please provide your contact information so our agent can get in touch with you." 
+            ? "If your contact information is correct please click submit" 
             : getCurrentQuestion()?.description || "Please help us understand your needs better."}
         </CardDescription>
       </CardHeader>
