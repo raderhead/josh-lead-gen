@@ -26,7 +26,7 @@ const AddressAutocomplete = ({
       placeholder={placeholder}
       defaultValue={defaultValue}
       onChange={handleInputChange}
-      className={className}
+      className={`text-gray-800 dark:text-white ${className || ''}`}
       autoComplete="off"
     />
   );

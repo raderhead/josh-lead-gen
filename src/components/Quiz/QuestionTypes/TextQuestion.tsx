@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { QuizQuestion } from '../types';
 
 interface TextQuestionProps {
@@ -15,15 +16,40 @@ interface TextQuestionProps {
 const TextQuestion: React.FC<TextQuestionProps> = ({ 
   question, value, onChange, onBlur, onAuthRequired, isAuthenticated 
 }) => {
+  const [inputValue, setInputValue] = useState(value || '');
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    onChange(newValue);
+  };
+  
+  const handleNext = () => {
+    if (inputValue.trim()) {
+      onBlur();
+    }
+  };
+
   return (
-    <Input
-      placeholder={question.placeholder}
-      value={value || ''}
-      onChange={(e) => onChange(e.target.value)}
-      className="text-lg py-6 px-5"
-      onBlur={onBlur}
-      onClick={() => !isAuthenticated && onAuthRequired()}
-    />
+    <div className="space-y-4">
+      <Input
+        placeholder={question.placeholder}
+        value={inputValue}
+        onChange={handleChange}
+        className="text-lg py-6 px-5 text-gray-800 dark:text-white"
+        onClick={() => !isAuthenticated && onAuthRequired()}
+      />
+      
+      <div className="flex justify-end">
+        <Button 
+          onClick={handleNext}
+          disabled={!inputValue.trim()}
+          className="bg-estate-blue hover:bg-estate-dark-blue text-white"
+        >
+          Next
+        </Button>
+      </div>
+    </div>
   );
 };
 

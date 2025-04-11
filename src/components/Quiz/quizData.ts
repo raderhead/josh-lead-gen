@@ -1,4 +1,3 @@
-
 import { QuizQuestion } from './types';
 
 export const initialQuestions: QuizQuestion[] = [
