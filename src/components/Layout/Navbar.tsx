@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Search, BarChart2, Phone } from 'lucide-react';
+import { Menu, X, Search, Phone } from 'lucide-react';
 import UserMenu from './UserMenu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useUser } from '@/contexts/UserContext';
@@ -41,7 +41,6 @@ const Navbar = () => {
             <div className="flex space-x-1">
               <Link to="/" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Home</Link>
               <Link to="/properties" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Properties</Link>
-              <Link to="/valuation" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Valuation</Link>
               <Link to="/contact" className="px-3 py-2 text-sm font-medium text-foreground hover:text-estate-blue">Contact</Link>
             </div>
             <div className="ml-4 flex items-center gap-2">
@@ -77,12 +76,6 @@ const Navbar = () => {
               <div className="flex items-center">
                 <Search className="h-5 w-5 mr-3" />
                 Properties
-              </div>
-            </Link>
-            <Link to="/valuation" className="block px-3 py-2 text-base font-medium text-foreground hover:text-estate-blue hover:bg-secondary" onClick={() => setIsOpen(false)}>
-              <div className="flex items-center">
-                <BarChart2 className="h-5 w-5 mr-3" />
-                Valuation
               </div>
             </Link>
             <Link to="/contact" className="block px-3 py-2 text-base font-medium text-foreground hover:text-estate-blue hover:bg-secondary" onClick={() => setIsOpen(false)}>

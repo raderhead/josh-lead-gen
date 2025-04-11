@@ -11,7 +11,6 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
-import HomeValuation from "./pages/HomeValuation";
 import Contact from "./pages/Contact";
 import SavedProperties from "./pages/SavedProperties";
 import EmailVerified from "./pages/EmailVerified";
@@ -36,7 +35,6 @@ const App = () => {
                   <Route path="/" element={<Index />} />
                   <Route path="/properties" element={<Properties />} />
                   <Route path="/property/:id" element={<PropertyDetail />} />
-                  <Route path="/valuation" element={<HomeValuation />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/saved-properties" element={<SavedProperties />} />
                   <Route path="/email-verified" element={<EmailVerified />} />
