@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -20,8 +21,20 @@ const Navbar = () => {
                 alt="Abilene Commercial logo" 
                 className="h-10" 
               />
-              <span className="ml-2 text-xl font-bold text-foreground">Texas Commercial</span>
             </Link>
+            <div className="h-8 mx-3 border-r border-border"></div>
+            <a 
+              href="https://mccullarproperties.com/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex-shrink-0 flex items-center"
+            >
+              <img 
+                src="https://s-static.cinccdn.com/images/header/UP65AA75D65FB844.png" 
+                alt="McCullar Properties logo" 
+                className="h-8" 
+              />
+            </a>
           </div>
           
           <div className="hidden md:flex items-center space-x-4">
