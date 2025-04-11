@@ -63,44 +63,45 @@ export const initialQuestions: QuizQuestion[] = [
   },
   {
     id: 8,
+    question: "What is the address of the commercial property you are selling?",
+    description: "Please provide the full address of your property",
+    type: 'text',
+    placeholder: "Enter property address",
+    forUserType: 'seller'
+  },
+  {
+    id: 9,
     question: "What type of commercial property are you selling?",
     type: 'radio',
     options: ['Office Space', 'Retail/Storefront', 'Industrial/Warehouse', 'Multi-family', 'Restaurant', 'Mixed-use', 'Land/Development', 'Other'],
     forUserType: 'seller'
   },
   {
-    id: 9,
+    id: 10,
     question: "What is the approximate square footage of your property?",
     type: 'select',
     options: ['Under 1,000 sq ft', '1,000 - 2,500 sq ft', '2,500 - 5,000 sq ft', '5,000 - 10,000 sq ft', '10,000 - 25,000 sq ft', 'Over 25,000 sq ft'],
     forUserType: 'seller'
   },
   {
-    id: 10,
+    id: 11,
     question: "How long have you owned the property?",
     type: 'radio',
     options: ['Less than 1 year', '1-5 years', '5-10 years', '10+ years'],
     forUserType: 'seller'
   },
   {
-    id: 11,
+    id: 12,
     question: "What is your reason for selling?",
     type: 'radio',
     options: ['Upgrading to larger space', 'Downsizing', 'Relocating', 'Investment strategy', 'Retirement', 'Financial reasons', 'Other'],
     forUserType: 'seller'
   },
   {
-    id: 12,
+    id: 13,
     question: "Is the property currently occupied?",
     type: 'radio',
     options: ['Yes, owner-occupied', 'Yes, tenant-occupied', 'No, vacant', 'Partially occupied'],
-    forUserType: 'seller'
-  },
-  {
-    id: 13,
-    question: "Have you had the property appraised recently?",
-    type: 'radio',
-    options: ['Yes, within the last 6 months', 'Yes, within the last year', 'Yes, more than a year ago', 'No'],
     forUserType: 'seller'
   },
   {
