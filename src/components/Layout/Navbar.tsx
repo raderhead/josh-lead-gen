@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Building, Search, BarChart2, Phone } from 'lucide-react';
+import { Menu, X, Search, BarChart2, Phone } from 'lucide-react';
 import UserMenu from './UserMenu';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useUser } from '@/contexts/UserContext';
@@ -16,9 +15,12 @@ const Navbar = () => {
         <div className="flex justify-between h-16 my-0">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <Building className="h-8 w-8 text-estate-blue" />
-              <span className="ml-2 text-xl font-bold text-foreground">Texas Commercial
-            </span>
+              <img 
+                src="https://abilenecommercial.com/lovable-uploads/8e0f7a87-fcde-45bb-840a-20ba1452adde.png" 
+                alt="Abilene Commercial logo" 
+                className="h-10" 
+              />
+              <span className="ml-2 text-xl font-bold text-foreground">Texas Commercial</span>
             </Link>
           </div>
           
@@ -50,7 +52,11 @@ const Navbar = () => {
           <div className="pt-2 pb-3 space-y-1">
             <Link to="/" className="block px-3 py-2 text-base font-medium text-foreground hover:text-estate-blue hover:bg-secondary" onClick={() => setIsOpen(false)}>
               <div className="flex items-center">
-                <Building className="h-5 w-5 mr-3" />
+                <img 
+                  src="https://abilenecommercial.com/lovable-uploads/8e0f7a87-fcde-45bb-840a-20ba1452adde.png" 
+                  alt="Abilene Commercial logo" 
+                  className="h-5 w-5 mr-3" 
+                />
                 Home
               </div>
             </Link>

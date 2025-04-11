@@ -1,6 +1,5 @@
-
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail, Phone, Building, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -9,7 +8,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Link to="/" className="flex items-center">
-              <Building className="h-8 w-8 text-estate-blue" />
+              <img 
+                src="https://abilenecommercial.com/lovable-uploads/8e0f7a87-fcde-45bb-840a-20ba1452adde.png" 
+                alt="Abilene Commercial logo" 
+                className="h-8" 
+              />
               <span className="ml-2 text-xl font-bold text-white">Abilene Commercial</span>
             </Link>
             <p className="mt-4 text-gray-400">
