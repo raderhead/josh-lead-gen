@@ -1,7 +1,7 @@
 
-import { useToast as useHookToast, toast } from "@/hooks/use-toast";
+import { useToast as useShadcnToast } from "@/components/ui/use-toast";
 
-// Export with an interface that includes the new variant
+// Export with an interface that includes the success variant
 export interface UseToastOptions {
   variant?: "default" | "destructive" | "success";
   title?: React.ReactNode;
@@ -10,7 +10,7 @@ export interface UseToastOptions {
 }
 
 export const useToast = () => {
-  const hookToast = useHookToast();
+  const hookToast = useShadcnToast();
   
   return {
     ...hookToast,
@@ -18,4 +18,5 @@ export const useToast = () => {
   };
 };
 
-export { toast };
+// Re-export the toast function from the shadcn implementation
+export { toast } from "@/components/ui/use-toast";

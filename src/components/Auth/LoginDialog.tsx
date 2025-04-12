@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import { useToast } from '@/hooks/use-toast'; // Added the missing import
 import {
   Dialog,
   DialogContent,
@@ -60,10 +61,13 @@ const LoginDialog: React.FC<LoginDialogProps> = ({
       form.reset();
       onOpenChange(false);
       
+      // Fixed the user_metadata handling with optional chaining and proper type checking
+      const userName = userData?.user?.user_metadata?.name || 'User';
+      
       // Use the success toast variant
       toast({
         variant: "success",
-        title: `Welcome, ${userData?.user_metadata?.name || 'User'}!`,
+        title: `Welcome, ${userName}!`,
       });
       
       if (onSuccess) onSuccess();
