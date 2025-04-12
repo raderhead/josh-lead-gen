@@ -10,13 +10,18 @@ export interface UseToastOptions {
 }
 
 export const useToast = () => {
-  const hookToast = useShadcnToast();
+  const { toast: innerToast, ...rest } = useShadcnToast();
   
   return {
-    ...hookToast,
-    toast: (options: UseToastOptions) => hookToast.toast(options),
+    ...rest,
+    toast: (options: UseToastOptions) => innerToast(options),
   };
 };
 
-// Re-export the toast function from the shadcn implementation
-export { toast } from "@/components/ui/use-toast";
+// Create a standalone toast function
+export const toast = (options: UseToastOptions) => {
+  // This is a wrapper that will be properly connected through the provider
+  const { useToast: innerUseToast } = require("@/components/ui/use-toast");
+  const { toast } = innerUseToast();
+  return toast(options);
+};
