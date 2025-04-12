@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, AlertCircle, Phone, UserPlus } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -43,6 +44,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({
   onSignInClick
 }) => {
   const { signup } = useUser();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -66,6 +68,14 @@ const SignupDialog: React.FC<SignupDialogProps> = ({
       console.log("Phone number from form:", values.phone);
       
       await signup(values.email, values.name, values.password, values.phone);
+      
+      // Show a simple green welcome toast with just the user's name
+      toast({
+        title: `Welcome, ${values.name}!`,
+        variant: 'default',
+        className: 'bg-green-500 border-green-600 text-white'
+      });
+      
       form.reset();
       onOpenChange(false);
     } catch (err: any) {
