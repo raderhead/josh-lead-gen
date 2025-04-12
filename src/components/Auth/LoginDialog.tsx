@@ -41,6 +41,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({
   const { login } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -55,9 +56,16 @@ const LoginDialog: React.FC<LoginDialogProps> = ({
     setError(null);
     
     try {
-      await login(values.email, values.password);
+      const userData = await login(values.email, values.password);
       form.reset();
       onOpenChange(false);
+      
+      // Use the success toast variant
+      toast({
+        variant: "success",
+        title: `Welcome, ${userData?.user_metadata?.name || 'User'}!`,
+      });
+      
       if (onSuccess) onSuccess();
     } catch (err: any) {
       console.error('Login error:', err);
