@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Mail, Phone, Calendar, MessageSquare, User, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from '@/contexts/UserContext';
+
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters."
@@ -27,6 +28,7 @@ const formSchema = z.object({
     required_error: "Please select a preferred contact method."
   })
 });
+
 const Contact: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const {
@@ -45,6 +47,7 @@ const Contact: React.FC = () => {
       preferredContactMethod: "either"
     }
   });
+
   useEffect(() => {
     if (user) {
       form.setValue('name', user.name || '');
@@ -52,6 +55,7 @@ const Contact: React.FC = () => {
       form.setValue('phone', user.phone || '');
     }
   }, [user, form]);
+
   async function sendToWebhook(formData: any) {
     try {
       const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook/51f17603-ea6a-4b27-abfb-b0106d76b5db";
@@ -79,6 +83,7 @@ const Contact: React.FC = () => {
       throw error;
     }
   }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true);
@@ -90,7 +95,6 @@ const Contact: React.FC = () => {
       console.log('Submitting contact form data:', formData);
       await sendToWebhook(formData);
 
-      // Get the human-readable preferred contact method for the toast message
       let contactMethodText = "";
       switch (values.preferredContactMethod) {
         case "email":
@@ -104,7 +108,6 @@ const Contact: React.FC = () => {
           break;
       }
 
-      // Show toast with preferred contact method
       toast({
         variant: "success",
         title: "Message Sent",
@@ -127,6 +130,7 @@ const Contact: React.FC = () => {
       setIsSubmitting(false);
     }
   }
+
   return <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
@@ -288,4 +292,5 @@ const Contact: React.FC = () => {
       </div>
     </Layout>;
 };
+
 export default Contact;

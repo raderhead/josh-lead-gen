@@ -1,4 +1,3 @@
-
 import { toast } from "@/hooks/use-toast";
 
 export interface PropertyDetails {
@@ -78,7 +77,7 @@ export const triggerValuationWebhook = async (propertyDetails: PropertyDetails) 
     console.log("Prepared webhook data:", webhookData);
     
     // Use the specific webhook URL provided
-    const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
+    const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook/1b0f7b13-ae37-436b-8aae-fb9ed0a07b32";
     
     // Make actual HTTP request to the webhook URL
     const response = await fetch(webhookUrl, {
