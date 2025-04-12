@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Mail, Phone, Calendar, MessageSquare, User, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from '@/contexts/UserContext';
-
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters."
@@ -29,12 +27,14 @@ const formSchema = z.object({
     required_error: "Please select a preferred contact method."
   })
 });
-
 const Contact: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useUser();
-  const { toast } = useToast();
-  
+  const {
+    user
+  } = useUser();
+  const {
+    toast
+  } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,7 +45,6 @@ const Contact: React.FC = () => {
       preferredContactMethod: "either"
     }
   });
-
   useEffect(() => {
     if (user) {
       form.setValue('name', user.name || '');
@@ -53,11 +52,9 @@ const Contact: React.FC = () => {
       form.setValue('phone', user.phone || '');
     }
   }, [user, form]);
-
   async function sendToWebhook(formData: any) {
     try {
       const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook/51f17603-ea6a-4b27-abfb-b0106d76b5db";
-      
       const queryParams = new URLSearchParams();
       queryParams.append('name', formData.name);
       queryParams.append('email', formData.email);
@@ -66,18 +63,15 @@ const Contact: React.FC = () => {
       queryParams.append('preferredContactMethod', formData.preferredContactMethod);
       queryParams.append('formType', formData.formType);
       queryParams.append('timestamp', formData.timestamp);
-      
       const response = await fetch(`${webhookUrl}?${queryParams.toString()}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-        },
+          'Content-Type': 'application/json'
+        }
       });
-      
       if (!response.ok) {
         throw new Error(`Webhook error: ${response.status}`);
       }
-      
       console.log('Webhook response:', await response.text());
       return true;
     } catch (error) {
@@ -85,24 +79,20 @@ const Contact: React.FC = () => {
       throw error;
     }
   }
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true);
-      
       const formData = {
         ...values,
         formType: "Contact Form",
         timestamp: new Date().toISOString()
       };
-      
       console.log('Submitting contact form data:', formData);
-      
       await sendToWebhook(formData);
-      
+
       // Get the human-readable preferred contact method for the toast message
       let contactMethodText = "";
-      switch(values.preferredContactMethod) {
+      switch (values.preferredContactMethod) {
         case "email":
           contactMethodText = "email";
           break;
@@ -113,16 +103,14 @@ const Contact: React.FC = () => {
           contactMethodText = "email or phone";
           break;
       }
-      
+
       // Show toast with preferred contact method
       toast({
         variant: "success",
         title: "Message Sent",
         description: `Thank you for contacting us. We'll get back to you soon via your preferred method (${contactMethodText}).`
       });
-      
       form.reset();
-      
       if (user) {
         form.setValue('name', user.name || '');
         form.setValue('email', user.email || '');
@@ -139,7 +127,6 @@ const Contact: React.FC = () => {
       setIsSubmitting(false);
     }
   }
-
   return <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-10">
@@ -233,19 +220,11 @@ const Contact: React.FC = () => {
                         <FormMessage />
                       </FormItem>} />
                   
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-estate-blue hover:bg-estate-dark-blue"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
+                  <Button type="submit" className="w-full bg-estate-blue hover:bg-estate-dark-blue" disabled={isSubmitting}>
+                    {isSubmitting ? <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Sending...
-                      </>
-                    ) : (
-                      'Send Message'
-                    )}
+                      </> : 'Send Message'}
                   </Button>
                 </form>
               </Form>
@@ -301,9 +280,7 @@ const Contact: React.FC = () => {
               </div>
               
               <div className="mt-6 p-4 bg-gray-50 rounded-md">
-                <p className="text-sm text-gray-500">
-                  Our office is located at 1234 Main Street, Suite 100, Abilene, TX 79601. Feel free to stop by during business hours!
-                </p>
+                <p className="text-sm text-gray-500">Our office is located at 1500 Industrial BLVD Suite 300 Abilene, Tx 79602. Feel free to stop by during business hours!</p>
               </div>
             </div>
           </div>
@@ -311,5 +288,4 @@ const Contact: React.FC = () => {
       </div>
     </Layout>;
 };
-
 export default Contact;
