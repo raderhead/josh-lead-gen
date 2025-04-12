@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +37,6 @@ const Signup = () => {
   } = useToast();
   const [showVerificationAlert, setShowVerificationAlert] = React.useState(false);
 
-  // Redirect if already logged in
   useEffect(() => {
     if (user && !isLoading) {
       navigate('/');
@@ -60,34 +58,26 @@ const Signup = () => {
     try {
       console.log("Signup form submitted with:", values);
 
-      // Log the phone number specifically to ensure it's passed correctly
       console.log("Phone number from form:", values.phone);
       console.log("Phone number type:", typeof values.phone);
 
-      // Just pass the phone number as-is - the formatting will be handled in UserContext
       await signup(values.email, values.name, values.password, values.phone);
       
-      // Show the verification alert with spam folder notice
       setShowVerificationAlert(true);
       
-      // Also show toast notification
       toast({
         title: 'Verification Required',
         description: 'Please check your email (including spam folder) for a verification link.',
         variant: 'default',
-        // Keep this as 'default' but we'll style it differently
-        className: 'bg-amber-50 border-amber-200 text-amber-800' // Add yellow styling
+        className: 'bg-amber-50 border-amber-200 text-amber-800'
       });
 
-      // Clear the form
       form.reset();
 
-      // Redirect to login page after a short delay
       setTimeout(() => {
         navigate('/login');
       }, 5000);
     } catch (error) {
-      // Error already handled in the signup function
       console.error('Signup error:', error);
     }
   };
