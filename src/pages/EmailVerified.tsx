@@ -1,10 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout/Layout';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Check } from 'lucide-react';
+import { Check, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const EmailVerified = () => {
@@ -82,6 +83,14 @@ const EmailVerified = () => {
               {error}
             </AlertDescription>
           </Alert>
+          
+          <Alert className="bg-amber-50 border-amber-300 mb-4">
+            <AlertTriangle className="h-4 w-4 text-amber-800" />
+            <AlertDescription className="text-amber-800">
+              If you're having trouble verifying your email, please check your spam/junk folder for the verification email and try again.
+            </AlertDescription>
+          </Alert>
+          
           <div className="flex justify-center mt-4">
             <Button 
               onClick={() => navigate('/login')} 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LogIn } from 'lucide-react';
+import { LogIn, AlertTriangle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useAuthDialog } from "@/contexts/AuthDialogContext";
 import {
@@ -12,6 +12,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface AuthDialogProps {
   open: boolean;
@@ -52,6 +53,13 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
           >
             Create an account
           </Button>
+          
+          <Alert className="bg-amber-50 border-amber-300">
+            <AlertTriangle className="h-4 w-4 text-amber-800" />
+            <AlertDescription className="text-amber-800">
+              After signing up, please check both your inbox and spam folder for the verification email.
+            </AlertDescription>
+          </Alert>
         </div>
         <DialogFooter className="sm:justify-start">
           <DialogClose asChild>

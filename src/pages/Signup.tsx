@@ -10,7 +10,8 @@ import Layout from '@/components/Layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { UserPlus, Phone } from 'lucide-react';
+import { UserPlus, Phone, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const formSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -35,6 +36,7 @@ const Signup = () => {
   const {
     toast
   } = useToast();
+  const [showVerificationAlert, setShowVerificationAlert] = React.useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -64,9 +66,14 @@ const Signup = () => {
 
       // Just pass the phone number as-is - the formatting will be handled in UserContext
       await signup(values.email, values.name, values.password, values.phone);
+      
+      // Show the verification alert with spam folder notice
+      setShowVerificationAlert(true);
+      
+      // Also show toast notification
       toast({
         title: 'Verification Required',
-        description: 'Please check your email for a verification link.',
+        description: 'Please check your email (including spam folder) for a verification link.',
         variant: 'default',
         // Keep this as 'default' but we'll style it differently
         className: 'bg-amber-50 border-amber-200 text-amber-800' // Add yellow styling
@@ -75,8 +82,10 @@ const Signup = () => {
       // Clear the form
       form.reset();
 
-      // Redirect to login page
-      navigate('/login');
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        navigate('/login');
+      }, 5000);
     } catch (error) {
       // Error already handled in the signup function
       console.error('Signup error:', error);
@@ -96,6 +105,16 @@ const Signup = () => {
 
   return <Layout>
       <div className="container max-w-md mx-auto py-10">
+        {showVerificationAlert && (
+          <Alert className="mb-6 bg-amber-50 border-amber-300">
+            <AlertTriangle className="h-4 w-4 text-amber-800" />
+            <AlertDescription className="text-amber-800">
+              <p className="font-medium">Please check your email for a verification link.</p>
+              <p>If you don't see it in your inbox, please check your spam/junk folder as verification emails sometimes end up there.</p>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="bg-card p-6 rounded-lg shadow-sm border">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
