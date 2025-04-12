@@ -7,7 +7,7 @@ export interface UseToastOptions {
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactNode;
-  className?: string; // Add className support
+  className?: string;
 }
 
 export const useToast = () => {

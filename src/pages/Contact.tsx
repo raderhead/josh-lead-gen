@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Mail, Phone, Calendar, MessageSquare, User, Loader2 } from 'lucide-react';
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useUser } from '@/contexts/UserContext';
 import {
   Sheet,
@@ -46,6 +46,7 @@ const Contact: React.FC = () => {
   const [showingMessage, setShowingMessage] = useState("");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { user } = useUser();
+  const { toast } = useToast();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -112,9 +113,25 @@ const Contact: React.FC = () => {
       
       await sendToWebhook(formData);
       
+      // Get the human-readable preferred contact method for the toast message
+      let contactMethodText = "";
+      switch(values.preferredContactMethod) {
+        case "email":
+          contactMethodText = "email";
+          break;
+        case "phone":
+          contactMethodText = "phone";
+          break;
+        case "either":
+          contactMethodText = "email or phone";
+          break;
+      }
+      
+      // Show toast with preferred contact method
       toast({
+        variant: "success",
         title: "Message Sent",
-        description: "Thank you for contacting us. We'll get back to you soon!"
+        description: `Thank you for contacting us. We'll get back to you soon via your preferred method (${contactMethodText}).`
       });
       
       form.reset();
