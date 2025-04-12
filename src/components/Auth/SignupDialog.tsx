@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({
 }) => {
   const { signup } = useUser();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -58,6 +60,11 @@ const SignupDialog: React.FC<SignupDialogProps> = ({
       confirmPassword: ''
     }
   });
+
+  const handleQuizClick = () => {
+    onOpenChange(false);
+    navigate('/property-quiz');
+  };
 
   const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
@@ -76,9 +83,12 @@ const SignupDialog: React.FC<SignupDialogProps> = ({
             <p>Please check your email (including spam folder) for a verification link.</p>
             <p className="mt-1">
               Feel free to browse our available commercial properties, send us a message, or{' '}
-              <Link to="/property-quiz" className="font-medium text-blue-700 underline-offset-4 hover:underline">
+              <button 
+                onClick={handleQuizClick}
+                className="font-medium text-blue-700 underline-offset-4 hover:underline bg-transparent border-none p-0 cursor-pointer"
+              >
                 take our Game Plan Quiz!
-              </Link>
+              </button>
             </p>
           </div>
         ),
