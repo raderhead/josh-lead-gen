@@ -21,7 +21,6 @@ export const useToast = () => {
 // Create a standalone toast function
 export const toast = (options: UseToastOptions) => {
   // This is a wrapper that will be properly connected through the provider
-  const { useToast: innerUseToast } = require("@/components/ui/use-toast");
-  const { toast } = innerUseToast();
+  const { toast } = useShadcnToast();
   return toast(options);
 };

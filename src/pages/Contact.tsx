@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -67,7 +68,7 @@ const Contact: React.FC = () => {
 
   async function sendToWebhook(formData: any) {
     try {
-      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/51f17603-ea6a-4b27-abfb-b0106d76b5db";
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook/51f17603-ea6a-4b27-abfb-b0106d76b5db";
       
       const queryParams = new URLSearchParams();
       queryParams.append('name', formData.name);
@@ -148,7 +149,7 @@ const Contact: React.FC = () => {
     setIsShowingSubmitting(true);
     
     try {
-      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/42172b32-2eaf-48e9-a912-9229f59e21be";
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook/42172b32-2eaf-48e9-a912-9229f59e21be";
       
       const queryParams = new URLSearchParams();
       queryParams.append('propertyId', "general-showing");

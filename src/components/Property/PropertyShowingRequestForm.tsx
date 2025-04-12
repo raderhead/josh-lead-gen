@@ -115,7 +115,7 @@ const PropertyShowingRequestForm: React.FC<PropertyShowingRequestFormProps> = ({
 
     try {
       // Call the webhook with showing request data
-      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/42172b32-2eaf-48e9-a912-9229f59e21be";
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook/42172b32-2eaf-48e9-a912-9229f59e21be";
       
       // Since it's a GET request, we'll encode the data in the URL
       const queryParams = new URLSearchParams({

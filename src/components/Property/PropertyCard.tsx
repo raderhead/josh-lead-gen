@@ -278,7 +278,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property }) => {
         message: values.message || ''
       };
 
-      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/42172b32-2eaf-48e9-a912-9229f59e21be";
+      const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook/42172b32-2eaf-48e9-a912-9229f59e21be";
       
       const queryParams = new URLSearchParams({
         propertyId: showingRequest.propertyId,
