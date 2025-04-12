@@ -1,3 +1,4 @@
+
 import { UserType, QuizQuestion } from './types';
 import { initialQuestions } from './quizData';
 
@@ -18,7 +19,7 @@ export interface WebhookError {
 
 export const sendToWebhook = async (formData: any): Promise<boolean | WebhookError> => {
   try {
-    const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook/d8f5b13a-ac80-4ae5-8247-27c574036746";
+    const webhookUrl = "https://n8n-1-yvtq.onrender.com/webhook-test/d8f5b13a-ac80-4ae5-8247-27c574036746";
     
     // Use fetch with a timeout to prevent hanging requests
     const controller = new AbortController();
