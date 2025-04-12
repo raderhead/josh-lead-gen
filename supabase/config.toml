@@ -35,6 +35,16 @@ enable_signup = true
 enable_signup = true
 double_confirm_changes = false
 enable_confirmations = false
+# Add custom email template settings
+template_create_user = """
+<h2>Welcome to Texas Commercial!</h2>
+<p>Thank you for signing up. Please confirm your email address by clicking the link below:</p>
+<p><a href="{{ .ConfirmationURL }}">Confirm Email Address</a></p>
+<p>If you didn't create this account, you can safely ignore this email.</p>
+<p>Best regards,<br>Texas Commercial Team</p>
+"""
+sender_name = "Texas Commercial"
+sender_email = "noreply@texascommercial.com"
 
 [auth.sms]
 enable_signup = false
@@ -50,3 +60,4 @@ import_map = "./import_map.json"
 
 [secrets]
 RESEND_API_KEY = "re_LA43rSah_QLAQfHspMYqGzf12vnxrcvRK"
+
