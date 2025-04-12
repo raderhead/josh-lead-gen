@@ -1,12 +1,13 @@
 
 import { useToast as useShadcnToast } from "@/components/ui/use-toast";
 
-// Export with an interface that includes the success variant
+// Export with an interface that includes the success variant and className
 export interface UseToastOptions {
   variant?: "default" | "destructive" | "success";
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactNode;
+  className?: string; // Add className support
 }
 
 export const useToast = () => {

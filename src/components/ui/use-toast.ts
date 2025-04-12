@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { type Toast as ToastPrimitive } from "@radix-ui/react-toast";
 
@@ -10,6 +11,8 @@ type ToasterToast = {
   description?: React.ReactNode;
   action?: React.ReactNode;
   variant?: "default" | "destructive" | "success";
+  open?: boolean; // Add open property
+  className?: string; // Add className support
 };
 
 const actionTypes = {
@@ -119,7 +122,7 @@ export const useToast = () => {
 
   React.useEffect(() => {
     state.toasts.forEach((toast) => {
-      if (!toast.open) {
+      if (toast.open === false) {
         setTimeout(() => {
           dispatch({
             type: "REMOVE_TOAST",
@@ -168,7 +171,7 @@ export const useToast = () => {
   };
 };
 
-export type ToastActionElement = React.ReactElement<typeof ToastPrimitive.Action>;
+export type ToastActionElement = React.ReactElement<any>;
 
 // Create a standalone toast function
 type ToastOptions = Omit<ToasterToast, "id">;

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
-import { useToast } from '@/hooks/use-toast'; // Added import
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -61,8 +61,8 @@ const LoginDialog: React.FC<LoginDialogProps> = ({
       form.reset();
       onOpenChange(false);
       
-      // Get the user's name with proper type checking and fallbacks
-      const userName = userData?.user_metadata?.name || userData?.user?.user_metadata?.name || 'User';
+      // Get the user's name with proper fallbacks
+      const userName = userData?.user?.user_metadata?.name || 'User';
       
       // Use the success toast variant
       toast({

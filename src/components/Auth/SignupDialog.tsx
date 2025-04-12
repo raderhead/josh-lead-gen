@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -72,8 +71,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({
       // Show a simple green welcome toast with just the user's name
       toast({
         title: `Welcome, ${values.name}!`,
-        variant: 'default',
-        className: 'bg-green-500 border-green-600 text-white'
+        variant: 'success'
       });
       
       form.reset();

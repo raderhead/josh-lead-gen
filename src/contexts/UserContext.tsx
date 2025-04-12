@@ -1,4 +1,3 @@
-
 // Make sure React is imported and available
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -88,6 +87,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           description: 'You have successfully logged in.',
         });
       }
+
+      return data;
     } catch (error: any) {
       console.error("Login error full:", error);
       toast({

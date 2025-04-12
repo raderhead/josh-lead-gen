@@ -57,7 +57,6 @@ const Signup = () => {
   const onSubmit = async (values: FormValues) => {
     try {
       console.log("Signup form submitted with:", values);
-
       console.log("Phone number from form:", values.phone);
       console.log("Phone number type:", typeof values.phone);
 
@@ -69,7 +68,6 @@ const Signup = () => {
         title: 'Verification Required',
         description: 'Please check your email (including spam folder) for a verification link.',
         variant: 'default',
-        className: 'bg-amber-50 border-amber-200 text-amber-800'
       });
 
       form.reset();
