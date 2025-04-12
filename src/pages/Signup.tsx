@@ -66,8 +66,18 @@ const Signup = () => {
       setShowVerificationAlert(true);
       
       toast({
-        title: 'Verification Required',
-        description: 'Please check your email (including spam folder) for a verification link.',
+        title: `Thanks for creating an account, ${values.name}!`,
+        description: (
+          <div className="space-y-1">
+            <p>Please check your email (including spam folder) for a verification link.</p>
+            <p className="mt-1">
+              Feel free to browse our available commercial properties, send us a message, or{' '}
+              <Link to="/property-quiz" className="font-medium text-blue-700 underline-offset-4 hover:underline">
+                take our Game Plan Quiz!
+              </Link>
+            </p>
+          </div>
+        ),
         variant: 'default',
         className: 'bg-amber-50 border-amber-200 text-amber-800'
       });

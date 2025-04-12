@@ -1,14 +1,15 @@
-
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, AlertCircle, Phone, UserPlus } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -43,6 +44,7 @@ const SignupDialog: React.FC<SignupDialogProps> = ({
   onSignInClick
 }) => {
   const { signup } = useUser();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -66,6 +68,24 @@ const SignupDialog: React.FC<SignupDialogProps> = ({
       console.log("Phone number from form:", values.phone);
       
       await signup(values.email, values.name, values.password, values.phone);
+      
+      toast({
+        title: `Thanks for creating an account, ${values.name}!`,
+        description: (
+          <div className="space-y-1">
+            <p>Please check your email (including spam folder) for a verification link.</p>
+            <p className="mt-1">
+              Feel free to browse our available commercial properties, send us a message, or{' '}
+              <Link to="/property-quiz" className="font-medium text-blue-700 underline-offset-4 hover:underline">
+                take our Game Plan Quiz!
+              </Link>
+            </p>
+          </div>
+        ),
+        variant: 'default',
+        className: 'bg-amber-50 border-amber-200 text-amber-800'
+      });
+      
       form.reset();
       onOpenChange(false);
     } catch (err: any) {
