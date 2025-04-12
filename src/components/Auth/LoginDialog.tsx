@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -62,6 +61,7 @@ const LoginDialog: React.FC<LoginDialogProps> = ({
       onOpenChange(false);
       
       // Get the user's name with proper fallbacks
+      // Check if userData exists before accessing nested properties
       const userName = userData?.user?.user_metadata?.name || 'User';
       
       // Use the success toast variant

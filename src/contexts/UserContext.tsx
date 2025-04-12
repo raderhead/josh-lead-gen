@@ -1,3 +1,4 @@
+
 // Make sure React is imported and available
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,10 +13,14 @@ export interface User {
   role: 'user' | 'agent' | 'admin';
 }
 
+// Update the return type of login to match what it actually returns
 interface UserContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{
+    user: SupabaseUser | null;
+    session: Session | null;
+  } | undefined>;
   signup: (email: string, name: string, password: string, phone?: string) => Promise<void>;
   logout: () => Promise<void>;
 }
